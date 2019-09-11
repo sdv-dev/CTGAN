@@ -8,7 +8,7 @@ flags.DEFINE_string("meta", "", "Filename of meta data.")
 flags.DEFINE_string("model_dir", "", "Path to save model.")
 flags.DEFINE_string("output", "", "Output filename.")
 flags.DEFINE_integer("max_epoch", 100, "Epoches to train.")
-flags.DEFINE_integer("sample", 1000, "Steps to train.")
+flags.DEFINE_integer("sample", 1000, "Number of rows to generate.")
 
 FLAGS = flags.FLAGS
 
