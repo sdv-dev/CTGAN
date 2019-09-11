@@ -12,7 +12,7 @@ CTGAN is a GAN-based data synthesizer that can generate synthetic tabular data w
 - Homepage: https://github.com/DAI-Lab/ctgan
 
 
-##Overview
+## Overview
 
 Based on previous work ([TGAN](https://github.com/DAI-Lab/tgan)) on synthetic data generation, we develop a new model called CTGAN. Several major differences make CTGAN outperform TGAN.
 
@@ -56,7 +56,6 @@ The data is a space (or tab) separated file. For example,
 ...        ...        ...
 ```
 
---
 
 Metafile describes each row as one line. `C` or `D` at the beginning of each line represent continuous column or discrete column respectively. For continuous column, the following two number indicates the range of the column. For discrete column, the following strings indicate all possible values in the column. For example,
 
