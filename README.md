@@ -94,10 +94,10 @@ If you use CTGAN, please cite the following work:
 - *Lei Xu, Maria Skoularidou, Alfredo Cuesta-Infante, Kalyan Veeramachaneni.* **Modeling Tabular data using Conditional GAN**. NeurIPS, 2019.
 
 ```LaTeX
-@article{xu2019modeling,
+@inproceedings{xu2019modeling,
   title={Modeling Tabular data using Conditional GAN},
   author={Xu, Lei and Skoularidou, Maria and Cuesta-Infante, Alfredo and Veeramachaneni, Kalyan},
-  journal={arXiv preprint arXiv:1907.00503},
+  booktitle={Advances in Neural Information Processing Systems},
   year={2019}
 }
 ```
