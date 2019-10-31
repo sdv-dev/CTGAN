@@ -31,7 +31,7 @@ Based on previous work ([TGAN](https://github.com/DAI-Lab/tgan)) on synthetic da
 ## Install
 ### Pip install
 ```
-> pip install pip install git+https://github.com/DAI-Lab/ctgan@master
+> pip install git+https://github.com/DAI-Lab/ctgan@master
 > python3 -m ctgan.cli [...]
 ```
 
