@@ -1,7 +1,7 @@
 import numpy as np
 
 from absl import app, flags
-from ctgan import CTGANSynthesizer
+from .ctgan_model import CTGANSynthesizer
 
 flags.DEFINE_string("data", "", "Filename of training data.")
 flags.DEFINE_string("meta", "", "Filename of meta data.")

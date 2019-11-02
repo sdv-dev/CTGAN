@@ -41,7 +41,7 @@ Make sure all the required libraries are installed.
 ```
 > git clone https://github.com/DAI-Lab/ctgan
 > cd ctgan
-> python3 ctgan/cli.py [...]
+> python3 -m ctgan.cli [...]
 ```
 
 ## Tutorial
@@ -85,6 +85,16 @@ flags:
   --sample: Number of rows to generate.
     (default: '1000')
     (an integer)
+```
+
+### Example
+It's easy to try our model using example datasets. 
+
+```
+git clone https://github.com/DAI-Lab/ctgan
+cd ctgan
+python3 -m ctgan.cli --data example/adult.dat --meta example/adult.meta
+
 ```
 
 ## Citing TGAN
