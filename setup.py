@@ -12,6 +12,12 @@ with open('HISTORY.md') as history_file:
     history = history_file.read()
 
 requirements = ['Click>=6.0',
+                'pytorch',
+                'torchvision',
+                'sklearn',
+                'numpy',
+                'pandas',
+                'absl-py'
 ]
 
 setup_requirements = [
