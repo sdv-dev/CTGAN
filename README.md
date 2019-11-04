@@ -57,7 +57,7 @@ The data is a space (or tab) separated file. For example,
 ```
 
 
-Metafile describes each row as one line. `C` or `D` at the beginning of each line represent continuous column or discrete column respectively. For continuous column, the following two number indicates the range of the column. For discrete column, the following strings indicate all possible values in the column. For example,
+Metafile describes each column as one line. `C` or `D` at the beginning of each line represent continuous column or discrete column respectively. For continuous column, the following two number indicates the range of the column. For discrete column, the following strings indicate all possible values in the column. For example,
 
 ```
 C    0    500
