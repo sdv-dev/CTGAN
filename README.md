@@ -93,7 +93,7 @@ It's easy to try our model using example datasets.
 ```
 git clone https://github.com/DAI-Lab/ctgan
 cd ctgan
-python3 -m ctgan.cli --data example/adult.dat --meta example/adult.meta
+python3 -m ctgan.cli --data examples/adult.dat --meta examples/adult.meta
 
 ```
 
