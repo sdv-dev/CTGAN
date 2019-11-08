@@ -68,7 +68,7 @@ In this short tutorial we will guide you through a series of steps that will hel
 getting started with **CTGAN**.
 
 
-### Data format
+## Data format
 
 The data is a space (or tab) separated file. For example,
 
@@ -89,7 +89,7 @@ D    A    B    C
 D    True     False
 ```
 
-### Run model
+## Run model
 
 ```
 USAGE:
@@ -111,7 +111,7 @@ flags:
     (an integer)
 ```
 
-### Example
+## Example
 
 It's easy to try our model using example datasets.
 
@@ -125,8 +125,7 @@ python3 -m ctgan.cli --data examples/adult.dat --meta examples/adult.meta
 ## What's next?
 
 For more details about **CTGAN** and all its possibilities
-and features, please check the [documentation site](
-https://DAI-Lab.github.io/CTGAN/).
+and features, please check the [documentation site](https://DAI-Lab.github.io/CTGAN/).
 
 
 # Citing TGAN
