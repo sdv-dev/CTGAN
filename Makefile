@@ -100,7 +100,7 @@ publish: dist ## package and upload a release
 
 .PHONY: bumpversion-release
 bumpversion-release: ## Merge master to stable and bumpversion release
-	git checkout stable
+	git checkout stable || git checkout -b stable
 	git merge --no-ff master -m"make release-tag: Merge branch 'master' into stable"
 	bumpversion release
 	git push --tags origin stable
