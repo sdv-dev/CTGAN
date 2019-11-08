@@ -38,8 +38,8 @@ and "help wanted" is open to whoever wants to implement it.
 Write Documentation
 ~~~~~~~~~~~~~~~~~~~
 
-ctgan could always use more documentation, whether as part of the
-official ctgan docs, in docstrings, or even on the web in blog posts,
+CTGAN could always use more documentation, whether as part of the
+official CTGAN docs, in docstrings, or even on the web in blog posts,
 articles, and such.
 
 Submit Feedback
@@ -57,18 +57,18 @@ If you are proposing a feature:
 Get Started!
 ------------
 
-Ready to contribute? Here's how to set up `ctgan` for local development.
+Ready to contribute? Here's how to set up `CTGAN` for local development.
 
-1. Fork the `ctgan` repo on GitHub.
+1. Fork the `CTGAN` repo on GitHub.
 2. Clone your fork locally::
 
-    $ git clone git@github.com:your_name_here/ctgan.git
+    $ git clone git@github.com:your_name_here/CTGAN.git
 
 3. Install your local copy into a virtualenv. Assuming you have virtualenvwrapper installed,
    this is how you set up your fork for local development::
 
-    $ mkvirtualenv ctgan
-    $ cd ctgan/
+    $ mkvirtualenv CTGAN
+    $ cd CTGAN/
     $ make install-develop
 
 4. Create a branch for local development::
@@ -201,6 +201,37 @@ Once this is done, run of the following commands:
 
     make release-major
 
-.. _GitHub issues page: https://github.com/DAI-Lab/ctgan/issues
-.. _Travis Build Status page: https://travis-ci.org/DAI-Lab/ctgan/pull_requests
+Release Candidates
+~~~~~~~~~~~~~~~~~~
+
+Sometimes it is necessary or convenient to upload a release candidate to PyPi as a pre-release,
+in order to make some of the new features available for testing on other projects before they
+are included in an actual full-blown release.
+
+In order to perform such an action, you can execute::
+
+    make release-candidate
+
+This will perform the following actions:
+
+1. Build and upload the current version to PyPi as a pre-release, with the format ``X.Y.Z.devN``
+
+2. Bump the current version to the next release candidate, ``X.Y.Z.dev(N+1)``
+
+After this is done, the new pre-release can be installed by including the ``dev`` section in the
+dependency specification, either in ``setup.py``::
+
+    install_requires = [
+        ...
+        'ctgan>=X.Y.Z.dev',
+        ...
+    ]
+
+or in command line::
+
+    pip install 'ctgan>=X.Y.Z.dev'
+
+
+.. _GitHub issues page: https://github.com/DAI-Lab/CTGAN/issues
+.. _Travis Build Status page: https://travis-ci.org/DAI-Lab/CTGAN/pull_requests
 .. _Google docstrings style: https://google.github.io/styleguide/pyguide.html?showone=Comments#Comments

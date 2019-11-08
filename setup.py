@@ -11,26 +11,25 @@ with open('README.md') as readme_file:
 with open('HISTORY.md') as history_file:
     history = history_file.read()
 
-requirements = ['Click>=6.0',
-                'torch',
-                'torchvision',
-                'sklearn',
-                'numpy',
-                'pandas',
-                'absl-py'
+install_requires = [
+    'torch>=1.0',
+    'torchvision',
+    'sklearn',
+    'numpy',
+    'pandas',
+    'absl-py'
 ]
 
-setup_requirements = [
+setup_requires = [
     'pytest-runner>=2.11.1',
 ]
 
-test_requirements = [
-    'coverage>=4.5.1',
+tests_require = [
     'pytest>=3.4.2',
-    'tox>=2.9.1',
+    'pytest-cov>=2.6.0',
 ]
 
-development_requirements = [
+development_requires = [
     # general
     'bumpversion>=0.5.3',
     'pip>=9.0.1',
@@ -40,18 +39,23 @@ development_requirements = [
     'm2r>=0.2.0',
     'Sphinx>=1.7.1',
     'sphinx_rtd_theme>=0.2.4',
+    'autodocsumm>=0.1.10',
 
     # style check
-    'flake8>=3.5.0',
+    'flake8>=3.7.7',
     'isort>=4.3.4',
 
     # fix style issues
-    'autoflake>=1.1',
-    'autopep8>=1.3.5',
+    'autoflake>=1.2',
+    'autopep8>=1.4.3',
 
     # distribute on PyPI
     'twine>=1.10.0',
     'wheel>=0.30.0',
+
+    # Advanced testing
+    'coverage>=4.5.1',
+    'tox>=2.9.1',
 ]
 
 setup(
@@ -63,35 +67,34 @@ setup(
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
     ],
-    description='CTGAN is a GAN-based data synthesizer that can generate synthetic tabular data with high fidelity. ',
+    description='Conditional GAN for Tabular Data',
     entry_points={
         'console_scripts': [
-            'ctgan=ctgan.cli:main',
+            'ctgan=ctgan.cli:main'
         ],
     },
     extras_require={
-        'test': test_requirements,
-        'dev': development_requirements + test_requirements,
+        'test': tests_require,
+        'dev': development_requires + tests_require,
     },
     install_package_data=True,
-    install_requires=requirements,
+    install_requires=install_requires,
     license='MIT license',
     long_description=readme + '\n\n' + history,
     long_description_content_type='text/markdown',
     include_package_data=True,
-    keywords='ctgan',
+    keywords='ctgan ctgan CTGAN',
     name='ctgan',
     packages=find_packages(include=['ctgan', 'ctgan.*']),
-    python_requires='>=3.4',
-    setup_requires=setup_requirements,
+    python_requires='>=3.5',
+    setup_requires=setup_requires,
     test_suite='tests',
-    tests_require=test_requirements,
-    url='https://github.com/DAI-Lab/ctgan',
-    version='0.1.0',
+    tests_require=tests_require,
+    url='https://github.com/DAI-Lab/CTGAN',
+    version='0.1.0.dev0',
     zip_safe=False,
 )

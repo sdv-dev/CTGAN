@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# ctgan documentation build configuration file, created by
+# CTGAN documentation build configuration file, created by
 # sphinx-quickstart on Fri Jun  9 13:47:02 2017.
 #
 # This file is execfile()d with the current directory set to its
@@ -17,13 +17,8 @@
 # directory, add these directories to sys.path here. If the directory is
 # relative to the documentation root, use os.path.abspath to make it
 # absolute, like shown here.
-#
-import os
-import sys
 
 import sphinx_rtd_theme # For read the docs theme
-
-sys.path.insert(0, os.path.abspath('..'))
 
 import ctgan
 
@@ -41,7 +36,12 @@ extensions = [
     'sphinx.ext.githubpages',
     'sphinx.ext.viewcode',
     'sphinx.ext.napoleon',
+    'autodocsumm',
 ]
+
+autodoc_default_options = {
+    'autosummary': True,
+}
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -54,9 +54,13 @@ source_suffix = ['.rst', '.md']
 master_doc = 'index'
 
 # General information about the project.
-project = u'ctgan'
-copyright = u'2019, Lei Xu'
-author = u'MIT Data To AI Lab'
+project = 'CTGAN'
+slug = 'ctgan'
+title = project + ' Documentation',
+copyright = '2019, MIT Data To AI Lab'
+author = 'MIT Data To AI Lab'
+description = 'Conditional GAN for Tabular Data'
+user = 'DAI-Lab'
 
 # The version info for the project you're documenting, acts as replacement
 # for |version| and |release|, also used in various other places throughout
@@ -77,14 +81,13 @@ language = None
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This patterns also effect to html_static_path and html_extra_path
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
+exclude_patterns = ['.py', '_build', 'Thumbs.db', '.DS_Store', '**.ipynb_checkpoints']
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
 # If true, `todo` and `todoList` produce output, else they produce nothing.
 todo_include_todos = False
-
 
 # -- Options for HTML output -------------------------------------------
 
@@ -97,8 +100,8 @@ html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 # Readthedocs additions
 html_context = {
     'display_github': True,
-    'github_user': 'DAI-Lab',
-    'github_repo': 'ctgan',
+    'github_user': user,
+    'github_repo': project,
     'github_version': 'master',
     'conf_py_path': '/docs/',
 }
@@ -114,13 +117,22 @@ html_theme_options = {
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+# html_static_path = ['_static']
 
+# The name of an image file (relative to this directory) to use as a favicon of
+# the docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
+# pixels large.
+html_favicon = 'images/dai-logo-white.ico'
+
+# If given, this must be the name of an image file (path relative to the
+# configuration directory) that is the logo of the docs. It is placed at
+# the top of the sidebar; its width should therefore not exceed 200 pixels.
+html_logo = 'images/dai-logo-white-200.png'
 
 # -- Options for HTMLHelp output ---------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'ctgandoc'
+htmlhelp_basename = slug + 'doc'
 
 
 # -- Options for LaTeX output ------------------------------------------
@@ -146,22 +158,26 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass
 # [howto, manual, or own class]).
-latex_documents = [
-    (master_doc, 'ctgan.tex',
-     u'ctgan Documentation',
-     u'Lei Xu', 'manual'),
-]
+latex_documents = [(
+    master_doc,
+    slug + '.tex',
+    title,
+    author,
+    'manual'
+)]
 
 
 # -- Options for manual page output ------------------------------------
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [
-    (master_doc, 'ctgan',
-     u'ctgan Documentation',
-     [author], 1)
-]
+man_pages = [(
+    master_doc,
+    slug,
+    title,
+    [author],
+    1
+)]
 
 
 # -- Options for Texinfo output ----------------------------------------
@@ -169,11 +185,12 @@ man_pages = [
 # Grouping the document tree into Texinfo files. List of tuples
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
-texinfo_documents = [
-    (master_doc, 'ctgan',
-     u'ctgan Documentation',
-     author,
-     'ctgan',
-     'One line description of project.',
-     'Miscellaneous'),
-]
+texinfo_documents = [(
+    master_doc,
+    slug,
+    title,
+    author,
+    slug,
+    description,
+    'Miscellaneous'
+)]

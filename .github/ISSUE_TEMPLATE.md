@@ -1,4 +1,4 @@
-* ctgan version:
+* CTGAN version:
 * Python version:
 * Operating System:
 
