@@ -39,7 +39,7 @@ install-test: clean-build clean-pyc ## install the package and test dependencies
 
 .PHONY: test
 test: ## run tests quickly with the default Python
-	python -m pytest
+	python -m pytest --basetemp=${ENVTMPDIR} --cov=ctgan
 
 .PHONY: lint
 lint: ## check style with flake8 and isort
@@ -52,7 +52,7 @@ install-develop: clean-build clean-pyc ## install the package in editable mode a
 
 .PHONY: test-all
 test-all: ## run tests on every Python version with tox
-	tox
+	tox -r
 
 .PHONY: fix-lint
 fix-lint: ## fix lint issues using autoflake, autopep8, and isort
@@ -73,7 +73,7 @@ coverage: ## check code coverage quickly with the default Python
 
 .PHONY: docs
 docs: clean-docs ## generate Sphinx HTML documentation, including API docs
-	sphinx-apidoc --module-first --separate -o docs/api/ ctgan
+	sphinx-apidoc --separate --no-toc -o docs/api/ ctgan
 	$(MAKE) -C docs html
 
 .PHONY: view-docs
@@ -120,20 +120,33 @@ bumpversion-minor: ## Bump the version the next minor skipping the release
 bumpversion-major: ## Bump the version the next major skipping the release
 	bumpversion --no-tag major
 
-CURRENT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD)
-CHANGELOG_LINES := $(shell git diff HEAD..stable HISTORY.md | wc -l)
+.PHONY: bumpversion-candidate
+bumpversion-candidate: ## Bump the version to the next candidate
+	bumpversion candidate --no-tag
 
-.PHONY: check-release
-check-release: ## Check if the release can be made
+CURRENT_BRANCH := $(shell git rev-parse --abbrev-ref HEAD 2>/dev/null)
+CHANGELOG_LINES := $(shell git diff HEAD..origin/stable HISTORY.md 2>&1 | wc -l)
+
+.PHONY: check-master
+check-master: ## Check if we are in master branch
 ifneq ($(CURRENT_BRANCH),master)
 	$(error Please make the release from master branch\n)
 endif
+
+.PHONY: check-history
+check-history: ## Check if HISTORY.md has been modified
 ifeq ($(CHANGELOG_LINES),0)
 	$(error Please insert the release notes in HISTORY.md before releasing)
 endif
 
+.PHONY: check-release
+check-release: check-master check-history ## Check if the release can be made
+
 .PHONY: release
 release: check-release bumpversion-release publish bumpversion-patch
+
+.PHONY: release-candidate
+release-candidate: check-master publish bumpversion-candidate
 
 .PHONY: release-minor
 release-minor: check-release bumpversion-minor release
