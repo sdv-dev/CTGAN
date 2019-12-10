@@ -96,7 +96,7 @@ For this example, we will be loading some data using the `ctgan.load_demo` funct
 ```python
 from ctgan import load_demo
 
-df = load_demo()
+data = load_demo()
 ```
 
 This will download a copy of the [Adult Census Dataset] as a dataframe:
