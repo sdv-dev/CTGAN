@@ -11,8 +11,8 @@ def _parse_args():
     parser = argparse.ArgumentParser(description='CTGAN Command Line Interface')
     parser.add_argument('-e', '--epochs', default=300, type=int,
                         help='Number of training epochs')
-    parser.add_argument('-c', '--csv', action='store_true',
-                        help='Load data in CSV format instead of tabular')
+    parser.add_argument('-t', '--tsv', action='store_true',
+                        help='Load data in TSV format instead of CSV')
     parser.add_argument('--no-header', dest='header', action='store_false',
                         help='The CSV file has no header. Discrete columns will be indices.')
 
@@ -32,7 +32,10 @@ def _parse_args():
 def main():
     args = _parse_args()
 
-    if args.csv:
+    if args.tsv:
+        data, metadata = read_data(args.data, args.metadata)
+        discrete_columns = metadata['discrete_columns']
+    else:
         if args.metadata:
             with open(args.metadata) as f:
                 metadata = json.load(f)
@@ -49,9 +52,6 @@ def main():
 
         header = 0 if args.header else None
         data = pd.read_csv(args.data, header='infer')
-    else:
-        data, metadata = read_data(args.data, args.metadata)
-        discrete_columns = metadata['discrete_columns']
 
     model = CTGANSynthesizer()
     model.fit(data, discrete_columns, args.epochs)
@@ -59,7 +59,7 @@ def main():
     num_samples = args.num_samples or len(data)
     sampled = model.sample(num_samples)
 
-    if args.csv:
-        sampled.to_csv(args.output, index=False)
-    else:
+    if args.tsv:
         write_data(sampled, metadata, args.output)
+    else:
+        sampled.to_csv(args.output, index=False)
