@@ -14,7 +14,7 @@ Implementation of our NeurIPS paper **Modeling Tabular data using Conditional GA
 
 CTGAN is a GAN-based data synthesizer that can generate synthetic tabular data with high fidelity.
 
-- Free software: [MIT license](https://github.com/DAI-Lab/CTGAN/tree/master/LICENSE.md)
+- Free software: [MIT license](https://github.com/DAI-Lab/CTGAN/tree/master/LICENSE)
 - Documentation: https://DAI-Lab.github.io/CTGAN
 - Homepage: https://github.com/DAI-Lab/CTGAN
 
