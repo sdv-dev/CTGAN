@@ -12,12 +12,11 @@ with open('HISTORY.md') as history_file:
     history = history_file.read()
 
 install_requires = [
-    'torch>=1.0',
-    'torchvision',
-    'sklearn',
-    'numpy',
-    'pandas',
-    'absl-py'
+    'torch<2,>=1.0',
+    'torchvision<1,>=0.4.2',
+    'sklearn<0.23,>=0.21',
+    'numpy<2,>=1.17.4',
+    'pandas<0.26,>=0.24',
 ]
 
 setup_requires = [
@@ -62,7 +61,7 @@ setup(
     author='MIT Data To AI Lab',
     author_email='dailabmit@gmail.com',
     classifiers=[
-        'Development Status :: 2 - Pre-Alpha',
+        'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: MIT License',
         'Natural Language :: English',
@@ -87,7 +86,7 @@ setup(
     long_description=readme + '\n\n' + history,
     long_description_content_type='text/markdown',
     include_package_data=True,
-    keywords='ctgan ctgan CTGAN',
+    keywords='ctgan CTGAN',
     name='ctgan',
     packages=find_packages(include=['ctgan', 'ctgan.*']),
     python_requires='>=3.5',
@@ -95,6 +94,6 @@ setup(
     test_suite='tests',
     tests_require=tests_require,
     url='https://github.com/DAI-Lab/CTGAN',
-    version='0.1.1.dev0',
+    version='0.2.0.dev0',
     zip_safe=False,
 )
