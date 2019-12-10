@@ -50,8 +50,8 @@ def main():
         else:
             discrete_columns = []
 
-        header = 0 if args.header else None
-        data = pd.read_csv(args.data, header='infer')
+        header = 'infer' if args.header else None
+        data = pd.read_csv(args.data, header=header)
 
     model = CTGANSynthesizer()
     model.fit(data, discrete_columns, args.epochs)
