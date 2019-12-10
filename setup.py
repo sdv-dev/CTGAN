@@ -74,7 +74,7 @@ setup(
     description='Conditional GAN for Tabular Data',
     entry_points={
         'console_scripts': [
-            'ctgan=ctgan.cli:main'
+            'ctgan=ctgan.__main__:main'
         ],
     },
     extras_require={
