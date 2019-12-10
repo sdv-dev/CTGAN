@@ -15,7 +15,6 @@ import pandas as pd
 from ctgan.synthesizer import CTGANSynthesizer
 
 
-
 def test_ctgan_dataframe():
     data = pd.DataFrame({
         'continuous': np.random.random(100),
