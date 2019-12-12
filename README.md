@@ -10,7 +10,7 @@
 
 # CTGAN
 
-Implementation of our NeurIPS paper **Modeling Tabular data using Conditional GAN**.
+Implementation of our NeurIPS paper [Modeling Tabular data using Conditional GAN](https://arxiv.org/abs/1907.00503).
 
 CTGAN is a GAN-based data synthesizer that can generate synthetic tabular data with high fidelity.
 
@@ -18,7 +18,7 @@ CTGAN is a GAN-based data synthesizer that can generate synthetic tabular data w
 - Documentation: https://DAI-Lab.github.io/CTGAN
 - Homepage: https://github.com/DAI-Lab/CTGAN
 
-# Overview
+## Overview
 
 Based on previous work ([TGAN](https://github.com/DAI-Lab/TGAN)) on synthetic data generation,
 we develop a new model called CTGAN. Several major differences make CTGAN outperform TGAN.
@@ -185,7 +185,7 @@ if you have a usage example that you would want to share with the community.
 https://DAI-Lab.github.io/CTGAN/contributing.html#get-started) for more details about how to do it.
 3. If you have any doubts, feature requests or detect an error, please [open an issue on github](
 https://github.com/DAI-Lab/CTGAN/issues)
-4. Also do not forget to check the [API Reference](https://DAI-Lab.github.io/CTGAN/api)!
+4. Also do not forget to check the [project documentation site](https://DAI-Lab.github.io/CTGAN/)!
 
 
 # Citing TGAN
