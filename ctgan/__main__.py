@@ -40,7 +40,11 @@ def main():
             with open(args.metadata) as f:
                 metadata = json.load(f)
 
-            discrete_columns = metadata['discrete_columns']
+            discrete_columns = [
+                column['name']
+                for column in metadata['columns']
+                if column['type'] != 'continuous'
+            ]
 
         elif args.discrete:
             discrete_columns = args.discrete.split(',')

@@ -57,7 +57,7 @@
             "type": "categorical"
         },
         {
-            "name": "label",
+            "name": "income",
             "type": "categorical"
         }
     ]
