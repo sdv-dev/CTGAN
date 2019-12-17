@@ -1,7 +1,35 @@
+import json
+
 import numpy as np
+import pandas as pd
 
 
-def read_data(data_filename, meta_filename):
+def read_csv(csv_filename, meta_filename=None, header=True, discrete=None):
+
+    data = pd.read_csv(csv_filename, header='infer' if header else None)
+
+    if meta_filename:
+        with open(meta_filename) as meta_file:
+            metadata = json.load(meta_file)
+
+        discrete_columns = [
+            column['name']
+            for column in metadata['columns']
+            if column['type'] != 'continuous'
+        ]
+
+    elif discrete:
+        discrete_columns = discrete.split(',')
+        if not header:
+            discrete_columns = [int(i) for i in discrete_columns]
+
+    else:
+        discrete_columns = []
+
+    return data, discrete_columns
+
+
+def read_tsv(data_filename, meta_filename):
     with open(meta_filename) as f:
         column_info = f.readlines()
 
@@ -45,10 +73,10 @@ def read_data(data_filename, meta_filename):
 
         data.append(row)
 
-    return np.asarray(data, dtype='float32'), meta
+    return np.asarray(data, dtype='float32'), meta['discrete_columns']
 
 
-def write_data(data, meta, output_filename):
+def write_tsv(data, meta, output_filename):
     with open(output_filename, "w") as f:
         for row in data:
             for idx, col in enumerate(row):

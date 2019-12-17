@@ -1,9 +1,6 @@
 import argparse
-import json
 
-import pandas as pd
-
-from ctgan.data import read_data, write_data
+from ctgan.data import read_csv, read_tsv, write_tsv
 from ctgan.synthesizer import CTGANSynthesizer
 
 
@@ -33,29 +30,9 @@ def main():
     args = _parse_args()
 
     if args.tsv:
-        data, metadata = read_data(args.data, args.metadata)
-        discrete_columns = metadata['discrete_columns']
+        data, discrete_columns = read_tsv(args.data, args.metadata)
     else:
-        if args.metadata:
-            with open(args.metadata) as f:
-                metadata = json.load(f)
-
-            discrete_columns = [
-                column['name']
-                for column in metadata['columns']
-                if column['type'] != 'continuous'
-            ]
-
-        elif args.discrete:
-            discrete_columns = args.discrete.split(',')
-            if not args.header:
-                discrete_columns = [int(i) for i in discrete_columns]
-
-        else:
-            discrete_columns = []
-
-        header = 'infer' if args.header else None
-        data = pd.read_csv(args.data, header=header)
+        data, discrete_columns = read_csv(args.data, args.metadata, args.header, args.discrete)
 
     model = CTGANSynthesizer()
     model.fit(data, discrete_columns, args.epochs)
@@ -64,6 +41,6 @@ def main():
     sampled = model.sample(num_samples)
 
     if args.tsv:
-        write_data(sampled, metadata, args.output)
+        write_tsv(sampled, args.metadata, args.output)
     else:
         sampled.to_csv(args.output, index=False)
