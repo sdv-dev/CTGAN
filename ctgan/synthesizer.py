@@ -10,7 +10,28 @@ from ctgan.transformer import DataTransformer
 
 
 class CTGANSynthesizer(object):
-    """docstring for IdentitySynthesizer."""
+    """Conditional Table GAN Synthesizer.
+
+    This is the core class of the CTGAN project, where the different components
+    are orchestrated together.
+
+    For more details about the process, please check the [Modeling Tabular data using
+    Conditional GAN](https://arxiv.org/abs/1907.00503) paper.
+
+    Args:
+        embedding_dim (int):
+            Size of the random sample passed to the Generator. Defaults to 128.
+        gen_dim (tuple or list of ints):
+            Size of the output samples for each one of the Residuals. A Resiudal Layer
+            will be created for each one of the values provided. Defaults to (256, 256).
+        dis_dim (tuple or list of ints):
+            Size of the output samples for each one of the Discriminator Layers. A Linear Layer
+            will be created for each one of the values provided. Defaults to (256, 256).
+        l2scale (float):
+            Wheight Decay for the Adam Optimizer. Defaults to 1e-6.
+        batch_size (int):
+            Number of data samples to process in each epoch.
+    """
 
     def __init__(self, embedding_dim=128, gen_dim=(256, 256), dis_dim=(256, 256),
                  l2scale=1e-6, batch_size=500):
@@ -75,6 +96,20 @@ class CTGANSynthesizer(object):
         return (loss * m).sum() / data.size()[0]
 
     def fit(self, train_data, discrete_columns=tuple(), epochs=300):
+        """Fit the CTGAN Synthesizer models to the training data.
+
+        Args:
+            train_data (numpy.ndarray or pandas.DataFrame):
+                Training Data. It must be a 2-dimensional numpy array or a
+                pandas.DataFrame.
+            discrete_columns (list-like):
+                List of discrete columns to be used to generate the Conditional
+                Vector. If ``train_data`` is a Numpy array, this list should
+                contain the integer indices of the columns. Otherwise, if it is
+                a ``pandas.DataFrame``, this list should contain the column names.
+            epochs (int):
+                Number of training epochs. Defaults to 300.
+        """
 
         self.transformer = DataTransformer()
         self.transformer.fit(train_data, discrete_columns)
@@ -183,6 +218,15 @@ class CTGANSynthesizer(object):
                   (i + 1, loss_g.detach().cpu(), loss_d.detach().cpu()))
 
     def sample(self, n):
+        """Sample data similar to the training data.
+
+        Args:
+            n (int):
+                Number of rows to sample.
+
+        Returns:
+            numpy.ndarray or pandas.DataFrame
+        """
 
         steps = n // self.batch_size + 1
         data = []
