@@ -3,15 +3,15 @@ Command Line Interface
 
 **CTGAN** comes with a command line interface that allows modeling and sampling data
 without the need to write any Python code. This is available under the ``ctgan`` command
-that will have been set up in your sistem upon installing **CTGAN**.
+that will have been set up in your system upon installing **CTGAN**.
 
 Working with CSV files
 ----------------------
 
-In the simples scenario, you ``ctgan`` can be used to read data from a CSV file, with headers,
+In the simplest scenario, ``ctgan`` can be used to read data from a CSV file, with headers,
 and using ``,`` as the separator.
 
-For this, you can call ``ctgan`` passin it only two arguments:
+For this, you can call ``ctgan`` passing it only two arguments:
 
 * The path to the input data file.
 * The path to the output file.
@@ -26,7 +26,7 @@ Optionally, if the CSV file contains no header, an additional ``--no-header`` op
 
    $ ctgan path/to/input.csv path/to/output.csv --no-header
 
-The command above will model the data from the input CSV file and produce a new CSV file with
+The commands above will model the data from the input CSV file and produce a new CSV file with
 synthetic data and as many rows as there were in the input table.
 
 
@@ -35,14 +35,14 @@ JSON Metadata
 
 The previous example will work for datasets that only contain continuous columns, but if the
 table that you are trying to model contains any discrete columns you will need to provide an
-additional Metadata file which specifies the continuous and discrete columns.
+additional Metadata file which specifies which columns are continuous and which ones are discrete.
 
 .. code-block:: bash
 
    $ ctgan path/to/input.csv path/to/output.csv -m path/to/metadata.json
 
 This Metadata file will be in JSON format, containing an entry called ``columns``, with a list
-of subdocuments containing both the ``name`` of the column and its ``type``::
+of sub-documents containing both the ``name`` of the column and its ``type``::
 
    {
        "columns": [
@@ -66,7 +66,7 @@ of subdocuments containing both the ``name`` of the column and its ``type``::
           ``ordinal`` or ``discrete`` for non-continuous columns.
 
 Alternatively, if there is no Metadata file, the list of discrete column names can be provided
-as a comma separated list,without white spaces, directly on the command line:
+as a comma separated list, without white spaces, directly on the command line:
 
 .. code-block:: bash
 
