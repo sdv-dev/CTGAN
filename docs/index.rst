@@ -7,6 +7,12 @@
    Overview <readme>
 
 .. toctree::
+   :caption: Advanced Usage
+   :maxdepth: 3
+
+   cli
+
+.. toctree::
    :caption: Resources
    :hidden:
 
