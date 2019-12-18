@@ -30,7 +30,7 @@ class CTGANSynthesizer(object):
         l2scale (float):
             Wheight Decay for the Adam Optimizer. Defaults to 1e-6.
         batch_size (int):
-            Number of data samples to process in each epoch.
+            Number of data samples to process in each step.
     """
 
     def __init__(self, embedding_dim=128, gen_dim=(256, 256), dis_dim=(256, 256),
