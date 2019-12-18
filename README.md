@@ -5,26 +5,32 @@
 
 [![PyPI Shield](https://img.shields.io/pypi/v/ctgan.svg)](https://pypi.python.org/pypi/ctgan)
 [![Travis CI Shield](https://travis-ci.org/DAI-Lab/CTGAN.svg?branch=master)](https://travis-ci.org/DAI-Lab/CTGAN)
-
-<!--[![Downloads](https://pepy.tech/badge/ctgan)](https://pepy.tech/project/ctgan)-->
+[![Downloads](https://pepy.tech/badge/ctgan)](https://pepy.tech/project/ctgan)
+[![Coverage Status](https://codecov.io/gh/DAI-Lab/CTGAN/branch/master/graph/badge.svg)](https://codecov.io/gh/DAI-Lab/CTGAN)
 
 # CTGAN
 
-Implementation of our NeurIPS paper **Modeling Tabular data using Conditional GAN**.
+Implementation of our NeurIPS paper [Modeling Tabular data using Conditional GAN](https://arxiv.org/abs/1907.00503).
 
 CTGAN is a GAN-based data synthesizer that can generate synthetic tabular data with high fidelity.
 
-- Free software: MIT license
+- Free software: [MIT license](https://github.com/DAI-Lab/CTGAN/tree/master/LICENSE)
 - Documentation: https://DAI-Lab.github.io/CTGAN
 - Homepage: https://github.com/DAI-Lab/CTGAN
 
-# Overview
+## Overview
 
-Based on previous work ([TGAN](https://github.com/DAI-Lab/tgan)) on synthetic data generation, we develop a new model called CTGAN. Several major differences make CTGAN outperform TGAN.
+Based on previous work ([TGAN](https://github.com/DAI-Lab/TGAN)) on synthetic data generation,
+we develop a new model called CTGAN. Several major differences make CTGAN outperform TGAN.
 
-- **Preprocessing**: CTGAN uses more sophisticated Variational Gaussian Mixture Model to detect modes of continuous columns.
-- **Network structure**: TGAN uses LSTM to generate synthetic data column by column. CTGAN uses Fully-connected networks which is more efficient.
-- **Features to prevent mode collapse**: We design a conditional generator and resample the training data to prevent model collapse on discrete columns. We use WGANGP and PacGAN to stabilize the training of GAN.
+- **Preprocessing**: CTGAN uses more sophisticated Variational Gaussian Mixture Model to detect
+  modes of continuous columns.
+- **Network structure**: TGAN uses LSTM to generate synthetic data column by column. CTGAN uses
+  Fully-connected networks which is more efficient.
+- **Features to prevent mode collapse**: We design a conditional generator and resample the
+  training data to prevent model collapse on discrete columns. We use WGANGP and PacGAN to
+  stabilize the training of GAN.
+
 
 # Install
 
@@ -42,90 +48,144 @@ pip install ctgan
 
 This will pull and install the latest stable release from [PyPI](https://pypi.org/).
 
-## Install from source
+If you want to install from source or contribute to the project please read the
+[Contributing Guide](https://DAI-Lab.github.io/CTGAN/contributing.html#get-started).
 
-Alternatively, you can clone the repository and install it from
-source by running `make install` on the `stable` branch:
+# Data Format
 
-```bash
-git clone git@github.com:DAI-Lab/CTGAN.git
-cd CTGAN
-git checkout stable
-make install
-```
+**CTGAN** expects the input data to be a table given as either a `numpy.ndarray` or a
+`pandas.DataFrame` object with two types of columns:
 
-## Install for Development
+* **Continuous Columns**: Columns that contain numerical values and which can take any value.
+* **Discrete columns**: Columns that only contain a finite number of possible values, wether
+these are string values or not.
 
-If you want to contribute to the project, a few more steps are required to make the project ready
-for development.
+This is an example of a table with 4 columns:
 
-Please head to the [Contributing Guide](https://DAI-Lab.github.io/CTGAN/contributing.html#get-started)
-for more details about this process.
+* A continuous column with float values
+* A continuous column with integer values
+* A discrete column with string values
+* A discrete column with integer values
 
-# Quickstart
+|   | A    | B   | C   | D |
+|---|------|-----|-----|---|
+| 0 | 0.1  | 100 | 'a' | 1 |
+| 1 | -1.3 | 28  | 'b' | 2 |
+| 2 | 0.3  | 14  | 'a' | 2 |
+| 3 | 1.4  | 87  | 'a' | 3 |
+| 4 | -0.1 | 69  | 'b' | 2 |
+
+
+**NOTE**: CTGAN does not distinguish between float and integer columns, which means that it will
+sample float values in all cases. If integer values are required, the outputted float values
+must be rounded to integers in a later step, outside of CTGAN.
+
+# Python Quickstart
 
 In this short tutorial we will guide you through a series of steps that will help you
 getting started with **CTGAN**.
 
+## 1. Model the data
 
-## Data format
+### Step 1: Prepare your data
 
-The data is a space (or tab) separated file. For example,
+Before being able to use CTGAN you will need to prepare your data as specified above.
 
-```
-100        A        True
-200        B        False
-105        A        True
-120        C        False
-...        ...        ...
-```
+For this example, we will be loading some data using the `ctgan.load_demo` function.
 
+```python
+from ctgan import load_demo
 
-Metafile describes each column as one line. `C` or `D` at the beginning of each line represent continuous column or discrete column respectively. For continuous column, the following two number indicates the range of the column. For discrete column, the following strings indicate all possible values in the column. For example,
-
-```
-C    0    500
-D    A    B    C
-D    True     False
+data = load_demo()
 ```
 
-## Run model
+This will download a copy of the [Adult Census Dataset](https://archive.ics.uci.edu/ml/datasets/adult) as a dataframe:
 
+|   age | workclass        |   fnlwgt | ... |   hours-per-week | native-country   | income   |
+|-------|------------------|----------|-----|------------------|------------------|----------|
+|    39 | State-gov        |    77516 | ... |               40 | United-States    | <=50K    |
+|    50 | Self-emp-not-inc |    83311 | ... |               13 | United-States    | <=50K    |
+|    38 | Private          |   215646 | ... |               40 | United-States    | <=50K    |
+|    53 | Private          |   234721 | ... |               40 | United-States    | <=50K    |
+|    28 | Private          |   338409 | ... |               40 | Cuba             | <=50K    |
+|   ... | ...              |      ... | ... |              ... | ...              | ...      |
+
+
+Aside from the table itself, you will need to create a list with the names of the discrete
+variables.
+
+For this example:
+
+```python
+discrete_columns = [
+    'workclass',
+    'education',
+    'marital-status',
+    'occupation',
+    'relationship',
+    'race',
+    'sex',
+    'native-country',
+    'income'
+]
 ```
-USAGE:
-    python3 ctgan/cli.py [flags]
-flags:
-  --data: Filename of training data.
-    (default: '')
-  --max_epoch: Epoches to train.
-    (default: '100')
-    (an integer)
-  --meta: Filename of meta data.
-    (default: '')
-  --model_dir: Path to save model.
-    (default: '')
-  --output: Output filename.
-    (default: '')
-  --sample: Number of rows to generate.
-    (default: '1000')
-    (an integer)
+
+### Step 2: Fit CTGAN to your data
+
+Once you have the data ready, you need to import and create an instance of the `CTGANSynthesizer`
+class and fit it passing your data and the list of discrete columns.
+
+```python
+from ctgan import CTGANSynthesizer
+
+ctgan = CTGANSynthesizer()
+ctgan.fit(data, discrete_columns)
 ```
 
-## Example
+This process is likely to take a long time to run.
+If you want to make the process shorter, or longer, you can control the number of training epochs
+that the model will be performing by adding it to the `fit` call:
 
-It's easy to try our model using example datasets.
-
-```
-git clone https://github.com/DAI-Lab/ctgan
-cd ctgan
-python3 -m ctgan.cli --data examples/adult.dat --meta examples/adult.meta
+```python
+ctgan.fit(data, discrete_columns, epochs=5)
 ```
 
+## 2. Generate synthetic data
 
-## What's next?
+Once the process has finished, all you need to do is call the `sample` method of your
+`CTGANSynthesizer` instance indicating the number of rows that you want to generate.
 
-For more details about **CTGAN** and all its possibilities
-and features, please check the [documentation site](https://DAI-Lab.github.io/CTGAN/).
+```python
+samples = ctgan.sample(1000)
+```
+
+The output will be a table with the exact same format as the input and filled with the synthetic
+data generated by the model.
+
+|     age | workclass    |    fnlwgt | ... |   hours-per-week | native-country   | income   |
+|---------|--------------|-----------|-----|------------------|------------------|----------|
+| 26.3191 | Private      | 124079    | ... |          40.1557 | United-States    | <=50K    |
+| 39.8558 | Private      | 133996    | ... |          40.2507 | United-States    | <=50K    |
+| 38.2477 | Self-emp-inc | 135955    | ... |          40.1124 | Ecuador          | <=50K    |
+| 29.6468 | Private      |   3331.86 | ... |          27.012  | United-States    | <=50K    |
+| 20.9853 | Private      | 120637    | ... |          40.0238 | United-States    | <=50K    |
+|     ... | ...          |       ... | ... |              ... | ...              | ...      |
+
+
+**NOTE**: CTGAN does not distinguish between float and integer columns, which means that it will
+sample float values in all cases. If integer values are required, the outputted float values
+must be rounded to integers in a later step, outside of CTGAN.
+
+# Join our community
+
+1. If you would like to try more dataset examples, please have a look at the [examples folder](
+https://github.com/DAI-Lab/CTGAN/tree/master/examples) of the repository. Please contact us
+if you have a usage example that you would want to share with the community.
+2. If you want to contribute to the project code, please head to the [Contributing Guide](
+https://DAI-Lab.github.io/CTGAN/contributing.html#get-started) for more details about how to do it.
+3. If you have any doubts, feature requests or detect an error, please [open an issue on github](
+https://github.com/DAI-Lab/CTGAN/issues)
+4. Also do not forget to check the [project documentation site](https://DAI-Lab.github.io/CTGAN/)!
 
 
 # Citing TGAN

@@ -1,19 +1,35 @@
+import json
+
 import numpy as np
-from absl import app, flags
-
-from ctgan.model import CTGANSynthesizer
-
-flags.DEFINE_string("data", "", "Filename of training data.")
-flags.DEFINE_string("meta", "", "Filename of meta data.")
-flags.DEFINE_string("model_dir", "", "Path to save model.")
-flags.DEFINE_string("output", "", "Output filename.")
-flags.DEFINE_integer("max_epoch", 100, "Epoches to train.")
-flags.DEFINE_integer("sample", 1000, "Number of rows to generate.")
-
-FLAGS = flags.FLAGS
+import pandas as pd
 
 
-def read_data(data_filename, meta_filename):
+def read_csv(csv_filename, meta_filename=None, header=True, discrete=None):
+
+    data = pd.read_csv(csv_filename, header='infer' if header else None)
+
+    if meta_filename:
+        with open(meta_filename) as meta_file:
+            metadata = json.load(meta_file)
+
+        discrete_columns = [
+            column['name']
+            for column in metadata['columns']
+            if column['type'] != 'continuous'
+        ]
+
+    elif discrete:
+        discrete_columns = discrete.split(',')
+        if not header:
+            discrete_columns = [int(i) for i in discrete_columns]
+
+    else:
+        discrete_columns = []
+
+    return data, discrete_columns
+
+
+def read_tsv(data_filename, meta_filename):
     with open(meta_filename) as f:
         column_info = f.readlines()
 
@@ -57,10 +73,10 @@ def read_data(data_filename, meta_filename):
 
         data.append(row)
 
-    return np.asarray(data, dtype='float32'), meta
+    return np.asarray(data, dtype='float32'), meta['discrete_columns']
 
 
-def write_data(data, meta, output_filename):
+def write_tsv(data, meta, output_filename):
     with open(output_filename, "w") as f:
         for row in data:
             for idx, col in enumerate(row):
@@ -71,19 +87,3 @@ def write_data(data, meta, output_filename):
                     print(meta['column_info'][idx][int(col)], end=' ', file=f)
 
             print(file=f)
-
-
-def _main(_):
-    data, meta = read_data(FLAGS.data, FLAGS.meta)
-    model = CTGANSynthesizer(epochs=FLAGS.max_epoch)
-    model.fit(data, meta['discrete_columns'], tuple())
-    data_syn = model.sample(FLAGS.sample)
-    write_data(data_syn, meta, FLAGS.output)
-
-
-def main():
-    app.run(_main)
-
-
-if __name__ == '__main__':
-    main()
