@@ -7,8 +7,8 @@ and increased data format support.
 
 ### Issues Resolved:
 
-* Reorganize the project structure - [Issue #10](https://github.com/DAI-Lab/CTGAN/issues/10) by @csala
-* Move epochs to the fit method - [Issue #5](https://github.com/DAI-Lab/CTGAN/issues/5) by @csala
+* Reorganize the project structure - [Issue #10](https://github.com/sdv-dev/CTGAN/issues/10) by @csala
+* Move epochs to the fit method - [Issue #5](https://github.com/sdv-dev/CTGAN/issues/5) by @csala
 
 ## v0.1.0 - 2019-11-07
 
