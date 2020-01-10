@@ -111,7 +111,7 @@ class CTGANSynthesizer(object):
                 Number of training epochs. Defaults to 300.
             log_frequency (boolean):
                 Whether to use log frequency of categorical levels in conditional
-                sampling. Defaults to True.
+                sampling. Defaults to ``True``.
         """
 
         self.transformer = DataTransformer()
