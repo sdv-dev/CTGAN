@@ -95,7 +95,7 @@ class CTGANSynthesizer(object):
 
         return (loss * m).sum() / data.size()[0]
 
-    def fit(self, train_data, discrete_columns=tuple(), epochs=300):
+    def fit(self, train_data, discrete_columns=tuple(), epochs=300, log_frequency=True):
         """Fit the CTGAN Synthesizer models to the training data.
 
         Args:
@@ -109,6 +109,9 @@ class CTGANSynthesizer(object):
                 a ``pandas.DataFrame``, this list should contain the column names.
             epochs (int):
                 Number of training epochs. Defaults to 300.
+            log_frequency (boolean):
+                Whether to use log frequency of categorical levels in conditional
+                sampling. Defaults to True.
         """
 
         self.transformer = DataTransformer()
@@ -118,7 +121,11 @@ class CTGANSynthesizer(object):
         data_sampler = Sampler(train_data, self.transformer.output_info)
 
         data_dim = self.transformer.output_dimensions
-        self.cond_generator = ConditionalGenerator(train_data, self.transformer.output_info)
+        self.cond_generator = ConditionalGenerator(
+            train_data,
+            self.transformer.output_info,
+            log_frequency
+        )
 
         self.generator = Generator(
             self.embedding_dim + self.cond_generator.n_opt,
