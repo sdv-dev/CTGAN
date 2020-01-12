@@ -215,7 +215,8 @@ class CTGANSynthesizer(object):
                 optimizerG.step()
 
             print("Epoch %d, Loss G: %.4f, Loss D: %.4f" %
-                  (i + 1, loss_g.detach().cpu(), loss_d.detach().cpu()))
+                  (i + 1, loss_g.detach().cpu(), loss_d.detach().cpu()),
+                  flush=True)
 
     def sample(self, n):
         """Sample data similar to the training data.
