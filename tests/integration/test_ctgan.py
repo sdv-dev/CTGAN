@@ -52,13 +52,13 @@ def test_ctgan_numpy():
 
 
 def test_log_frequency():
-    with patch('numpy.random.choice', 
-               return_value = np.repeat(['a', 'b', 'c'], [950, 25, 25])):
+    with patch('numpy.random.choice',
+               return_value=np.repeat(['a', 'b', 'c'], [950, 25, 25])):
         data = pd.DataFrame({
             'continuous': np.random.random(1000),
             'discrete': np.random.choice(['a', 'b', 'c'], 1000, p=[0.95, 0.025, 0.025])
         })
-    
+
     discrete_columns = ['discrete']
 
     ctgan = CTGANSynthesizer()
