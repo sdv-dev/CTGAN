@@ -9,11 +9,12 @@ but correctness of the data values and the internal behavior of the
 model are not checked.
 """
 
+from unittest.mock import patch
+
 import numpy as np
 import pandas as pd
 
 from ctgan.synthesizer import CTGANSynthesizer
-from unittest.mock import patch
 
 
 def test_ctgan_dataframe():
