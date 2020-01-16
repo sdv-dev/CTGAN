@@ -13,6 +13,7 @@ import numpy as np
 import pandas as pd
 
 from ctgan.synthesizer import CTGANSynthesizer
+from unittest.mock import patch
 
 
 def test_ctgan_dataframe():
@@ -51,11 +52,13 @@ def test_ctgan_numpy():
 
 
 def test_log_frequency():
-    data = pd.DataFrame({
-        'continuous': np.random.random(1000),
-        'discrete': np.random.choice(['a', 'b', 'c'], 1000, p=[0.95, 0.025, 0.025])
-    })
-
+    with patch('numpy.random.choice', 
+               return_value = np.repeat(['a', 'b', 'c'], [950, 25, 25])):
+        data = pd.DataFrame({
+            'continuous': np.random.random(1000),
+            'discrete': np.random.choice(['a', 'b', 'c'], 1000, p=[0.95, 0.025, 0.025])
+        })
+    
     discrete_columns = ['discrete']
 
     ctgan = CTGANSynthesizer()
