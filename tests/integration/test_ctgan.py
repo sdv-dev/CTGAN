@@ -64,13 +64,13 @@ def test_log_frequency():
     ctgan = CTGANSynthesizer()
     ctgan.fit(data, discrete_columns, epochs=100)
 
-    sampled = ctgan.sample(1000)
+    sampled = ctgan.sample(10000)
     counts = sampled['discrete'].value_counts()
-    assert counts['a'] < 650
+    assert counts['a'] < 6500
 
     ctgan = CTGANSynthesizer()
     ctgan.fit(data, discrete_columns, epochs=100, log_frequency=False)
 
-    sampled = ctgan.sample(1000)
+    sampled = ctgan.sample(10000)
     counts = sampled['discrete'].value_counts()
-    assert counts['a'] > 900
+    assert counts['a'] > 9000
