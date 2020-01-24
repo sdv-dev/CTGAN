@@ -51,9 +51,10 @@ def test_ctgan_numpy():
 
 
 def test_log_frequency():
+
     data = pd.DataFrame({
         'continuous': np.random.random(1000),
-        'discrete': np.random.choice(['a', 'b', 'c'], 1000, p=[0.95, 0.025, 0.025])
+        'discrete': np.repeat(['a', 'b', 'c'], [950, 25, 25])
     })
 
     discrete_columns = ['discrete']
@@ -61,13 +62,13 @@ def test_log_frequency():
     ctgan = CTGANSynthesizer()
     ctgan.fit(data, discrete_columns, epochs=100)
 
-    sampled = ctgan.sample(1000)
+    sampled = ctgan.sample(10000)
     counts = sampled['discrete'].value_counts()
-    assert counts['a'] < 650
+    assert counts['a'] < 6500
 
     ctgan = CTGANSynthesizer()
     ctgan.fit(data, discrete_columns, epochs=100, log_frequency=False)
 
-    sampled = ctgan.sample(1000)
+    sampled = ctgan.sample(10000)
     counts = sampled['discrete'].value_counts()
-    assert counts['a'] > 900
+    assert counts['a'] > 9000
