@@ -48,3 +48,27 @@ def test_ctgan_numpy():
     assert sampled.shape == (100, 2)
     assert isinstance(sampled, np.ndarray)
     assert set(np.unique(sampled[:, 1])) == {'a', 'b', 'c'}
+
+
+def test_log_frequency():
+
+    data = pd.DataFrame({
+        'continuous': np.random.random(1000),
+        'discrete': np.repeat(['a', 'b', 'c'], [950, 25, 25])
+    })
+
+    discrete_columns = ['discrete']
+
+    ctgan = CTGANSynthesizer()
+    ctgan.fit(data, discrete_columns, epochs=100)
+
+    sampled = ctgan.sample(10000)
+    counts = sampled['discrete'].value_counts()
+    assert counts['a'] < 6500
+
+    ctgan = CTGANSynthesizer()
+    ctgan.fit(data, discrete_columns, epochs=100, log_frequency=False)
+
+    sampled = ctgan.sample(10000)
+    counts = sampled['discrete'].value_counts()
+    assert counts['a'] > 9000

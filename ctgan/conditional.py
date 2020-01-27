@@ -2,7 +2,7 @@ import numpy as np
 
 
 class ConditionalGenerator(object):
-    def __init__(self, data, output_info):
+    def __init__(self, data, output_info, log_frequency):
         self.model = []
 
         start = 0
@@ -50,7 +50,8 @@ class ConditionalGenerator(object):
                     continue
                 end = start + item[0]
                 tmp = np.sum(data[:, start:end], axis=0)
-                tmp = np.log(tmp + 1)
+                if log_frequency:
+                    tmp = np.log(tmp + 1)
                 tmp = tmp / np.sum(tmp)
                 self.p[self.n_col, :item[0]] = tmp
                 self.interval.append((self.n_opt, item[0]))

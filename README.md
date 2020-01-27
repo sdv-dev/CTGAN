@@ -1,12 +1,12 @@
 <p align="left">
-<img width=15% src="https://dai.lids.mit.edu/wp-content/uploads/2018/06/Logo_DAI_highres.png" alt=“DAI-Lab” />
+<img width=15% src="https://dai.lids.mit.edu/wp-content/uploads/2018/06/Logo_DAI_highres.png" alt=“sdv-dev” />
 <i>An open source project from Data to AI Lab at MIT.</i>
 </p>
 
 [![PyPI Shield](https://img.shields.io/pypi/v/ctgan.svg)](https://pypi.python.org/pypi/ctgan)
-[![Travis CI Shield](https://travis-ci.org/DAI-Lab/CTGAN.svg?branch=master)](https://travis-ci.org/DAI-Lab/CTGAN)
+[![Travis CI Shield](https://travis-ci.org/sdv-dev/CTGAN.svg?branch=master)](https://travis-ci.org/sdv-dev/CTGAN)
 [![Downloads](https://pepy.tech/badge/ctgan)](https://pepy.tech/project/ctgan)
-[![Coverage Status](https://codecov.io/gh/DAI-Lab/CTGAN/branch/master/graph/badge.svg)](https://codecov.io/gh/DAI-Lab/CTGAN)
+[![Coverage Status](https://codecov.io/gh/sdv-dev/CTGAN/branch/master/graph/badge.svg)](https://codecov.io/gh/sdv-dev/CTGAN)
 
 # CTGAN
 
@@ -14,13 +14,13 @@ Implementation of our NeurIPS paper [Modeling Tabular data using Conditional GAN
 
 CTGAN is a GAN-based data synthesizer that can generate synthetic tabular data with high fidelity.
 
-- Free software: [MIT license](https://github.com/DAI-Lab/CTGAN/tree/master/LICENSE)
-- Documentation: https://DAI-Lab.github.io/CTGAN
-- Homepage: https://github.com/DAI-Lab/CTGAN
+* License: [MIT](https://github.com/sdv-dev/CTGAN/blob/master/LICENSE)
+* Documentation: https://sdv-dev.github.io/CTGAN
+* Homepage: https://github.com/sdv-dev/CTGAN
 
 ## Overview
 
-Based on previous work ([TGAN](https://github.com/DAI-Lab/TGAN)) on synthetic data generation,
+Based on previous work ([TGAN](https://github.com/sdv-dev/TGAN)) on synthetic data generation,
 we develop a new model called CTGAN. Several major differences make CTGAN outperform TGAN.
 
 - **Preprocessing**: CTGAN uses more sophisticated Variational Gaussian Mixture Model to detect
@@ -49,7 +49,7 @@ pip install ctgan
 This will pull and install the latest stable release from [PyPI](https://pypi.org/).
 
 If you want to install from source or contribute to the project please read the
-[Contributing Guide](https://DAI-Lab.github.io/CTGAN/contributing.html#get-started).
+[Contributing Guide](https://sdv-dev.github.io/CTGAN/contributing.html#get-started).
 
 # Data Format
 
@@ -179,13 +179,13 @@ must be rounded to integers in a later step, outside of CTGAN.
 # Join our community
 
 1. If you would like to try more dataset examples, please have a look at the [examples folder](
-https://github.com/DAI-Lab/CTGAN/tree/master/examples) of the repository. Please contact us
+https://github.com/sdv-dev/CTGAN/tree/master/examples) of the repository. Please contact us
 if you have a usage example that you would want to share with the community.
 2. If you want to contribute to the project code, please head to the [Contributing Guide](
-https://DAI-Lab.github.io/CTGAN/contributing.html#get-started) for more details about how to do it.
+https://sdv-dev.github.io/CTGAN/contributing.html#get-started) for more details about how to do it.
 3. If you have any doubts, feature requests or detect an error, please [open an issue on github](
-https://github.com/DAI-Lab/CTGAN/issues)
-4. Also do not forget to check the [project documentation site](https://DAI-Lab.github.io/CTGAN/)!
+https://github.com/sdv-dev/CTGAN/issues)
+4. Also do not forget to check the [project documentation site](https://sdv-dev.github.io/CTGAN/)!
 
 
 # Citing TGAN
@@ -202,3 +202,15 @@ If you use CTGAN, please cite the following work:
   year={2019}
 }
 ```
+
+# Related Projects
+
+## R interface for CTGAN
+
+A wrapper around **CTGAN** has been implemented by Kevin Kuo @kevinykuo, bringing the functionalities
+of **CTGAN** to **R** users.
+
+More details can be found in the corresponding repository: https://github.com/kasaai/ctgan
+
+Please note that this package is an external contribution and is not maintained nor suporvised by
+the MIT DAI-Lab team.

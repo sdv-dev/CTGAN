@@ -232,6 +232,6 @@ or in command line::
     pip install 'ctgan>=X.Y.Z.dev'
 
 
-.. _GitHub issues page: https://github.com/DAI-Lab/CTGAN/issues
-.. _Travis Build Status page: https://travis-ci.org/DAI-Lab/CTGAN/pull_requests
+.. _GitHub issues page: https://github.com/sdv-dev/CTGAN/issues
+.. _Travis Build Status page: https://travis-ci.org/sdv-dev/CTGAN/pull_requests
 .. _Google docstrings style: https://google.github.io/styleguide/pyguide.html?showone=Comments#Comments
