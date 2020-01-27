@@ -202,3 +202,15 @@ If you use CTGAN, please cite the following work:
   year={2019}
 }
 ```
+
+# Related Projects
+
+## R interface for CTGAN
+
+A wrapper around **CTGAN** has been implemented by Kevin Kuo @kevinykuo, bringing the functionalities
+of **CTGAN** to **R** users.
+
+More details can be found in the corresponding repository: https://github.com/kasaai/ctgan
+
+Please note that this package is an external contribution and is not maintained nor suporvised by
+the MIT DAI-Lab team.
