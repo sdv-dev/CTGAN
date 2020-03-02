@@ -182,8 +182,8 @@ One method of restoring column data types after sampling:
 
 ```
 data_dtype=data.dtypes.values
-        for i in range(len(samples.columns)):          
-       samples[samples.columns[i]]=samples[samples.columns[i]].astype(data_dtype[i])
+for i in range(len(samples.columns)):          
+  samples[samples.columns[i]]=samples[samples.columns[i]].astype(data_dtype[i])
 ```
 
 
