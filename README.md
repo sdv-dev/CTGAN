@@ -206,6 +206,8 @@ If you use CTGAN, please cite the following work:
 ```
 
 # Related Projects
+Please note that these libriries are external contributions and are not maintained nor suporvised by
+the MIT DAI-Lab team.
 
 ## R interface for CTGAN
 
@@ -214,5 +216,9 @@ of **CTGAN** to **R** users.
 
 More details can be found in the corresponding repository: https://github.com/kasaai/ctgan
 
-Please note that this package is an external contribution and is not maintained nor suporvised by
-the MIT DAI-Lab team.
+## CTGAN Server CLI
+
+A package to easily depoly **CTGAN** onto a remote server. This package is developed by @oregonpillow.
+
+More details can be found in the corresponding repository: https://github.com/oregonpillow/ctgan-server-cli
+
