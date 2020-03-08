@@ -66,6 +66,7 @@ class DataTransformer(object):
         else:
             self.dataframe = True
 
+        self.dtypes = data.infer_objects().dtypes
         self.meta = []
         for column in data.columns:
             column_data = data[[column]].values
@@ -170,7 +171,8 @@ class DataTransformer(object):
             start += dimensions
 
         output = np.column_stack(output)
-        if self.dataframe:
-            output = pd.DataFrame(output, columns=column_names)
+        output = pd.DataFrame(output, columns=column_names).astype(self.dtypes)
+        if not self.dataframe:
+            output = output.values
 
         return output
