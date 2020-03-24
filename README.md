@@ -214,7 +214,7 @@ More details can be found in the corresponding repository: https://github.com/ka
 
 ## CTGAN Server CLI
 
-A package to easily deploy **CTGAN** onto a remote server. This package is developed by @oregonpillow.
+A package to easily deploy **CTGAN** onto a remote server. This package is developed by Timothy Pillow @oregonpillow.
 
 More details can be found in the corresponding repository: https://github.com/oregonpillow/ctgan-server-cli
 
