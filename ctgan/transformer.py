@@ -3,7 +3,7 @@ import pandas as pd
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.mixture import BayesianGaussianMixture
 from sklearn.preprocessing import OneHotEncoder
-from sklearn.utils._testing import ignore_warnings
+from sklearn.utils.testing import ignore_warnings
 
 
 class DataTransformer(object):
