@@ -3,8 +3,8 @@ import pandas as pd
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.mixture import BayesianGaussianMixture
 from sklearn.preprocessing import OneHotEncoder
-from sklearn.utils.testing import ignore_warnings
-
+import warnings
+warnings.filterwarnings("ignore", category=ConvergenceWarning)
 
 class DataTransformer(object):
     """Data Transformer.
@@ -24,7 +24,6 @@ class DataTransformer(object):
         self.n_clusters = n_clusters
         self.epsilon = epsilon
 
-    @ignore_warnings(category=ConvergenceWarning)
     def _fit_continuous(self, column, data):
         gm = BayesianGaussianMixture(
             self.n_clusters,

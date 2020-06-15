@@ -3,10 +3,9 @@ import torch
 from torch import optim
 from torch.nn import functional
 
-from ctgan.conditional import ConditionalGenerator
-from ctgan.models import Discriminator, Generator
-from ctgan.sampler import Sampler
-from ctgan.transformer import DataTransformer
+from .data_sampler import ConditionalGenerator, Sampler
+from .models import Discriminator, Generator
+from .transformer import DataTransformer
 
 
 class CTGANSynthesizer(object):

@@ -1,7 +1,7 @@
 import argparse
 
-from ctgan.data import read_csv, read_tsv, write_tsv
-from ctgan.synthesizer import CTGANSynthesizer
+from .data import read_csv, read_tsv, write_tsv
+from .synthesizer import CTGANSynthesizer
 
 
 def _parse_args():
@@ -28,7 +28,6 @@ def _parse_args():
 
 def main():
     args = _parse_args()
-
     if args.tsv:
         data, discrete_columns = read_tsv(args.data, args.metadata)
     else:
@@ -44,3 +43,7 @@ def main():
         write_tsv(sampled, args.metadata, args.output)
     else:
         sampled.to_csv(args.output, index=False)
+
+
+if __name__ == "__main__":
+    main()
