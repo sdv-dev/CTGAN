@@ -3,7 +3,7 @@ import torch
 from torch import optim
 from torch.nn import functional
 
-from .data_sampler import ConditionalGenerator, Sampler
+from .data_sampler import DataSampler
 from .models import Discriminator, Generator
 from .transformer import DataTransformer
 
@@ -46,17 +46,18 @@ class CTGANSynthesizer(object):
     def _apply_activate(self, data):
         data_t = []
         st = 0
-        for item in self.transformer.output_info:
-            if item[1] == 'tanh':
-                ed = st + item[0]
-                data_t.append(torch.tanh(data[:, st:ed]))
-                st = ed
-            elif item[1] == 'softmax':
-                ed = st + item[0]
-                data_t.append(functional.gumbel_softmax(data[:, st:ed], tau=0.2))
-                st = ed
-            else:
-                assert 0
+        for items in self.transformer.output_info:
+            for item in items:
+                if item[1] == 'tanh':
+                    ed = st + item[0]
+                    data_t.append(torch.tanh(data[:, st:ed]))
+                    st = ed
+                elif item[1] == 'softmax':
+                    ed = st + item[0]
+                    data_t.append(functional.gumbel_softmax(data[:, st:ed], tau=0.2))
+                    st = ed
+                else:
+                    assert 0
 
         return torch.cat(data_t, dim=1)
 
@@ -65,30 +66,31 @@ class CTGANSynthesizer(object):
         st = 0
         st_c = 0
         skip = False
-        for item in self.transformer.output_info:
-            if item[1] == 'tanh':
-                st += item[0]
-                skip = True
-
-            elif item[1] == 'softmax':
-                if skip:
-                    skip = False
+        for items in self.transformer.output_info:
+            for item in items:
+                if item[1] == 'tanh':
                     st += item[0]
-                    continue
+                    skip = True
 
-                ed = st + item[0]
-                ed_c = st_c + item[0]
-                tmp = functional.cross_entropy(
-                    data[:, st:ed],
-                    torch.argmax(c[:, st_c:ed_c], dim=1),
-                    reduction='none'
-                )
-                loss.append(tmp)
-                st = ed
-                st_c = ed_c
+                elif item[1] == 'softmax':
+                    if skip:
+                        skip = False
+                        st += item[0]
+                        continue
 
-            else:
-                assert 0
+                    ed = st + item[0]
+                    ed_c = st_c + item[0]
+                    tmp = functional.cross_entropy(
+                        data[:, st:ed],
+                        torch.argmax(c[:, st_c:ed_c], dim=1),
+                        reduction='none'
+                    )
+                    loss.append(tmp)
+                    st = ed
+                    st_c = ed_c
+
+                else:
+                    assert 0
 
         loss = torch.stack(loss, dim=1)
 
@@ -117,23 +119,18 @@ class CTGANSynthesizer(object):
         self.transformer.fit(train_data, discrete_columns)
         train_data = self.transformer.transform(train_data)
 
-        data_sampler = Sampler(train_data, self.transformer.output_info)
+        self.data_sampler = DataSampler(train_data, self.transformer.output_info, log_frequency)
 
         data_dim = self.transformer.output_dimensions
-        self.cond_generator = ConditionalGenerator(
-            train_data,
-            self.transformer.output_info,
-            log_frequency
-        )
 
         self.generator = Generator(
-            self.embedding_dim + self.cond_generator.n_opt,
+            self.embedding_dim + self.data_sampler.n_opt,
             self.gen_dim,
             data_dim
         ).to(self.device)
 
         discriminator = Discriminator(
-            data_dim + self.cond_generator.n_opt,
+            data_dim + self.data_sampler.n_opt,
             self.dis_dim
         ).to(self.device)
 
@@ -152,10 +149,10 @@ class CTGANSynthesizer(object):
             for id_ in range(steps_per_epoch):
                 fakez = torch.normal(mean=mean, std=std)
 
-                condvec = self.cond_generator.sample(self.batch_size)
+                condvec = self.data_sampler.sample_condvec(self.batch_size)
                 if condvec is None:
                     c1, m1, col, opt = None, None, None, None
-                    real = data_sampler.sample(self.batch_size, col, opt)
+                    real = self.data_sampler.sample(self.batch_size, col, opt)
                 else:
                     c1, m1, col, opt = condvec
                     c1 = torch.from_numpy(c1).to(self.device)
@@ -164,7 +161,7 @@ class CTGANSynthesizer(object):
 
                     perm = np.arange(self.batch_size)
                     np.random.shuffle(perm)
-                    real = data_sampler.sample(self.batch_size, col[perm], opt[perm])
+                    real = self.data_sampler.sample(self.batch_size, col[perm], opt[perm])
                     c2 = c1[perm]
 
                 fake = self.generator(fakez)
@@ -191,7 +188,7 @@ class CTGANSynthesizer(object):
                 optimizerD.step()
 
                 fakez = torch.normal(mean=mean, std=std)
-                condvec = self.cond_generator.sample(self.batch_size)
+                condvec = self.data_sampler.sample_condvec(self.batch_size)
 
                 if condvec is None:
                     c1, m1, col, opt = None, None, None, None
@@ -242,7 +239,7 @@ class CTGANSynthesizer(object):
             std = mean + 1
             fakez = torch.normal(mean=mean, std=std).to(self.device)
 
-            condvec = self.cond_generator.sample_zero(self.batch_size)
+            condvec = self.data_sampler.sample_zero_condvec(self.batch_size)
             if condvec is None:
                 pass
             else:

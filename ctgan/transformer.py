@@ -74,7 +74,7 @@ class DataTransformer(object):
             else:
                 meta = self._fit_continuous(column, column_data)
 
-            self.output_info += meta['output_info']
+            self.output_info.append(meta['output_info'])
             self.output_dimensions += meta['output_dimensions']
             self.meta.append(meta)
 
