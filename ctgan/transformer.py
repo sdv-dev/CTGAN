@@ -10,6 +10,18 @@ from sklearn.preprocessing import OneHotEncoder
 warnings.filterwarnings("ignore", category=ConvergenceWarning)
 
 
+class SpanInfo(object):
+  def __init__(self, dim, activation_fn):
+    self._dim = dim
+    self._activation_fn = activation_fn
+
+  def dim(self):
+    return self._dim
+
+  def activation_fn(self):
+    return self._activation_fn
+
+
 class DataTransformer(object):
   """Data Transformer.
 
@@ -43,7 +55,8 @@ class DataTransformer(object):
         'name': column,
         'model': gm,
         'components': components,
-        'output_info': [(1, 'tanh'), (num_components, 'softmax')],
+        'output_info': [SpanInfo(1, 'tanh'),
+                        SpanInfo(num_components, 'softmax')],
         'output_dimensions': 1 + num_components,
     }
 
@@ -55,7 +68,7 @@ class DataTransformer(object):
     return {
         'name': column,
         'encoder': ohe,
-        'output_info': [(categories, 'softmax')],
+        'output_info': [SpanInfo(categories, 'softmax')],
         'output_dimensions': categories
     }
 

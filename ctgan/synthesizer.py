@@ -47,14 +47,14 @@ class CTGANSynthesizer(object):
   def _apply_activate(self, data):
     data_t = []
     st = 0
-    for items in self.transformer.output_info:
-      for item in items:
-        if item[1] == 'tanh':
-          ed = st + item[0]
+    for column_info in self.transformer.output_info:
+      for span_info in column_info:
+        if span_info.activation_fn() == 'tanh':
+          ed = st + span_info.dim()
           data_t.append(torch.tanh(data[:, st:ed]))
           st = ed
-        elif item[1] == 'softmax':
-          ed = st + item[0]
+        elif span_info.activation_fn() == 'softmax':
+          ed = st + span_info.dim()
           data_t.append(functional.gumbel_softmax(data[:, st:ed], tau=0.2))
           st = ed
         else:
@@ -67,20 +67,20 @@ class CTGANSynthesizer(object):
     st = 0
     st_c = 0
     skip = False
-    for items in self.transformer.output_info:
-      for item in items:
-        if item[1] == 'tanh':
-          st += item[0]
+    for column_info in self.transformer.output_info:
+      for span_info in column_info:
+        if span_info.activation_fn() == 'tanh':
+          st += span_info.dim()
           skip = True
 
-        elif item[1] == 'softmax':
+        elif span_info.activation_fn() == 'softmax':
           if skip:
             skip = False
-            st += item[0]
+            st += span_info.dim()
             continue
 
-          ed = st + item[0]
-          ed_c = st_c + item[0]
+          ed = st + span_info.dim()
+          ed_c = st_c + span_info.dim()
           tmp = functional.cross_entropy(
               data[:, st:ed],
               torch.argmax(c[:, st_c:ed_c], dim=1),
@@ -126,13 +126,13 @@ class CTGANSynthesizer(object):
     data_dim = self.transformer.output_dimensions
 
     self.generator = Generator(
-        self.embedding_dim + self.data_sampler.n_opt,
+        self.embedding_dim + self.data_sampler.dim_cond_vec(),
         self.gen_dim,
         data_dim
     ).to(self.device)
 
     discriminator = Discriminator(
-        data_dim + self.data_sampler.n_opt,
+        data_dim + self.data_sampler.dim_cond_vec(),
         self.dis_dim
     ).to(self.device)
 
@@ -155,7 +155,7 @@ class CTGANSynthesizer(object):
         condvec = self.data_sampler.sample_condvec(self.batch_size)
         if condvec is None:
           c1, m1, col, opt = None, None, None, None
-          real = self.data_sampler.sample(self.batch_size, col, opt)
+          real = self.data_sampler.sample_data(self.batch_size, col, opt)
         else:
           c1, m1, col, opt = condvec
           c1 = torch.from_numpy(c1).to(self.device)
@@ -164,7 +164,7 @@ class CTGANSynthesizer(object):
 
           perm = np.arange(self.batch_size)
           np.random.shuffle(perm)
-          real = self.data_sampler.sample(self.batch_size, col[perm], opt[perm])
+          real = self.data_sampler.sample_data(self.batch_size, col[perm], opt[perm])
           c2 = c1[perm]
 
         fake = self.generator(fakez)
@@ -243,7 +243,7 @@ class CTGANSynthesizer(object):
       std = mean + 1
       fakez = torch.normal(mean=mean, std=std).to(self.device)
 
-      condvec = self.data_sampler.sample_zero_condvec(self.batch_size)
+      condvec = self.data_sampler.sample_original_condvec(self.batch_size)
       if condvec is None:
         pass
       else:

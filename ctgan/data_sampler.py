@@ -2,100 +2,128 @@ import numpy as np
 
 
 class DataSampler(object):
+  """DataSampler samples the conditional vector and corresponding data
+  for CTGAN.
+  """
+
   def __init__(self, data, output_info, log_frequency):
-    self.data = data
-    self.model = []
-    self.model2 = []
-    start = 0
-    skip = False
-    max_interval = 0
-    counter = 0
-    for items in output_info:
-      if len(items) == 2:
-        start += items[0][0] + items[1][0]
-        continue
+    self._data = data
+
+    def is_discrete_column(column_info):
+      return (len(column_info) == 1
+              and column_info[0].activation_fn() == "softmax")
+
+    n_discrete_columns = sum(
+        [1 for column_info in output_info if is_discrete_column(column_info)])
+
+    self._discrete_column_matrix_st = np.zeros(
+        n_discrete_columns, dtype="int32")
+
+    # Store the row id for each category in each discrete column.
+    # For example _rid_by_cat_cols[a][b] is a list of all rows with the
+    # a-th discrete column equal value b.
+    self._rid_by_cat_cols = []
+
+    # Compute _rid_by_cat_cols
+    st = 0
+    for column_info in output_info:
+      if is_discrete_column(column_info):
+        span_info = column_info[0]
+        ed = st + span_info.dim()
+
+        rid_by_cat = []
+        for j in range(span_info.dim()):
+          rid_by_cat.append(np.nonzero(data[:, st + j])[0])
+        self._rid_by_cat_cols.append(rid_by_cat)
+        st = ed
       else:
-        assert len(items) == 1
-        item = items[0]
-        end = start + item[0]
-        max_interval = max(max_interval, end - start)
-        counter += 1
-        self.model.append(np.argmax(data[:, start:end], axis=-1))
+        st += sum([span_info.dim() for span_info in column_info])
+    assert st == data.shape[1]
 
-        tmp = []
-        for j in range(item[0]):
-          tmp.append(np.nonzero(data[:, start + j])[0])
+    # Prepare an interval matrix for efficiently sample conditional vector
+    max_category = max(
+        [column_info[0].dim() for column_info in output_info
+         if is_discrete_column(column_info)])
 
-        self.model2.append(tmp)
-        start = end
-    assert start == data.shape[1]
+    self._discrete_column_cond_st = np.zeros(n_discrete_columns, dtype='int32')
+    self._discrete_column_n_category = np.zeros(
+        n_discrete_columns, dtype='int32')
+    self._discrete_column_category_prob = np.zeros(
+        (n_discrete_columns, max_category))
+    self._n_discrete_columns = n_discrete_columns
+    self._n_categories = sum(
+        [column_info[0].dim() for column_info in output_info
+         if is_discrete_column(column_info)])
 
-    self.interval = []
-    self.n_col = 0
-    self.n_opt = 0
-    start = 0
-    self.p = np.zeros((counter, max_interval))
-    for items in output_info:
-      if len(items) == 2:
-        start += items[0][0] + items[1][0]
-        continue
-      else:
-        assert len(items) == 1
-        item = items[0]
-        end = start + item[0]
-        tmp = np.sum(data[:, start:end], axis=0)
+    st = 0
+    current_id = 0
+    current_cond_st = 0
+    for column_info in output_info:
+      if is_discrete_column(column_info):
+        span_info = column_info[0]
+        ed = st + span_info.dim()
+        category_freq = np.sum(data[:, st:ed], axis=0)
         if log_frequency:
-          tmp = np.log(tmp + 1)
-        tmp = tmp / np.sum(tmp)
-        self.p[self.n_col, :item[0]] = tmp
-        self.interval.append((self.n_opt, item[0]))
-        self.n_opt += item[0]
-        self.n_col += 1
-        start = end
+          category_freq = np.log(category_freq + 1)
+        category_prob = category_freq / np.sum(category_freq)
+        self._discrete_column_category_prob[current_id, :span_info.dim()] = (
+            category_prob)
+        self._discrete_column_cond_st[current_id] = current_cond_st
+        self._discrete_column_n_category = span_info.dim()
+        current_cond_st += span_info.dim()
+        current_id += 1
+        st = ed
+      else:
+        st += sum([span_info.dim() for span_info in column_info])
 
-    self.interval = np.asarray(self.interval)
-
-  def random_choice_prob_index(self, idx):
-    a = self.p[idx]
-    r = np.expand_dims(np.random.rand(a.shape[0]), axis=1)
-    return (a.cumsum(axis=1) > r).argmax(axis=1)
+  def random_choice_prob_index(self, discrete_column_id):
+    probs = self._discrete_column_category_prob[discrete_column_id]
+    r = np.expand_dims(np.random.rand(probs.shape[0]), axis=1)
+    return (probs.cumsum(axis=1) > r).argmax(axis=1)
 
   def sample_condvec(self, batch):
-    if self.n_col == 0:
+    if self._n_discrete_columns == 0:
       return None
 
     batch = batch
-    idx = np.random.choice(np.arange(self.n_col), batch)
+    discrete_column_id = np.random.choice(
+        np.arange(self._n_discrete_columns), batch)
 
-    vec1 = np.zeros((batch, self.n_opt), dtype='float32')
-    mask1 = np.zeros((batch, self.n_col), dtype='float32')
-    mask1[np.arange(batch), idx] = 1
-    opt1prime = self.random_choice_prob_index(idx)
-    opt1 = self.interval[idx, 0] + opt1prime
-    vec1[np.arange(batch), opt1] = 1
+    vec = np.zeros((batch, self._n_categories), dtype='float32')
+    mask = np.zeros((batch, self._n_discrete_columns), dtype='float32')
+    mask[np.arange(batch), discrete_column_id] = 1
+    category_id_in_col = self.random_choice_prob_index(discrete_column_id)
+    category_id = (self._discrete_column_cond_st[discrete_column_id]
+                   + category_id_in_col)
+    vec[np.arange(batch), category_id] = 1
 
-    return vec1, mask1, idx, opt1prime
+    return vec, mask, discrete_column_id, category_id_in_col
 
-  def sample_zero_condvec(self, batch):
-    if self.n_col == 0:
+  def sample_original_condvec(self, batch):
+    if self._n_discrete_columns == 0:
       return None
 
-    vec = np.zeros((batch, self.n_opt), dtype='float32')
-    idx = np.random.choice(np.arange(self.n_col), batch)
+    vec = np.zeros((batch, self._n_categories), dtype='float32')
+    row_idx = np.random.randint(0, len(self.data), batch)
+    col_idx = np.random.randint(0, self._n_discrete_columns, batch)
     for i in range(batch):
-      col = idx[i]
-      pick = int(np.random.choice(self.model[col]))
-      vec[i, pick + self.interval[col, 0]] = 1
+      matrix_st = self._discrete_column_matrix_st[col_idx]
+      matrix_ed = matrix_st + self._discrete_column_n_category[col_idx]
+      pick = self._data[row_idx, matrix_st:matrix_ed]
+      vec[i, pick + self._discrete_column_cond_st[col_idx]] = 1
 
     return vec
 
-  def sample(self, n, col, opt):
+  def sample_data(self, n, col, opt):
     if col is None:
-      idx = np.random.choice(np.arange(self.n), n)
-      return self.data[idx]
+      idx = np.random.randint(len(self.data), n)
+      return self._data[idx]
 
     idx = []
     for c, o in zip(col, opt):
-      idx.append(np.random.choice(self.model2[c][o]))
+      idx.append(np.random.choice(self._rid_by_cat_cols[c][o]))
 
-    return self.data[idx]
+    return self._data[idx]
+
+  def dim_cond_vec(self):
+    return self._n_categories
