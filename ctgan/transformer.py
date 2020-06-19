@@ -1,4 +1,5 @@
 import warnings
+from collections import namedtuple
 
 import numpy as np
 
@@ -9,186 +10,190 @@ from sklearn.preprocessing import OneHotEncoder
 
 warnings.filterwarnings("ignore", category=ConvergenceWarning)
 
-
-class SpanInfo(object):
-  def __init__(self, dim, activation_fn):
-    self._dim = dim
-    self._activation_fn = activation_fn
-
-  def dim(self):
-    return self._dim
-
-  def activation_fn(self):
-    return self._activation_fn
+SpanInfo = namedtuple("SpanInfo", ["dim", "activation_fn"])
+ColumnTransformInfo = namedtuple(
+    "ColumnTransformInfo", ["column_name", "column_type",
+                            "transform",  "transform_aux",
+                            "output_info", "output_dim"])
 
 
 class DataTransformer(object):
   """Data Transformer.
 
-  Model continuous columns with a BayesianGMM and normalized to a scalar
+  Model continuous columns with a Bayesian GMM and normalized to a scalar
   [0, 1] and a vector.
   Discrete columns are encoded using a scikit-learn OneHotEncoder.
-
-  Args:
-      n_cluster (int):
-          Number of modes.
-      epsilon (float):
-          Epsilon value.
   """
 
-  def __init__(self, n_clusters=10, epsilon=0.005):
-    self.n_clusters = n_clusters
-    self.epsilon = epsilon
+  def __init__(self, max_clusters=10, weight_threshold=0.005):
+    """Args:
+    max_clusters (int):
+        Maximum number of Gaussian distributions in Bayesian GMM.
+    weight_threshold (float):
+        Weight threshold for a Gaussian distribution to be kept.
+    """
+    self._max_clusters = max_clusters
+    self._weight_threshold = weight_threshold
 
-  def _fit_continuous(self, column, data):
+  def _fit_continuous(self, column_name, raw_column_data):
+    """Train Bayesian GMM for continuous column."""
     gm = BayesianGaussianMixture(
-        self.n_clusters,
+        self._max_clusters,
         weight_concentration_prior_type='dirichlet_process',
-        weight_concentration_prior=0.001,
-        n_init=1
-    )
-    gm.fit(data)
-    components = gm.weights_ > self.epsilon
-    num_components = components.sum()
+        weight_concentration_prior=0.001, n_init=1)
+    gm.fit(raw_column_data.reshape(-1, 1))
+    valid_component_indicator = gm.weights_ > self._weight_threshold
+    num_components = valid_component_indicator.sum()
 
-    return {
-        'name': column,
-        'model': gm,
-        'components': components,
-        'output_info': [SpanInfo(1, 'tanh'),
-                        SpanInfo(num_components, 'softmax')],
-        'output_dimensions': 1 + num_components,
-    }
+    return ColumnTransformInfo(
+        column_name=column_name, column_type="continuous", transform=gm,
+        transform_aux=valid_component_indicator,
+        output_info=[SpanInfo(1, 'tanh'),  SpanInfo(num_components, 'softmax')],
+        output_dim=1 + num_components)
 
-  def _fit_discrete(self, column, data):
+  def _fit_discrete(self, column_name, raw_column_data):
+    """Fit one hot encoder for continuous column."""
     ohe = OneHotEncoder(sparse=False)
-    ohe.fit(data)
-    categories = len(ohe.categories_[0])
+    ohe.fit(raw_column_data.reshape(-1, 1))
+    num_categories = len(ohe.categories_[0])
 
-    return {
-        'name': column,
-        'encoder': ohe,
-        'output_info': [SpanInfo(categories, 'softmax')],
-        'output_dimensions': categories
-    }
+    return ColumnTransformInfo(
+        column_name=column_name, column_type="discrete", transform=ohe,
+        transform_aux=None,
+        output_info=[SpanInfo(num_categories, 'softmax')],
+        output_dim=num_categories)
 
-  def fit(self, data, discrete_columns=tuple()):
-    self.output_info = []
-    self.output_dimensions = 0
+  def fit(self, raw_data, discrete_columns=tuple()):
+    self._output_info_list = []
+    self._output_dim = 0
 
-    if not isinstance(data, pd.DataFrame):
-      self.dataframe = False
-      data = pd.DataFrame(data)
+    if not isinstance(raw_data, pd.DataFrame):
+      self._output_as_dataframe = False
+      data = pd.DataFrame(raw_data)
     else:
-      self.dataframe = True
+      self._output_as_dataframe = True
 
-    self.dtypes = data.infer_objects().dtypes
-    self.meta = []
-    for column in data.columns:
-      column_data = data[[column]].values
-      if column in discrete_columns:
-        meta = self._fit_discrete(column, column_data)
+    self._column_raw_dtypes = raw_data.infer_objects().dtypes
+
+    self._column_transform_info_list = []
+    for column_name in raw_data.columns:
+      raw_column_data = raw_data[column_name].values
+      if column_name in discrete_columns:
+        column_transform_info = self._fit_discrete(
+            column_name, raw_column_data)
       else:
-        meta = self._fit_continuous(column, column_data)
+        column_transform_info = self._fit_continuous(
+            column_name, raw_column_data)
 
-      self.output_info.append(meta['output_info'])
-      self.output_dimensions += meta['output_dimensions']
-      self.meta.append(meta)
+      self._output_info_list.append(column_transform_info.output_info)
+      self._output_dim += column_transform_info.output_dim
+      self._column_transform_info_list.append(column_transform_info)
 
-  def _transform_continuous(self, column_meta, data):
-    components = column_meta['components']
-    model = column_meta['model']
+  def _transform_continuous(self, column_transform_info, raw_column_data):
+    gm = column_transform_info.transform
 
-    means = model.means_.reshape((1, self.n_clusters))
-    stds = np.sqrt(model.covariances_).reshape((1, self.n_clusters))
-    features = (data - means) / (4 * stds)
+    valid_component_indicator = column_transform_info.transform_aux
+    num_components = valid_component_indicator.sum()
 
-    probs = model.predict_proba(data)
+    means = gm.means_.reshape((1, self._max_clusters))
+    stds = np.sqrt(gm.covariances_).reshape((1, self._max_clusters))
+    normalized_values = ((raw_column_data - means) / (4 * stds)
+                         )[:, valid_component_indicator]
+    component_probs = gm.predict_proba(
+        raw_column_data)[:, valid_component_indicator]
 
-    n_opts = components.sum()
-    features = features[:, components]
-    probs = probs[:, components]
+    selected_component = np.zeros(len(raw_column_data), dtype='int')
+    for i in range(len(raw_column_data)):
+      component_porb_t = component_probs[i] + 1e-6
+      component_porb_t = component_porb_t / component_porb_t.sum()
+      selected_component[i] = np.random.choice(
+          np.arange(num_components), p=component_porb_t)
 
-    opt_sel = np.zeros(len(data), dtype='int')
-    for i in range(len(data)):
-      pp = probs[i] + 1e-6
-      pp = pp / pp.sum()
-      opt_sel[i] = np.random.choice(np.arange(n_opts), p=pp)
+    selected_normalized_value = normalized_values[
+        np.arange(len(raw_column_data)), selected_component].reshape([-1, 1])
+    selected_normalized_value = np.clip(selected_normalized_value, -.99, .99)
 
-    idx = np.arange((len(features)))
-    features = features[idx, opt_sel].reshape([-1, 1])
-    features = np.clip(features, -.99, .99)
+    selected_component_onehot = np.zeros_like(component_probs)
+    selected_component_onehot[np.arange(len(raw_column_data)),
+                              selected_component] = 1
+    return [selected_normalized_value, selected_component_onehot]
 
-    probs_onehot = np.zeros_like(probs)
-    probs_onehot[np.arange(len(probs)), opt_sel] = 1
-    return [features, probs_onehot]
+  def _transform_discrete(self, column_transform_info, raw_column_data):
+    ohe = column_transform_info.transform
+    return [ohe.transform(raw_column_data)]
 
-  def _transform_discrete(self, column_meta, data):
-    encoder = column_meta['encoder']
-    return encoder.transform(data)
+  def transform(self, raw_data):
+    if not isinstance(raw_data, pd.DataFrame):
+      raw_data = pd.DataFrame(raw_data)
 
-  def transform(self, data):
-    if not isinstance(data, pd.DataFrame):
-      data = pd.DataFrame(data)
-
-    values = []
-    for meta in self.meta:
-      column_data = data[[meta['name']]].values
-      if 'model' in meta:
-        values += self._transform_continuous(meta, column_data)
+    column_data_list = []
+    for column_transform_info in self._column_transform_info_list:
+      column_data = raw_data[[column_transform_info.column_name]].values
+      if column_transform_info.column_type == "continuous":
+        column_data_list += self._transform_continuous(
+            column_transform_info, column_data)
       else:
-        values.append(self._transform_discrete(meta, column_data))
+        assert column_transform_info.column_type == "discrete"
+        column_data_list += self._transform_discrete(
+            column_transform_info, column_data)
 
-    return np.concatenate(values, axis=1).astype(float)
+    return np.concatenate(column_data_list, axis=1).astype(float)
 
-  def _inverse_transform_continuous(self, meta, data, sigma):
-    model = meta['model']
-    components = meta['components']
+  def _inverse_transform_continuous(self, column_transform_info, column_data):
+    gm = column_transform_info.transform
+    valid_component_indicator = column_transform_info.transform_aux
 
-    u = data[:, 0]
-    v = data[:, 1:]
+    selected_normalized_value = column_data[:, 0]
+    selected_component_probs = column_data[:, 1:]
 
-    if sigma is not None:
-      u = np.random.normal(u, sigma)
+    selected_normalized_value = np.clip(selected_normalized_value, -1, 1)
+    component_probs = np.ones((len(column_data), self._max_clusters)) * -100
+    component_probs[:, valid_component_indicator] = selected_component_probs
 
-    u = np.clip(u, -1, 1)
-    v_t = np.ones((len(data), self.n_clusters)) * -100
-    v_t[:, components] = v
-    v = v_t
-    means = model.means_.reshape([-1])
-    stds = np.sqrt(model.covariances_).reshape([-1])
-    p_argmax = np.argmax(v, axis=1)
-    std_t = stds[p_argmax]
-    mean_t = means[p_argmax]
-    column = u * 4 * std_t + mean_t
+    means = gm.means_.reshape([-1])
+    stds = np.sqrt(gm.covariances_).reshape([-1])
+    selected_component = np.argmax(component_probs, axis=1)
+
+    std_t = stds[selected_component]
+    mean_t = means[selected_component]
+    column = selected_normalized_value * 4 * std_t + mean_t
 
     return column
 
-  def _inverse_transform_discrete(self, meta, data):
-    encoder = meta['encoder']
-    return encoder.inverse_transform(data)
+  def _inverse_transform_discrete(self, column_transform_info, column_data):
+    ohe = column_transform_info.transform
+    return ohe.inverse_transform(column_data)
 
-  def inverse_transform(self, data, sigmas):
-    start = 0
-    output = []
+  def inverse_transform(self, data):
+    st = 0
+    recovered_column_data_list = []
     column_names = []
-    for meta in self.meta:
-      dimensions = meta['output_dimensions']
-      columns_data = data[:, start:start + dimensions]
+    for column_transform_info in self._column_transform_info_list:
+      dim = column_transform_info.output_dim
+      column_data = data[:, st:st + dim]
 
-      if 'model' in meta:
-        sigma = sigmas[start] if sigmas else None
-        inverted = self._inverse_transform_continuous(meta, columns_data, sigma)
+      if column_transform_info.column_type == 'continuous':
+        recovered_column_data = self._inverse_transform_continuous(
+            column_transform_info, column_data)
       else:
-        inverted = self._inverse_transform_discrete(meta, columns_data)
+        assert column_transform_info.column_type == 'discrete'
+        recovered_column_data = self._inverse_transform_discrete(
+            column_transform_info, column_data)
 
-      output.append(inverted)
-      column_names.append(meta['name'])
-      start += dimensions
+      recovered_column_data_list.append(recovered_column_data)
+      column_names.append(column_transform_info.column_name)
+      st += dim
 
-    output = np.column_stack(output)
-    output = pd.DataFrame(output, columns=column_names).astype(self.dtypes)
-    if not self.dataframe:
-      output = output.values
+    recovered_data = np.column_stack(recovered_column_data_list)
+    recovered_data = (pd.DataFrame(recovered_data, columns=column_names)
+                      .astype(self._column_raw_dtypes))
+    if not self._output_as_dataframe:
+      recovered_data = recovered_data.values
 
-    return output
+    return recovered_data
+
+  def output_info(self):
+    return self._output_info_list
+
+  def output_dim(self):
+    return self._output_dim

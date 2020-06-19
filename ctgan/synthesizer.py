@@ -47,14 +47,14 @@ class CTGANSynthesizer(object):
   def _apply_activate(self, data):
     data_t = []
     st = 0
-    for column_info in self.transformer.output_info:
+    for column_info in self.transformer.output_info():
       for span_info in column_info:
-        if span_info.activation_fn() == 'tanh':
-          ed = st + span_info.dim()
+        if span_info.activation_fn == 'tanh':
+          ed = st + span_info.dim
           data_t.append(torch.tanh(data[:, st:ed]))
           st = ed
-        elif span_info.activation_fn() == 'softmax':
-          ed = st + span_info.dim()
+        elif span_info.activation_fn == 'softmax':
+          ed = st + span_info.dim
           data_t.append(functional.gumbel_softmax(data[:, st:ed], tau=0.2))
           st = ed
         else:
@@ -67,20 +67,20 @@ class CTGANSynthesizer(object):
     st = 0
     st_c = 0
     skip = False
-    for column_info in self.transformer.output_info:
+    for column_info in self.transformer.output_info():
       for span_info in column_info:
-        if span_info.activation_fn() == 'tanh':
-          st += span_info.dim()
+        if span_info.activation_fn == 'tanh':
+          st += span_info.dim
           skip = True
 
-        elif span_info.activation_fn() == 'softmax':
+        elif span_info.activation_fn == 'softmax':
           if skip:
             skip = False
-            st += span_info.dim()
+            st += span_info.dim
             continue
 
-          ed = st + span_info.dim()
-          ed_c = st_c + span_info.dim()
+          ed = st + span_info.dim
+          ed_c = st_c + span_info.dim
           tmp = functional.cross_entropy(
               data[:, st:ed],
               torch.argmax(c[:, st_c:ed_c], dim=1),
@@ -121,9 +121,9 @@ class CTGANSynthesizer(object):
     train_data = self.transformer.transform(train_data)
 
     self.data_sampler = DataSampler(
-        train_data, self.transformer.output_info, log_frequency)
+        train_data, self.transformer.output_info(), log_frequency)
 
-    data_dim = self.transformer.output_dimensions
+    data_dim = self.transformer.output_dim()
 
     self.generator = Generator(
         self.embedding_dim + self.data_sampler.dim_cond_vec(),
@@ -258,4 +258,4 @@ class CTGANSynthesizer(object):
     data = np.concatenate(data, axis=0)
     data = data[:n]
 
-    return self.transformer.inverse_transform(data, None)
+    return self.transformer.inverse_transform(data)

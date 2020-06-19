@@ -11,7 +11,7 @@ class DataSampler(object):
 
     def is_discrete_column(column_info):
       return (len(column_info) == 1
-              and column_info[0].activation_fn() == "softmax")
+              and column_info[0].activation_fn == "softmax")
 
     n_discrete_columns = sum(
         [1 for column_info in output_info if is_discrete_column(column_info)])
@@ -29,20 +29,20 @@ class DataSampler(object):
     for column_info in output_info:
       if is_discrete_column(column_info):
         span_info = column_info[0]
-        ed = st + span_info.dim()
+        ed = st + span_info.dim
 
         rid_by_cat = []
-        for j in range(span_info.dim()):
+        for j in range(span_info.dim):
           rid_by_cat.append(np.nonzero(data[:, st + j])[0])
         self._rid_by_cat_cols.append(rid_by_cat)
         st = ed
       else:
-        st += sum([span_info.dim() for span_info in column_info])
+        st += sum([span_info.dim for span_info in column_info])
     assert st == data.shape[1]
 
     # Prepare an interval matrix for efficiently sample conditional vector
     max_category = max(
-        [column_info[0].dim() for column_info in output_info
+        [column_info[0].dim for column_info in output_info
          if is_discrete_column(column_info)])
 
     self._discrete_column_cond_st = np.zeros(n_discrete_columns, dtype='int32')
@@ -52,7 +52,7 @@ class DataSampler(object):
         (n_discrete_columns, max_category))
     self._n_discrete_columns = n_discrete_columns
     self._n_categories = sum(
-        [column_info[0].dim() for column_info in output_info
+        [column_info[0].dim for column_info in output_info
          if is_discrete_column(column_info)])
 
     st = 0
@@ -61,20 +61,20 @@ class DataSampler(object):
     for column_info in output_info:
       if is_discrete_column(column_info):
         span_info = column_info[0]
-        ed = st + span_info.dim()
+        ed = st + span_info.dim
         category_freq = np.sum(data[:, st:ed], axis=0)
         if log_frequency:
           category_freq = np.log(category_freq + 1)
         category_prob = category_freq / np.sum(category_freq)
-        self._discrete_column_category_prob[current_id, :span_info.dim()] = (
+        self._discrete_column_category_prob[current_id, :span_info.dim] = (
             category_prob)
         self._discrete_column_cond_st[current_id] = current_cond_st
-        self._discrete_column_n_category = span_info.dim()
-        current_cond_st += span_info.dim()
+        self._discrete_column_n_category[current_id] = span_info.dim
+        current_cond_st += span_info.dim
         current_id += 1
         st = ed
       else:
-        st += sum([span_info.dim() for span_info in column_info])
+        st += sum([span_info.dim for span_info in column_info])
 
   def random_choice_prob_index(self, discrete_column_id):
     probs = self._discrete_column_category_prob[discrete_column_id]
@@ -104,19 +104,20 @@ class DataSampler(object):
       return None
 
     vec = np.zeros((batch, self._n_categories), dtype='float32')
-    row_idx = np.random.randint(0, len(self.data), batch)
-    col_idx = np.random.randint(0, self._n_discrete_columns, batch)
+
     for i in range(batch):
+      row_idx = np.random.randint(0, len(self._data))
+      col_idx = np.random.randint(0, self._n_discrete_columns)
       matrix_st = self._discrete_column_matrix_st[col_idx]
       matrix_ed = matrix_st + self._discrete_column_n_category[col_idx]
-      pick = self._data[row_idx, matrix_st:matrix_ed]
+      pick = np.argmax(self._data[row_idx, matrix_st:matrix_ed])
       vec[i, pick + self._discrete_column_cond_st[col_idx]] = 1
 
     return vec
 
   def sample_data(self, n, col, opt):
     if col is None:
-      idx = np.random.randint(len(self.data), n)
+      idx = np.random.randint(len(self._data), n)
       return self._data[idx]
 
     idx = []
