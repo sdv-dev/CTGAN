@@ -6,7 +6,7 @@ from torch.nn import functional
 
 from .data_sampler import DataSampler
 from .models import Discriminator, Generator
-from .transformer import DataTransformer
+from .data_transformer import DataTransformer
 
 
 class CTGANSynthesizer(object):
