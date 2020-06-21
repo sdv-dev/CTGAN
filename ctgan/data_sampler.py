@@ -76,7 +76,7 @@ class DataSampler(object):
       else:
         st += sum([span_info.dim for span_info in column_info])
 
-  def random_choice_prob_index(self, discrete_column_id):
+  def _random_choice_prob_index(self, discrete_column_id):
     probs = self._discrete_column_category_prob[discrete_column_id]
     r = np.expand_dims(np.random.rand(probs.shape[0]), axis=1)
     return (probs.cumsum(axis=1) > r).argmax(axis=1)
@@ -92,7 +92,7 @@ class DataSampler(object):
     vec = np.zeros((batch, self._n_categories), dtype='float32')
     mask = np.zeros((batch, self._n_discrete_columns), dtype='float32')
     mask[np.arange(batch), discrete_column_id] = 1
-    category_id_in_col = self.random_choice_prob_index(discrete_column_id)
+    category_id_in_col = self._random_choice_prob_index(discrete_column_id)
     category_id = (self._discrete_column_cond_st[discrete_column_id]
                    + category_id_in_col)
     vec[np.arange(batch), category_id] = 1
