@@ -82,6 +82,13 @@ class DataSampler(object):
     return (probs.cumsum(axis=1) > r).argmax(axis=1)
 
   def sample_condvec(self, batch):
+    """generate the conditional vector for training. (use log_frequency if enabled)
+    Returns:
+    	cond (batch x #categories) the conditional vector.
+    	mask (batch x #discrete columns) an one-hot vector indicating the selected discrete column.
+    	discrete column id (batch) integer representation of mask.
+    	category_id_in_col (batch) selected category in the selected discrete column."""
+
     if self._n_discrete_columns == 0:
       return None
 
@@ -89,21 +96,22 @@ class DataSampler(object):
     discrete_column_id = np.random.choice(
         np.arange(self._n_discrete_columns), batch)
 
-    vec = np.zeros((batch, self._n_categories), dtype='float32')
+    cond = np.zeros((batch, self._n_categories), dtype='float32')
     mask = np.zeros((batch, self._n_discrete_columns), dtype='float32')
     mask[np.arange(batch), discrete_column_id] = 1
     category_id_in_col = self._random_choice_prob_index(discrete_column_id)
     category_id = (self._discrete_column_cond_st[discrete_column_id]
                    + category_id_in_col)
-    vec[np.arange(batch), category_id] = 1
+    cond[np.arange(batch), category_id] = 1
 
-    return vec, mask, discrete_column_id, category_id_in_col
+    return cond, mask, discrete_column_id, category_id_in_col
 
   def sample_original_condvec(self, batch):
+    """generate the conditional vector for generation. (always use original frequency)"""
     if self._n_discrete_columns == 0:
       return None
 
-    vec = np.zeros((batch, self._n_categories), dtype='float32')
+    cond = np.zeros((batch, self._n_categories), dtype='float32')
 
     for i in range(batch):
       row_idx = np.random.randint(0, len(self._data))
@@ -111,11 +119,14 @@ class DataSampler(object):
       matrix_st = self._discrete_column_matrix_st[col_idx]
       matrix_ed = matrix_st + self._discrete_column_n_category[col_idx]
       pick = np.argmax(self._data[row_idx, matrix_st:matrix_ed])
-      vec[i, pick + self._discrete_column_cond_st[col_idx]] = 1
+      cond[i, pick + self._discrete_column_cond_st[col_idx]] = 1
 
-    return vec
+    return cond
 
   def sample_data(self, n, col, opt):
+    """sample data from original training data satisfying the sampled conditional vector.
+	  return n rows of matrix data.
+    """
     if col is None:
       idx = np.random.randint(len(self._data), n)
       return self._data[idx]

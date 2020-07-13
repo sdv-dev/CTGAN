@@ -27,6 +27,7 @@ class DataTransformer(object):
 
   def __init__(self, max_clusters=10, weight_threshold=0.005):
     """Args:
+    Create a data transformer.
     max_clusters (int):
         Maximum number of Gaussian distributions in Bayesian GMM.
     weight_threshold (float):
@@ -64,6 +65,8 @@ class DataTransformer(object):
         output_dim=num_categories)
 
   def fit(self, raw_data, discrete_columns=tuple()):
+    """fit GMM for continuous columns and One hot encoder for discrete columns.
+    this step also counts the #columns in matrix data, and span information."""
     self._output_info_list = []
     self._output_dim = 0
 
@@ -123,6 +126,7 @@ class DataTransformer(object):
     return [ohe.transform(raw_column_data)]
 
   def transform(self, raw_data):
+    """take raw data and output a matrix data."""
     if not isinstance(raw_data, pd.DataFrame):
       raw_data = pd.DataFrame(raw_data)
 
@@ -165,6 +169,10 @@ class DataTransformer(object):
     return ohe.inverse_transform(column_data)
 
   def inverse_transform(self, data):
+    """take matrix data and output raw data.
+    (output uses the same type as input to the transform function.
+    Either np array or pd dataframe.)
+    """
     st = 0
     recovered_column_data_list = []
     column_names = []
@@ -193,7 +201,9 @@ class DataTransformer(object):
     return recovered_data
 
   def output_info(self):
+    """return a list of SpanInfo."""
     return self._output_info_list
 
   def output_dim(self):
+    """return the number of columns in matrix data."""
     return self._output_dim
