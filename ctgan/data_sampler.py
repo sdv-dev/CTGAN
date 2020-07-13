@@ -82,12 +82,14 @@ class DataSampler(object):
     return (probs.cumsum(axis=1) > r).argmax(axis=1)
 
   def sample_condvec(self, batch):
-    """generate the conditional vector for training. (use log_frequency if enabled)
+    """generate the conditional vector for training.
     Returns:
     	cond (batch x #categories) the conditional vector.
-    	mask (batch x #discrete columns) an one-hot vector indicating the selected discrete column.
+    	mask (batch x #discrete columns) an one-hot vector indicating the
+          selected discrete column.
     	discrete column id (batch) integer representation of mask.
-    	category_id_in_col (batch) selected category in the selected discrete column."""
+    	category_id_in_col (batch) selected category in the selected
+          discrete column."""
 
     if self._n_discrete_columns == 0:
       return None
@@ -107,7 +109,7 @@ class DataSampler(object):
     return cond, mask, discrete_column_id, category_id_in_col
 
   def sample_original_condvec(self, batch):
-    """generate the conditional vector for generation. (always use original frequency)"""
+    """generate the conditional vector for generation use original frequency."""
     if self._n_discrete_columns == 0:
       return None
 
@@ -124,9 +126,9 @@ class DataSampler(object):
     return cond
 
   def sample_data(self, n, col, opt):
-    """sample data from original training data satisfying the sampled conditional vector.
-	  return n rows of matrix data.
-    """
+    """sample data from original training data satisfying the sampled
+    conditional vector.
+	  returns n rows of matrix data."""
     if col is None:
       idx = np.random.randint(len(self._data), n)
       return self._data[idx]

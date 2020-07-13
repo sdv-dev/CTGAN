@@ -5,8 +5,8 @@ from torch import optim
 from torch.nn import functional
 
 from .data_sampler import DataSampler
-from .models import Discriminator, Generator
 from .data_transformer import DataTransformer
+from .models import Discriminator, Generator
 
 
 class CTGANSynthesizer(object):
@@ -22,11 +22,13 @@ class CTGANSynthesizer(object):
       z_dim (int):
           Size of the random sample passed to the Generator. Defaults to 128.
       gen_dims (tuple or list of ints):
-          Size of the output samples for each one of the Residuals. A Resiudal Layer
-          will be created for each one of the values provided. Defaults to (256, 256).
+          Size of the output samples for each one of the Residuals. A Resiudal
+          Layer will be created for each one of the values provided.
+          Defaults to (256, 256).
       dis_dims (tuple or list of ints):
-          Size of the output samples for each one of the self._dis Layers. A Linear Layer
-          will be created for each one of the values provided. Defaults to (256, 256).
+          Size of the output samples for each one of the self._dis Layers.
+          A Linear Layer will be created for each one of the values provided.
+          Defaults to (256, 256).
       gen_lr (float):
           Learning rate for the generator. Defaults to 2e-4.
       gen_decay (float):
@@ -53,7 +55,8 @@ class CTGANSynthesizer(object):
     self._dis_lr = dis_lr
     self._dis_decay = dis_decay
     self._batch_size = batch_size
-    self._device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    self._device = torch.device(
+        "cuda:0" if torch.cuda.is_available() else "cpu")
 
   def _apply_activate(self, data):
     "Apply proper activation function to the output of the generator."
@@ -82,7 +85,8 @@ class CTGANSynthesizer(object):
     skip = False
     for column_info in self._transformer.output_info():
       for span_info in column_info:
-        if len(column_info) != 1 or span_info.activation_fn != "softmax":  # not discrete column
+        if len(column_info) != 1 or span_info.activation_fn != "softmax":
+          # not discrete column
           st += span_info.dim
         else:
           ed = st + span_info.dim
@@ -100,7 +104,8 @@ class CTGANSynthesizer(object):
 
     return (loss * m).sum() / data.size()[0]
 
-  def fit(self, train_data, discrete_columns=tuple(), epochs=300, log_frequency=True):
+  def fit(self, train_data, discrete_columns=tuple(), epochs=300,
+          log_frequency=True):
     """Fit the CTGAN Synthesizer models to the training data.
 
     Args:
@@ -115,9 +120,8 @@ class CTGANSynthesizer(object):
         epochs (int):
             Number of training epochs. Defaults to 300.
         log_frequency (boolean):
-            Whether to use log frequency of categorical levels in date conditional
-            sampling. Defaults to ``True``.
-    """
+            Whether to use log frequency of categorical levels in date
+            conditional sampling. Defaults to ``True``."""
 
     self._transformer = DataTransformer()
     self._transformer.fit(train_data, discrete_columns)
@@ -167,7 +171,8 @@ class CTGANSynthesizer(object):
 
           perm = np.arange(self._batch_size)
           np.random.shuffle(perm)
-          real = self._data_sampler.sample_data(self._batch_size, col[perm], opt[perm])
+          real = self._data_sampler.sample_data(
+              self._batch_size, col[perm], opt[perm])
           c2 = c1[perm]
 
         fake = self._gen(fakez)

@@ -11,14 +11,17 @@ def _parse_args():
   parser.add_argument('-t', '--tsv', action='store_true',
                       help='Load data in TSV format instead of CSV')
   parser.add_argument('--no-header', dest='header', action='store_false',
-                      help='The CSV file has no header. Discrete columns will be indices.')
+                      help='The CSV file has no header. '
+                      'Discrete columns will be indices.')
 
   parser.add_argument('-m', '--metadata', help='Path to the metadata')
   parser.add_argument('-d', '--discrete',
-                      help='Comma separated list of discrete columns, no whitespaces.')
+                      help='Comma separated list of discrete columns without '
+                      'whitespaces.')
 
   parser.add_argument('-n', '--num-samples', type=int,
-                      help='Number of rows to sample. Defaults to the training data size.')
+                      help='Number of rows to sample. Defaults to the '
+                      'training data size.')
 
   parser.add_argument('--gen_lr', type=float, default=2e-4,
                       help='Learning rate for the generator.')
