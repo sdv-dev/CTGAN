@@ -72,7 +72,7 @@ class DataTransformer(object):
 
     if not isinstance(raw_data, pd.DataFrame):
       self._output_as_dataframe = False
-      data = pd.DataFrame(raw_data)
+      raw_data = pd.DataFrame(raw_data)
     else:
       self._output_as_dataframe = True
 
