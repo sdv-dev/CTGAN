@@ -3,13 +3,13 @@
 
 """The setup script."""
 
-from setuptools import setup, find_packages
+from setuptools import find_packages, setup
 
 with open('README.md') as readme_file:
-    readme = readme_file.read()
+  readme = readme_file.read()
 
 with open('HISTORY.md') as history_file:
-    history = history_file.read()
+  history = history_file.read()
 
 install_requires = [
     'torch<2,>=1.0',
