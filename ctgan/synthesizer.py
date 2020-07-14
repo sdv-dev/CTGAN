@@ -15,8 +15,8 @@ class CTGANSynthesizer(object):
   This is the core class of the CTGAN project, where the different components
   are orchestrated together.
 
-  For more details about the process, please check the [Modeling Tabular data using
-  Conditional GAN](https://arxiv.org/abs/1907.00503) paper.
+  For more details about the process, please check the [Modeling Tabular data
+  using Conditional GAN](https://arxiv.org/abs/1907.00503) paper.
 
   Args:
       z_dim (int):

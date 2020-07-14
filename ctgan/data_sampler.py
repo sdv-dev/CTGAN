@@ -83,13 +83,15 @@ class DataSampler(object):
 
   def sample_condvec(self, batch):
     """generate the conditional vector for training.
+
     Returns:
-    	cond (batch x #categories) the conditional vector.
-    	mask (batch x #discrete columns) an one-hot vector indicating the
+        cond (batch x #categories) the conditional vector.
+        mask (batch x #discrete columns) an one-hot vector indicating the
           selected discrete column.
-    	discrete column id (batch) integer representation of mask.
-    	category_id_in_col (batch) selected category in the selected
-          discrete column."""
+        discrete column id (batch) integer representation of mask.
+        category_id_in_col (batch) selected category in the selected
+          discrete column.
+    """
 
     if self._n_discrete_columns == 0:
       return None
@@ -128,7 +130,9 @@ class DataSampler(object):
   def sample_data(self, n, col, opt):
     """sample data from original training data satisfying the sampled
     conditional vector.
-	  returns n rows of matrix data."""
+    returns:
+        n rows of matrix data.
+    """
     if col is None:
       idx = np.random.randint(len(self._data), n)
       return self._data[idx]
