@@ -14,9 +14,9 @@ with open('HISTORY.md') as history_file:
 install_requires = [
     'torch<2,>=1.0',
     'torchvision<1,>=0.4.2',
-    'scikit-learn<0.23,>=0.21',
+    'scikit-learn<0.24,>=0.21',
     'numpy<2,>=1.17.4',
-    'pandas<0.26,>=0.24',
+    'pandas<2,>=0.24',
 ]
 
 setup_requires = [
@@ -70,6 +70,7 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
     ],
     description='Conditional GAN for Tabular Data',
     entry_points={
@@ -90,7 +91,7 @@ setup(
     keywords='ctgan CTGAN',
     name='ctgan',
     packages=find_packages(include=['ctgan', 'ctgan.*']),
-    python_requires='>=3.5',
+    python_requires='>=3.5,<3.9',
     setup_requires=setup_requires,
     test_suite='tests',
     tests_require=tests_require,
