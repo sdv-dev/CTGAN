@@ -39,7 +39,7 @@ install-test: clean-build clean-pyc ## install the package and test dependencies
 
 .PHONY: test
 test: ## run tests quickly with the default Python
-	python -m pytest --basetemp=${ENVTMPDIR} --cov=ctgan
+	python -m pytest --cov=ctgan
 
 .PHONY: lint
 lint: ## check style with flake8 and isort
