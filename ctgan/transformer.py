@@ -1,10 +1,12 @@
+import pickle
+
 import numpy as np
 import pandas as pd
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.mixture import BayesianGaussianMixture
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.utils.testing import ignore_warnings
-import pickle
+
 
 class DataTransformer(object):
     """Data Transformer.
