@@ -4,7 +4,7 @@ from sklearn.exceptions import ConvergenceWarning
 from sklearn.mixture import BayesianGaussianMixture
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.utils.testing import ignore_warnings
-
+import pickle
 
 class DataTransformer(object):
     """Data Transformer.
@@ -176,3 +176,12 @@ class DataTransformer(object):
             output = output.values
 
         return output
+
+    def save(self, path):
+        with open(path + "/data_transform.pl", "wb") as f:
+            pickle.dump(self, f)
+
+    @classmethod
+    def load(cls, path):
+        with open(path + "/data_transform.pl", "rb") as f:
+            return pickle.load(f)

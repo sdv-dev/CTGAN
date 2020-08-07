@@ -43,6 +43,7 @@ class CTGANSynthesizer(object):
         self.l2scale = l2scale
         self.batch_size = batch_size
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        self.trained_epoches = 0
 
     def _apply_activate(self, data):
         data_t = []
@@ -95,7 +96,8 @@ class CTGANSynthesizer(object):
 
         return (loss * m).sum() / data.size()[0]
 
-    def fit(self, train_data, discrete_columns=tuple(), epochs=300, log_frequency=True):
+    def fit(self, train_data, discrete_columns=tuple(), epochs=300, log_frequency=True,
+            load_path=None):
         """Fit the CTGAN Synthesizer models to the training data.
 
         Args:
@@ -112,10 +114,14 @@ class CTGANSynthesizer(object):
             log_frequency (boolean):
                 Whether to use log frequency of categorical levels in conditional
                 sampling. Defaults to ``True``.
+            load_path: a path of load a pretrained data transformer and synthesizer.
         """
 
-        self.transformer = DataTransformer()
-        self.transformer.fit(train_data, discrete_columns)
+        if load_path is not None:
+            self.transformer = DataTransformer.load(load_path)
+        else:
+            self.transformer = DataTransformer()
+            self.transformer.fit(train_data, discrete_columns)
         train_data = self.transformer.transform(train_data)
 
         data_sampler = Sampler(train_data, self.transformer.output_info)
@@ -133,16 +139,25 @@ class CTGANSynthesizer(object):
             data_dim
         ).to(self.device)
 
-        discriminator = Discriminator(
+        self.discriminator = Discriminator(
             data_dim + self.cond_generator.n_opt,
             self.dis_dim
         ).to(self.device)
 
-        optimizerG = optim.Adam(
+        self.optimizerG = optim.Adam(
             self.generator.parameters(), lr=2e-4, betas=(0.5, 0.9),
             weight_decay=self.l2scale
         )
-        optimizerD = optim.Adam(discriminator.parameters(), lr=2e-4, betas=(0.5, 0.9))
+        self.optimizerD = optim.Adam(
+            self.discriminator.parameters(), lr=2e-4, betas=(0.5, 0.9))
+
+        if load_path is not None:
+            state_dict = torch.load(load_path + "/synthesizer.pt")
+            self.generator.load_state_dict(state_dict["generator"])
+            self.discriminator.load_state_dict(state_dict["discriminator"])
+            self.optimizerD.load_state_dict(state_dict["optimizerD"])
+            self.optimizerG.load_state_dict(state_dict["optimizerG"])
+            self.trained_epoches = state_dict["trained_epoches"]
 
         assert self.batch_size % 2 == 0
         mean = torch.zeros(self.batch_size, self.embedding_dim, device=self.device)
@@ -150,6 +165,7 @@ class CTGANSynthesizer(object):
 
         steps_per_epoch = max(len(train_data) // self.batch_size, 1)
         for i in range(epochs):
+            self.trained_epoches += 1
             for id_ in range(steps_per_epoch):
                 fakez = torch.normal(mean=mean, std=std)
 
@@ -180,16 +196,17 @@ class CTGANSynthesizer(object):
                     real_cat = real
                     fake_cat = fake
 
-                y_fake = discriminator(fake_cat)
-                y_real = discriminator(real_cat)
+                y_fake = self.discriminator(fake_cat)
+                y_real = self.discriminator(real_cat)
 
-                pen = discriminator.calc_gradient_penalty(real_cat, fake_cat, self.device)
+                pen = self.discriminator.calc_gradient_penalty(
+                    real_cat, fake_cat, self.device)
                 loss_d = -(torch.mean(y_real) - torch.mean(y_fake))
 
-                optimizerD.zero_grad()
+                self.optimizerD.zero_grad()
                 pen.backward(retain_graph=True)
                 loss_d.backward()
-                optimizerD.step()
+                self.optimizerD.step()
 
                 fakez = torch.normal(mean=mean, std=std)
                 condvec = self.cond_generator.sample(self.batch_size)
@@ -206,9 +223,9 @@ class CTGANSynthesizer(object):
                 fakeact = self._apply_activate(fake)
 
                 if c1 is not None:
-                    y_fake = discriminator(torch.cat([fakeact, c1], dim=1))
+                    y_fake = self.discriminator(torch.cat([fakeact, c1], dim=1))
                 else:
-                    y_fake = discriminator(fakeact)
+                    y_fake = self.discriminator(fakeact)
 
                 if condvec is None:
                     cross_entropy = 0
@@ -217,12 +234,12 @@ class CTGANSynthesizer(object):
 
                 loss_g = -torch.mean(y_fake) + cross_entropy
 
-                optimizerG.zero_grad()
+                self.optimizerG.zero_grad()
                 loss_g.backward()
-                optimizerG.step()
+                self.optimizerG.step()
 
             print("Epoch %d, Loss G: %.4f, Loss D: %.4f" %
-                  (i + 1, loss_g.detach().cpu(), loss_d.detach().cpu()),
+                  (self.trained_epoches, loss_g.detach().cpu(), loss_d.detach().cpu()),
                   flush=True)
 
     def sample(self, n):
@@ -259,3 +276,14 @@ class CTGANSynthesizer(object):
         data = data[:n]
 
         return self.transformer.inverse_transform(data, None)
+
+    def save(self, path):
+        states = {
+            "generator": self.generator.state_dict(),
+            "discriminator": self.discriminator.state_dict(),
+            "optimizerD": self.optimizerD.state_dict(),
+            "optimizerG": self.optimizerG.state_dict(),
+            "trained_epoches": self.trained_epoches,
+        }
+        torch.save(states, path + "/synthesizer.pt")
+        self.transformer.save(path)

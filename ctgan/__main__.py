@@ -20,6 +20,10 @@ def _parse_args():
     parser.add_argument('-n', '--num-samples', type=int,
                         help='Number of rows to sample. Defaults to the training data size')
 
+    parser.add_argument('--save_path', default=None, type=str,
+                        help='A folder to save the trained synthesizer.')
+    parser.add_argument('--load_path', default=None, type=str,
+                        help='A folder to load a trained synthesizer.')
     parser.add_argument('data', help='Path to training data')
     parser.add_argument('output', help='Path of the output file')
 
@@ -35,7 +39,10 @@ def main():
         data, discrete_columns = read_csv(args.data, args.metadata, args.header, args.discrete)
 
     model = CTGANSynthesizer()
-    model.fit(data, discrete_columns, args.epochs)
+    model.fit(data, discrete_columns, args.epochs, load_path=args.load_path)
+
+    if args.save_path is not None:
+        model.save(args.save_path)
 
     num_samples = args.num_samples or len(data)
     sampled = model.sample(num_samples)
@@ -44,3 +51,6 @@ def main():
         write_tsv(sampled, args.metadata, args.output)
     else:
         sampled.to_csv(args.output, index=False)
+
+if __name__ == "__main__":
+  main()
