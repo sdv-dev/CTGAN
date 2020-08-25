@@ -183,6 +183,22 @@ class DataTransformer(object):
         with open(path + "/data_transform.pl", "wb") as f:
             pickle.dump(self, f)
 
+    def covert_column_name_value_to_id(self, column_name, value):
+        counter = 0
+        column_id = 0
+        for info in self.meta:
+            if info["name"] == column_name:
+                break
+            if info["output_info"] == 1:  # is discrete column
+                discrete_counter += 1
+            column_id += 1
+
+        return {
+            "discrete_column_id": counter,
+            "column_id": column_id,
+            "value_id": np.argmax(info["encoder"].transform([[value]])[0])
+        }
+
     @classmethod
     def load(cls, path):
         with open(path + "/data_transform.pl", "rb") as f:

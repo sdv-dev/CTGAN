@@ -242,7 +242,7 @@ class CTGANSynthesizer(object):
                   (self.trained_epoches, loss_g.detach().cpu(), loss_d.detach().cpu()),
                   flush=True)
 
-    def sample(self, n):
+    def sample(self, n, condition_column, condition_value):
         """Sample data similar to the training data.
 
         Args:
@@ -253,6 +253,14 @@ class CTGANSynthesizer(object):
             numpy.ndarray or pandas.DataFrame
         """
 
+        if condition_column is not None and condition_value is not None:
+            condition_info = self.transformer.covert_column_name_value_to_id(
+                condition_column, condition_value)
+            global_condition_vec = self.cond_generator.generate_cond_from_condition_column_info(
+                condition_info, self.batch_size)
+        else:
+            global_condition_vec = None
+
         steps = n // self.batch_size + 1
         data = []
         for i in range(steps):
@@ -260,7 +268,11 @@ class CTGANSynthesizer(object):
             std = mean + 1
             fakez = torch.normal(mean=mean, std=std).to(self.device)
 
-            condvec = self.cond_generator.sample_zero(self.batch_size)
+            if global_condition_vec is not None:
+                condvec = global_condition_vec.copy()
+            else:
+                condvec = self.cond_generator.sample_zero(self.batch_size)
+
             if condvec is None:
                 pass
             else:

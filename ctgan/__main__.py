@@ -2,7 +2,7 @@ import argparse
 
 from ctgan.data import read_csv, read_tsv, write_tsv
 from ctgan.synthesizer import CTGANSynthesizer
-
+import os
 
 def _parse_args():
     parser = argparse.ArgumentParser(description='CTGAN Command Line Interface')
@@ -24,6 +24,12 @@ def _parse_args():
                         help='A folder to save the trained synthesizer.')
     parser.add_argument('--load_path', default=None, type=str,
                         help='A folder to load a trained synthesizer.')
+
+    parser.add_argument("--sample_condition_column", default=None, type=str,
+                        help="Select a discrete column name.")
+    parser.add_argument("--sample_condition_column_value", default=None, type=str,
+                        help="Specify the value of the selected discrete column.")
+
     parser.add_argument('data', help='Path to training data')
     parser.add_argument('output', help='Path of the output file')
 
@@ -42,10 +48,18 @@ def main():
     model.fit(data, discrete_columns, args.epochs, load_path=args.load_path)
 
     if args.save_path is not None:
+        try:
+            os.makedirs(args.save_path)
+        except:
+            pass
         model.save(args.save_path)
 
     num_samples = args.num_samples or len(data)
-    sampled = model.sample(num_samples)
+
+    if args.sample_condition_column is not None:
+        assert args.sample_condition_column_value is not None
+
+    sampled = model.sample(num_samples, args.sample_condition_column, args.sample_condition_column_value)
 
     if args.tsv:
         write_tsv(sampled, args.metadata, args.output)
