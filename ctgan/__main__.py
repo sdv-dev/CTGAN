@@ -1,8 +1,9 @@
 import argparse
+import os
 
 from ctgan.data import read_csv, read_tsv, write_tsv
 from ctgan.synthesizer import CTGANSynthesizer
-import os
+
 
 def _parse_args():
     parser = argparse.ArgumentParser(description='CTGAN Command Line Interface')
@@ -48,10 +49,7 @@ def main():
     model.fit(data, discrete_columns, args.epochs, load_path=args.load_path)
 
     if args.save_path is not None:
-        try:
-            os.makedirs(args.save_path)
-        except:
-            pass
+        os.makedirs(args.save_path, exist_ok=True)
         model.save(args.save_path)
 
     num_samples = args.num_samples or len(data)
@@ -59,7 +57,10 @@ def main():
     if args.sample_condition_column is not None:
         assert args.sample_condition_column_value is not None
 
-    sampled = model.sample(num_samples, args.sample_condition_column, args.sample_condition_column_value)
+    sampled = model.sample(
+        num_samples,
+        args.sample_condition_column,
+        args.sample_condition_column_value)
 
     if args.tsv:
         write_tsv(sampled, args.metadata, args.output)
