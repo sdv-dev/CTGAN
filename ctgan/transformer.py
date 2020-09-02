@@ -189,7 +189,7 @@ class DataTransformer(object):
         for info in self.meta:
             if info["name"] == column_name:
                 break
-            if info["output_info"] == 1:  # is discrete column
+            if len(info["output_info"]) == 1:  # is discrete column
                 discrete_counter += 1
             column_id += 1
 
