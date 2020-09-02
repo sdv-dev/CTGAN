@@ -242,7 +242,7 @@ class CTGANSynthesizer(object):
                   (self.trained_epoches, loss_g.detach().cpu(), loss_d.detach().cpu()),
                   flush=True)
 
-    def sample(self, n, condition_column, condition_value):
+    def sample(self, n, condition_column=None, condition_value=None):
         """Sample data similar to the training data.
 
         Args:
