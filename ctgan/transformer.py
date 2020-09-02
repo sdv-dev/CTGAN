@@ -184,7 +184,7 @@ class DataTransformer(object):
             pickle.dump(self, f)
 
     def covert_column_name_value_to_id(self, column_name, value):
-        counter = 0
+        discrete_counter = 0
         column_id = 0
         for info in self.meta:
             if info["name"] == column_name:
@@ -194,7 +194,7 @@ class DataTransformer(object):
             column_id += 1
 
         return {
-            "discrete_column_id": counter,
+            "discrete_column_id": discrete_counter,
             "column_id": column_id,
             "value_id": np.argmax(info["encoder"].transform([[value]])[0])
         }
