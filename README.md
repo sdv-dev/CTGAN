@@ -17,7 +17,6 @@ CTGAN is a GAN-based data synthesizer that can generate synthetic tabular data w
 
 * License: [MIT](https://github.com/sdv-dev/CTGAN/blob/master/LICENSE)
 * Development Status: [Pre-Alpha](https://pypi.org/search/?c=Development+Status+%3A%3A+2+-+Pre-Alpha)
-* Documentation: https://sdv-dev.github.io/CTGAN
 * Homepage: https://github.com/sdv-dev/CTGAN
 
 ## Overview
@@ -51,7 +50,7 @@ pip install ctgan
 This will pull and install the latest stable release from [PyPI](https://pypi.org/).
 
 If you want to install from source or contribute to the project please read the
-[Contributing Guide](https://sdv-dev.github.io/CTGAN/contributing.html#get-started).
+[Contributing Guide](CONTRIBUTING.rst).
 
 # Data Format
 
@@ -183,8 +182,6 @@ if you have a usage example that you would want to share with the community.
 https://sdv-dev.github.io/CTGAN/contributing.html#get-started) for more details about how to do it.
 3. If you have any doubts, feature requests or detect an error, please [open an issue on github](
 https://github.com/sdv-dev/CTGAN/issues)
-4. Also do not forget to check the [project documentation site](https://sdv-dev.github.io/CTGAN/)!
-
 
 # Citing TGAN
 
