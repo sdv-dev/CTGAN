@@ -96,8 +96,7 @@ class CTGANSynthesizer(object):
 
         return (loss * m).sum() / data.size()[0]
 
-    def fit(self, train_data, discrete_columns=tuple(), epochs=300, log_frequency=True,
-            load_path=None):
+    def fit(self, train_data, discrete_columns=tuple(), epochs=300, log_frequency=True):
         """Fit the CTGAN Synthesizer models to the training data.
 
         Args:
@@ -114,12 +113,9 @@ class CTGANSynthesizer(object):
             log_frequency (boolean):
                 Whether to use log frequency of categorical levels in conditional
                 sampling. Defaults to ``True``.
-            load_path: a path of load a pretrained data transformer and synthesizer.
         """
 
-        if load_path is not None:
-            self.transformer = DataTransformer.load(load_path)
-        else:
+        if not hasattr(self, "transformer"):
             self.transformer = DataTransformer()
             self.transformer.fit(train_data, discrete_columns)
         train_data = self.transformer.transform(train_data)
@@ -127,37 +123,36 @@ class CTGANSynthesizer(object):
         data_sampler = Sampler(train_data, self.transformer.output_info)
 
         data_dim = self.transformer.output_dimensions
-        self.cond_generator = ConditionalGenerator(
-            train_data,
-            self.transformer.output_info,
-            log_frequency
-        )
 
-        self.generator = Generator(
-            self.embedding_dim + self.cond_generator.n_opt,
-            self.gen_dim,
-            data_dim
-        ).to(self.device)
+        if not hasattr(self, "cond_generator"):
+            self.cond_generator = ConditionalGenerator(
+                train_data,
+                self.transformer.output_info,
+                log_frequency
+            )
 
-        self.discriminator = Discriminator(
-            data_dim + self.cond_generator.n_opt,
-            self.dis_dim
-        ).to(self.device)
+        if not hasattr(self, "generator"):
+            self.generator = Generator(
+                self.embedding_dim + self.cond_generator.n_opt,
+                self.gen_dim,
+                data_dim
+            ).to(self.device)
 
-        self.optimizerG = optim.Adam(
-            self.generator.parameters(), lr=2e-4, betas=(0.5, 0.9),
-            weight_decay=self.l2scale
-        )
-        self.optimizerD = optim.Adam(
-            self.discriminator.parameters(), lr=2e-4, betas=(0.5, 0.9))
+        if not hasattr(self, "discriminator"):
+            self.discriminator = Discriminator(
+                data_dim + self.cond_generator.n_opt,
+                self.dis_dim
+            ).to(self.device)
 
-        if load_path is not None:
-            state_dict = torch.load(load_path + "/synthesizer.pt")
-            self.generator.load_state_dict(state_dict["generator"])
-            self.discriminator.load_state_dict(state_dict["discriminator"])
-            self.optimizerD.load_state_dict(state_dict["optimizerD"])
-            self.optimizerG.load_state_dict(state_dict["optimizerG"])
-            self.trained_epoches = state_dict["trained_epoches"]
+        if not hasattr(self, "optimizerG"):
+            self.optimizerG = optim.Adam(
+                self.generator.parameters(), lr=2e-4, betas=(0.5, 0.9),
+                weight_decay=self.l2scale
+            )
+
+        if not hasattr(self, "optimizerD"):
+            self.optimizerD = optim.Adam(
+                self.discriminator.parameters(), lr=2e-4, betas=(0.5, 0.9))
 
         assert self.batch_size % 2 == 0
         mean = torch.zeros(self.batch_size, self.embedding_dim, device=self.device)
@@ -290,12 +285,26 @@ class CTGANSynthesizer(object):
         return self.transformer.inverse_transform(data, None)
 
     def save(self, path):
-        states = {
-            "generator": self.generator.state_dict(),
-            "discriminator": self.discriminator.state_dict(),
-            "optimizerD": self.optimizerD.state_dict(),
-            "optimizerG": self.optimizerG.state_dict(),
-            "trained_epoches": self.trained_epoches,
-        }
-        torch.save(states, path + "/synthesizer.pt")
-        self.transformer.save(path)
+        assert hasattr(self, "generator")
+        assert hasattr(self, "discriminator")
+        assert hasattr(self, "transformer")
+
+        # always save a cpu model.
+        device_bak = self.device
+        self.device = self.device = torch.device("cpu")
+        self.generator.to(self.device)
+        self.discriminator.to(self.device)
+
+        torch.save(self, path)
+
+        self.device = device_bak
+        self.generator.to(self.device)
+        self.discriminator.to(self.device)
+
+    @classmethod
+    def load(cls, path):
+        model = torch.load(path)
+        model.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        model.generator.to(model.device)
+        model.discriminator.to(model.device)
+        return model

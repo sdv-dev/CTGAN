@@ -21,10 +21,10 @@ def _parse_args():
     parser.add_argument('-n', '--num-samples', type=int,
                         help='Number of rows to sample. Defaults to the training data size')
 
-    parser.add_argument('--save_path', default=None, type=str,
-                        help='A folder to save the trained synthesizer.')
-    parser.add_argument('--load_path', default=None, type=str,
-                        help='A folder to load a trained synthesizer.')
+    parser.add_argument('--save', default=None, type=str,
+                        help='A filename to save the trained synthesizer.')
+    parser.add_argument('--load', default=None, type=str,
+                        help='A filename to load a trained synthesizer.')
 
     parser.add_argument("--sample_condition_column", default=None, type=str,
                         help="Select a discrete column name.")
@@ -45,12 +45,14 @@ def main():
     else:
         data, discrete_columns = read_csv(args.data, args.metadata, args.header, args.discrete)
 
-    model = CTGANSynthesizer()
-    model.fit(data, discrete_columns, args.epochs, load_path=args.load_path)
+    if args.load:
+        model = CTGANSynthesizer.load(args.load)
+    else:
+        model = CTGANSynthesizer()
+    model.fit(data, discrete_columns, args.epochs)
 
-    if args.save_path is not None:
-        os.makedirs(args.save_path, exist_ok=True)
-        model.save(args.save_path)
+    if args.save is not None:
+        model.save(args.save)
 
     num_samples = args.num_samples or len(data)
 
