@@ -1,5 +1,4 @@
 import argparse
-import os
 
 from ctgan.data import read_csv, read_tsv, write_tsv
 from ctgan.synthesizer import CTGANSynthesizer
