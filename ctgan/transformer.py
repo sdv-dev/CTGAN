@@ -1,3 +1,5 @@
+import pickle
+
 import numpy as np
 import pandas as pd
 from sklearn.exceptions import ConvergenceWarning
@@ -176,3 +178,28 @@ class DataTransformer(object):
             output = output.values
 
         return output
+
+    def save(self, path):
+        with open(path + "/data_transform.pl", "wb") as f:
+            pickle.dump(self, f)
+
+    def covert_column_name_value_to_id(self, column_name, value):
+        discrete_counter = 0
+        column_id = 0
+        for info in self.meta:
+            if info["name"] == column_name:
+                break
+            if len(info["output_info"]) == 1:  # is discrete column
+                discrete_counter += 1
+            column_id += 1
+
+        return {
+            "discrete_column_id": discrete_counter,
+            "column_id": column_id,
+            "value_id": np.argmax(info["encoder"].transform([[value]])[0])
+        }
+
+    @classmethod
+    def load(cls, path):
+        with open(path + "/data_transform.pl", "rb") as f:
+            return pickle.load(f)
