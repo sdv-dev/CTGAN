@@ -22,7 +22,7 @@ class CTGANSynthesizer(object):
         embedding_dim (int):
             Size of the random sample passed to the Generator. Defaults to 128.
         gen_dim (tuple or list of ints):
-            Size of the output samples for each one of the Residuals. A Resiudal Layer
+            Size of the output samples for each one of the Residuals. A Residual Layer
             will be created for each one of the values provided. Defaults to (256, 256).
         dis_dim (tuple or list of ints):
             Size of the output samples for each one of the Discriminator Layers. A Linear Layer
