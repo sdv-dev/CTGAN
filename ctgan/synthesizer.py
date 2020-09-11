@@ -291,7 +291,7 @@ class CTGANSynthesizer(object):
 
         # always save a cpu model.
         device_bak = self.device
-        self.device = self.device = torch.device("cpu")
+        self.device = torch.device("cpu")
         self.generator.to(self.device)
         self.discriminator.to(self.device)
 
