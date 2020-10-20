@@ -31,10 +31,12 @@ class CTGANSynthesizer(object):
             Wheight Decay for the Adam Optimizer. Defaults to 1e-6.
         batch_size (int):
             Number of data samples to process in each step.
+        blackbox_model:
+            Model that implements fit, predict, predict_proba
     """
 
     def __init__(self, embedding_dim=128, gen_dim=(256, 256), dis_dim=(256, 256),
-                 l2scale=1e-6, batch_size=500):
+                 l2scale=1e-6, batch_size=500, blackbox_model=None):
 
         self.embedding_dim = embedding_dim
         self.gen_dim = gen_dim
@@ -44,6 +46,7 @@ class CTGANSynthesizer(object):
         self.batch_size = batch_size
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.trained_epoches = 0
+        self.blackbox_model = blackbox_model
 
     def _apply_activate(self, data):
         data_t = []
@@ -96,7 +99,7 @@ class CTGANSynthesizer(object):
 
         return (loss * m).sum() / data.size()[0]
 
-    def fit(self, train_data, discrete_columns=tuple(), epochs=300, log_frequency=True):
+    def fit(self, train_data, discrete_columns=tuple(), epochs=300, log_frequency=True, confidence_level=0.9):
         """Fit the CTGAN Synthesizer models to the training data.
 
         Args:
@@ -113,8 +116,11 @@ class CTGANSynthesizer(object):
             log_frequency (boolean):
                 Whether to use log frequency of categorical levels in conditional
                 sampling. Defaults to ``True``.
+            confidence_level (double):
+                desired confidence level for the generated data
         """
-
+        
+        print("Todo: something with confidence_level")
         if not hasattr(self, "transformer"):
             self.transformer = DataTransformer()
             self.transformer.fit(train_data, discrete_columns)
@@ -282,6 +288,7 @@ class CTGANSynthesizer(object):
         data = np.concatenate(data, axis=0)
         data = data[:n]
 
+        # Eli: Generate some data from preprocessed data, and then inverse transofrm it
         return self.transformer.inverse_transform(data, None)
 
     def save(self, path):
