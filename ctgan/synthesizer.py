@@ -28,7 +28,7 @@ class CTGANSynthesizer(object):
             Size of the output samples for each one of the Discriminator Layers. A Linear Layer
             will be created for each one of the values provided. Defaults to (256, 256).
         l2scale (float):
-            Wheight Decay for the Adam Optimizer. Defaults to 1e-6.
+            Weight Decay for the Adam Optimizer. Defaults to 1e-6.
         batch_size (int):
             Number of data samples to process in each step.
         blackbox_model:
@@ -119,8 +119,10 @@ class CTGANSynthesizer(object):
             confidence_level (double):
                 desired confidence level for the generated data
         """
-        
+
         print("Todo: something with confidence_level")
+
+        # Eli: add Mode-specific Normalization
         if not hasattr(self, "transformer"):
             self.transformer = DataTransformer()
             self.transformer.fit(train_data, discrete_columns)
@@ -130,6 +132,7 @@ class CTGANSynthesizer(object):
 
         data_dim = self.transformer.output_dimensions
 
+        # add all attributes
         if not hasattr(self, "cond_generator"):
             self.cond_generator = ConditionalGenerator(
                 train_data,
@@ -161,14 +164,16 @@ class CTGANSynthesizer(object):
                 self.discriminator.parameters(), lr=2e-4, betas=(0.5, 0.9))
 
         assert self.batch_size % 2 == 0
+
+        # init mean to zero and std to one
         mean = torch.zeros(self.batch_size, self.embedding_dim, device=self.device)
         std = mean + 1
 
         steps_per_epoch = max(len(train_data) // self.batch_size, 1)
-        for i in range(epochs):
+        for i in range(epochs): # in each epoch
             self.trained_epoches += 1
-            for id_ in range(steps_per_epoch):
-                fakez = torch.normal(mean=mean, std=std)
+            for id_ in range(steps_per_epoch): # epoch step
+                fakez = torch.normal(mean=mean, std=std) #
 
                 condvec = self.cond_generator.sample(self.batch_size)
                 if condvec is None:
