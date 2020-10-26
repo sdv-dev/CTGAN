@@ -1,7 +1,8 @@
 import numpy as np
 import torch
 from torch import optim
-from torch.nn import functional
+import torch.nn.functional as F
+
 
 from ctgan.conditional import ConditionalGenerator
 from ctgan.models import Discriminator, Generator
@@ -36,7 +37,7 @@ class CTGANSynthesizer(object):
     """
 
     def __init__(self, embedding_dim=128, gen_dim=(256, 256), dis_dim=(256, 256),
-                 l2scale=1e-6, batch_size=500, blackbox_model=None):
+                 l2scale=1e-6, batch_size=500, blackbox_model=None, preprocessing_pipeline=None):
 
         self.embedding_dim = embedding_dim
         self.gen_dim = gen_dim
@@ -47,6 +48,8 @@ class CTGANSynthesizer(object):
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.trained_epoches = 0
         self.blackbox_model = blackbox_model
+        self.preprocessing_pipeline = preprocessing_pipeline
+        self.confidence_level = -1  # will set in fit
 
     def _apply_activate(self, data):
         data_t = []
@@ -58,7 +61,7 @@ class CTGANSynthesizer(object):
                 st = ed
             elif item[1] == 'softmax':
                 ed = st + item[0]
-                data_t.append(functional.gumbel_softmax(data[:, st:ed], tau=0.2))
+                data_t.append(F.gumbel_softmax(data[:, st:ed], tau=0.2))
                 st = ed
             else:
                 assert 0
@@ -83,7 +86,7 @@ class CTGANSynthesizer(object):
 
                 ed = st + item[0]
                 ed_c = st_c + item[0]
-                tmp = functional.cross_entropy(
+                tmp = F.cross_entropy(
                     data[:, st:ed],
                     torch.argmax(c[:, st_c:ed_c], dim=1),
                     reduction='none'
@@ -99,7 +102,8 @@ class CTGANSynthesizer(object):
 
         return (loss * m).sum() / data.size()[0]
 
-    def fit(self, train_data, discrete_columns=tuple(), epochs=300, log_frequency=True, confidence_level=0.9):
+    def fit(self, train_data, discrete_columns=tuple(), epochs=300, log_frequency=True,
+            confidence_level=-1):
         """Fit the CTGAN Synthesizer models to the training data.
 
         Args:
@@ -117,10 +121,10 @@ class CTGANSynthesizer(object):
                 Whether to use log frequency of categorical levels in conditional
                 sampling. Defaults to ``True``.
             confidence_level (double):
-                desired confidence level for the generated data
+                desired confidence level for the generated data.
+                Defaults to ``-1``.
         """
-
-        print("Todo: something with confidence_level")
+        self.confidence_level = confidence_level
 
         # Eli: add Mode-specific Normalization
         if not hasattr(self, "transformer"):
@@ -170,10 +174,12 @@ class CTGANSynthesizer(object):
         std = mean + 1
 
         steps_per_epoch = max(len(train_data) // self.batch_size, 1)
-        for i in range(epochs): # in each epoch
+
+        # Eli: start training loop
+        for i in range(epochs):
             self.trained_epoches += 1
-            for id_ in range(steps_per_epoch): # epoch step
-                fakez = torch.normal(mean=mean, std=std) #
+            for id_ in range(steps_per_epoch):  # epoch step
+                fakez = torch.normal(mean=mean, std=std)
 
                 condvec = self.cond_generator.sample(self.batch_size)
                 if condvec is None:
@@ -192,9 +198,9 @@ class CTGANSynthesizer(object):
 
                 fake = self.generator(fakez)
                 fakeact = self._apply_activate(fake)
-
                 real = torch.from_numpy(real.astype('float32')).to(self.device)
 
+                # Eli: start here - generated fake and real data
                 if c1 is not None:
                     fake_cat = torch.cat([fakeact, c1], dim=1)
                     real_cat = torch.cat([real, c2], dim=1)
@@ -238,7 +244,13 @@ class CTGANSynthesizer(object):
                 else:
                     cross_entropy = self._cond_loss(fake, c1, m1)
 
+                # Eli: todo - add here our loss
                 loss_g = -torch.mean(y_fake) + cross_entropy
+
+                if self.confidence_level != -1:
+                    gen_out = self.sample(self.batch_size)  # generate `batch_size` samples
+                    loss_confidence = self._calc_bb_confidence_loss(gen_out)
+                    loss_g = 0.5 * loss_g + 0.5 * loss_confidence
 
                 self.optimizerG.zero_grad()
                 loss_g.backward()
@@ -320,3 +332,17 @@ class CTGANSynthesizer(object):
         model.generator.to(model.device)
         model.discriminator.to(model.device)
         return model
+
+    def _calc_bb_confidence_loss(self, gen_out):
+        gen_out_after = self.preprocessing_pipeline.fit_transform(gen_out)
+        import ipdb
+        ipdb.set_trace()
+        y_prob = self.blackbox_model.predict_proba(gen_out_after)
+        y_conf_gen = np.max(y_prob, axis=1)  # confidence scores
+        # create vector with the same size of y_confidence filled with `confidence_level` values
+        y_conf_wanted = np.full(len(y_conf_gen), self.confidence_level)
+        conf_loss = F.l1_loss(y_conf_gen, y_conf_wanted)
+        return conf_loss
+
+
+
