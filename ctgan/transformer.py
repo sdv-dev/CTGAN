@@ -2,9 +2,9 @@ import pickle
 
 import numpy as np
 import pandas as pd
+from rdt.transformers import OneHotEncodingTransformer
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.mixture import BayesianGaussianMixture
-from sklearn.preprocessing import OneHotEncoder
 from sklearn.utils.testing import ignore_warnings
 
 
@@ -47,9 +47,10 @@ class DataTransformer(object):
         }
 
     def _fit_discrete(self, column, data):
-        ohe = OneHotEncoder(sparse=False)
+        ohe = OneHotEncodingTransformer()
+        data = data[:, 0]
         ohe.fit(data)
-        categories = len(ohe.categories_[0])
+        categories = len(set(data))
 
         return {
             'name': column,
@@ -111,7 +112,7 @@ class DataTransformer(object):
 
     def _transform_discrete(self, column_meta, data):
         encoder = column_meta['encoder']
-        return encoder.transform(data)
+        return encoder.transform(data[:, 0])
 
     def transform(self, data):
         if not isinstance(data, pd.DataFrame):
@@ -152,7 +153,7 @@ class DataTransformer(object):
 
     def _inverse_transform_discrete(self, meta, data):
         encoder = meta['encoder']
-        return encoder.inverse_transform(data)
+        return encoder.reverse_transform(data)
 
     def inverse_transform(self, data, sigmas):
         start = 0
