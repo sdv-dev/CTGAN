@@ -244,21 +244,29 @@ class CTGANSynthesizer(object):
                 else:
                     cross_entropy = self._cond_loss(fake, c1, m1)
 
-                # Eli: todo - add here our loss
-                loss_g = -torch.mean(y_fake) + cross_entropy
-
                 if self.confidence_level != -1:
                     gen_out = self.sample(self.batch_size)  # generate `batch_size` samples
-                    loss_confidence = self._calc_bb_confidence_loss(gen_out)
-                    loss_g = 0.5 * loss_g + 0.5 * loss_confidence
+                    loss_bb = self._calc_bb_confidence_loss(gen_out)
+                    loss_g = loss_bb + cross_entropy
+                else:  # original loss
+                    loss_g = -torch.mean(y_fake) + cross_entropy
+
+                import ipdb
+                ipdb.set_trace()
 
                 self.optimizerG.zero_grad()
                 loss_g.backward()
                 self.optimizerG.step()
 
-            print("Epoch %d, Loss G: %.4f, Loss D: %.4f" %
-                  (self.trained_epoches, loss_g.detach().cpu(), loss_d.detach().cpu()),
-                  flush=True)
+
+            if self.confidence_level != -1:
+                print("Epoch %d, Loss G: %.4f, Loss BB: %.4f" %
+                      (self.trained_epoches, loss_g.detach().cpu(), loss_bb.detach().cpu()),
+                      flush=True)
+            else:  # original loss
+                print("Epoch %d, Loss G: %.4f, Loss D: %.4f" %
+                      (self.trained_epoches, loss_g.detach().cpu(), loss_d.detach().cpu()),
+                      flush=True)
 
     def sample(self, n, condition_column=None, condition_value=None):
         """Sample data similar to the training data.
@@ -305,7 +313,7 @@ class CTGANSynthesizer(object):
         data = np.concatenate(data, axis=0)
         data = data[:n]
 
-        # Eli: Generate some data from preprocessed data, and then inverse transofrm it
+        # Eli: Generate some data from preprocessed data, and then inverse transform it
         return self.transformer.inverse_transform(data, None)
 
     def save(self, path):
@@ -334,14 +342,19 @@ class CTGANSynthesizer(object):
         return model
 
     def _calc_bb_confidence_loss(self, gen_out):
-        gen_out_after = self.preprocessing_pipeline.fit_transform(gen_out)
-        import ipdb
-        ipdb.set_trace()
-        y_prob = self.blackbox_model.predict_proba(gen_out_after)
-        y_conf_gen = np.max(y_prob, axis=1)  # confidence scores
+        y_prob = self.blackbox_model.predict_proba(gen_out)
+        y_conf_gen = y_prob[:, 0]  # confidence scores
+
         # create vector with the same size of y_confidence filled with `confidence_level` values
         y_conf_wanted = np.full(len(y_conf_gen), self.confidence_level)
-        conf_loss = F.l1_loss(y_conf_gen, y_conf_wanted)
+
+        # to tensor
+        y_conf_gen = torch.from_numpy(y_conf_gen).to(self.device)
+        y_conf_wanted = torch.from_numpy(y_conf_wanted).to(self.device)
+
+        # loss
+        conf_loss = torch.nn.L1Loss()(y_conf_gen, y_conf_wanted)
+
         return conf_loss
 
 
