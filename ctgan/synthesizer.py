@@ -3,7 +3,6 @@ import torch
 from torch import optim
 import torch.nn.functional as F
 
-
 from ctgan.conditional import ConditionalGenerator
 from ctgan.models import Discriminator, Generator
 from ctgan.sampler import Sampler
@@ -36,8 +35,15 @@ class CTGANSynthesizer(object):
             Model that implements fit, predict, predict_proba
     """
 
-    def __init__(self, embedding_dim=128, gen_dim=(256, 256), dis_dim=(256, 256),
-                 l2scale=1e-6, batch_size=500, blackbox_model=None, preprocessing_pipeline=None):
+    def __init__(self,
+                 embedding_dim=128,
+                 gen_dim=(256, 256),
+                 dis_dim=(256, 256),
+                 l2scale=1e-6,
+                 batch_size=500,
+                 blackbox_model=None,
+                 preprocessing_pipeline=None,
+                 ):
 
         self.embedding_dim = embedding_dim
         self.gen_dim = gen_dim
@@ -103,7 +109,7 @@ class CTGANSynthesizer(object):
         return (loss * m).sum() / data.size()[0]
 
     def fit(self, train_data, discrete_columns=tuple(), epochs=300, log_frequency=True,
-            confidence_level=-1):
+            confidence_level=-1, verbose=True):
         """Fit the CTGAN Synthesizer models to the training data.
 
         Args:
@@ -125,6 +131,8 @@ class CTGANSynthesizer(object):
                 Defaults to ``-1``.
         """
         self.confidence_level = confidence_level
+        loss_other_name = 'loss_bb' if confidence_level != -1 else 'loss_d'
+        history = {'loss_g': [], loss_other_name: []}
 
         # Eli: add Mode-specific Normalization
         if not hasattr(self, "transformer"):
@@ -211,14 +219,14 @@ class CTGANSynthesizer(object):
                 y_fake = self.discriminator(fake_cat)
                 y_real = self.discriminator(real_cat)
 
-                pen = self.discriminator.calc_gradient_penalty(
-                    real_cat, fake_cat, self.device)
+                pen = self.discriminator.calc_gradient_penalty(real_cat, fake_cat, self.device)
                 loss_d = -(torch.mean(y_real) - torch.mean(y_fake))
 
-                self.optimizerD.zero_grad()
-                pen.backward(retain_graph=True)
-                loss_d.backward()
-                self.optimizerD.step()
+                if self.confidence_level == -1:  # without bb loss
+                    self.optimizerD.zero_grad()
+                    pen.backward(retain_graph=True)
+                    loss_d.backward()
+                    self.optimizerD.step()
 
                 fakez = torch.normal(mean=mean, std=std)
                 condvec = self.cond_generator.sample(self.batch_size)
@@ -251,22 +259,21 @@ class CTGANSynthesizer(object):
                 else:  # original loss
                     loss_g = -torch.mean(y_fake) + cross_entropy
 
-                import ipdb
-                ipdb.set_trace()
-
                 self.optimizerG.zero_grad()
                 loss_g.backward()
                 self.optimizerG.step()
 
+            loss_g_val = loss_g.detach().cpu()
+            loss_other_val = locals()[loss_other_name].detach().cpu()
+            history['loss_g'].append(loss_g.item())
+            history[loss_other_name].append(loss_other_val.item())
 
-            if self.confidence_level != -1:
-                print("Epoch %d, Loss G: %.4f, Loss BB: %.4f" %
-                      (self.trained_epoches, loss_g.detach().cpu(), loss_bb.detach().cpu()),
-                      flush=True)
-            else:  # original loss
-                print("Epoch %d, Loss G: %.4f, Loss D: %.4f" %
-                      (self.trained_epoches, loss_g.detach().cpu(), loss_d.detach().cpu()),
-                      flush=True)
+            if verbose:
+                print(
+                    f"Epoch {self.trained_epoches}, Loss G: {loss_g_val}, {loss_other_name}: {loss_other_val}",
+                    flush=True)
+
+        return history
 
     def sample(self, n, condition_column=None, condition_value=None):
         """Sample data similar to the training data.
@@ -349,13 +356,10 @@ class CTGANSynthesizer(object):
         y_conf_wanted = np.full(len(y_conf_gen), self.confidence_level)
 
         # to tensor
-        y_conf_gen = torch.from_numpy(y_conf_gen).to(self.device)
-        y_conf_wanted = torch.from_numpy(y_conf_wanted).to(self.device)
+        y_conf_gen = torch.tensor(y_conf_gen, requires_grad=True).to(self.device)
+        y_conf_wanted = torch.tensor(y_conf_wanted).to(self.device)
 
         # loss
         conf_loss = torch.nn.L1Loss()(y_conf_gen, y_conf_wanted)
 
         return conf_loss
-
-
-
