@@ -37,7 +37,7 @@ we develop a new model called CTGAN. Several major differences make CTGAN outper
 
 ## Requirements
 
-**CTGAN** has been developed and tested on [Python 3.5, 3.6 and 3.7](https://www.python.org/downloads/)
+**CTGAN** has been developed and tested on [Python 3.6, 3.7 and 3.8](https://www.python.org/downloads/)
 
 ## Install from PyPI
 
