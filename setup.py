@@ -15,7 +15,7 @@ install_requires = [
     'torch<2,>=1.0',
     'torchvision<1,>=0.4.2',
     'scikit-learn<0.24,>=0.21',
-    'rdt>=0.2.7',
+    'rdt>=0.2.7,<0.3',
     'numpy<2,>=1.17.4',
     'pandas<2,>=0.24',
 ]
