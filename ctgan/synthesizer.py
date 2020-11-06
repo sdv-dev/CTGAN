@@ -8,6 +8,8 @@ from ctgan.models import Discriminator, Generator
 from ctgan.sampler import Sampler
 from ctgan.transformer import DataTransformer
 
+from packaging import version
+
 
 class CTGANSynthesizer(object):
     """Conditional Table GAN Synthesizer.
@@ -55,10 +57,21 @@ class CTGANSynthesizer(object):
                 st = ed
             elif item[1] == 'softmax':
                 ed = st + item[0]
-                weights = functional.gumbel_softmax(data[:, st:ed], tau=0.2)
-                while np.isnan(torch.sum(weights).cpu().detach().numpy()):
-                    weights = functional.gumbel_softmax(data[:, st:ed], tau=0.2)
-                data_t.append(weights)
+                transformed = functional.gumbel_softmax(data[:, st:ed], tau=0.2)
+
+                #Deals with the instability of the gumbel_softmax for older versions of torch
+                #https://drive.google.com/file/d/1AA5wPfZ1kquaRtVruCd6BiYZGcDeNxyP/view?usp=sharing
+                if version.parse(torch.__version__) < version.parse("1.2.0"):
+                    for i in range(10):
+                        if torch.isnan(transformed).any():
+                            transformed = functional.gumbel_softmax(data[:, st:ed], tau=0.2)
+                        else:
+                            break
+                    else:
+                        raise ValueError("gumbel_softmax returning NaN.")
+
+
+                data_t.append(transformed)
                 st = ed
             else:
                 assert 0
