@@ -55,7 +55,10 @@ class CTGANSynthesizer(object):
                 st = ed
             elif item[1] == 'softmax':
                 ed = st + item[0]
-                data_t.append(functional.gumbel_softmax(data[:, st:ed], tau=0.2))
+                weights = functional.gumbel_softmax(data[:, st:ed], tau=0.2)
+                while np.isnan(torch.sum(weights).cpu().detach().numpy()):
+                    weights = functional.gumbel_softmax(data[:, st:ed], tau=0.2)
+                data_t.append(weights)
                 st = ed
             else:
                 assert 0
