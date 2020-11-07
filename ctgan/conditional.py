@@ -10,6 +10,10 @@ class ConditionalGenerator(object):
         max_interval = 0
         counter = 0
         for item in output_info:
+            # NOTE:
+            # in transformer.py, the output_info of _fit_continuous contains tanh and softmax.
+            # Thus, the reason for skip = True in the for loop.
+            # the output_info of _fit_discrete contains only softmax.
             if item[1] == 'tanh':
                 start += item[0]
                 skip = True
@@ -32,6 +36,9 @@ class ConditionalGenerator(object):
 
         assert start == data.shape[1]
 
+        # NOTE:
+        # n_col is the number of categorical columns.
+        # n_opt is total number of categories in all categorical columns.
         self.interval = []
         self.n_col = 0
         self.n_opt = 0
@@ -50,9 +57,16 @@ class ConditionalGenerator(object):
                     continue
                 end = start + item[0]
                 tmp = np.sum(data[:, start:end], axis=0)
+
+                # NOTE:
+                # See explanation in Figure 2 of the paper.
+                # "training data are sampled according to the log-frequency of each category,
+                # thus CTGAN can evenly explore all possible discrete values."
                 if log_frequency:
                     tmp = np.log(tmp + 1)
                 tmp = tmp / np.sum(tmp)
+
+                # NOTE: p records the probability mass function of corresponding categorical columns.
                 self.p[self.n_col, :item[0]] = tmp
                 self.interval.append((self.n_opt, item[0]))
                 self.n_opt += item[0]
@@ -64,13 +78,21 @@ class ConditionalGenerator(object):
         self.interval = np.asarray(self.interval)
 
     def random_choice_prob_index(self, idx):
+        # NOTE: inverse transform sampling
         a = self.p[idx]
         r = np.expand_dims(np.random.rand(a.shape[0]), axis=1)
         return (a.cumsum(axis=1) > r).argmax(axis=1)
 
     def sample(self, batch):
+        # NOTE: sample is used for training. See synthesizer fit function
         if self.n_col == 0:
             return None
+
+        # NOTE:
+        # idx: randomly choose one of the categorical columns
+        # vec1: example in the paper, see Figure 2, the one-hot encoded vector of D1 and D2.
+        # mask1: which categorical column is selected.
+        # opt1prime: the selected category of corresponding categorical column.
 
         batch = batch
         idx = np.random.choice(np.arange(self.n_col), batch)
@@ -85,6 +107,8 @@ class ConditionalGenerator(object):
         return vec1, mask1, idx, opt1prime
 
     def sample_zero(self, batch):
+        # NOTE: sample_zero is used for synthesizing data after ctgan is trained.
+        # See synthesizer sample function.
         if self.n_col == 0:
             return None
 
@@ -98,6 +122,8 @@ class ConditionalGenerator(object):
         return vec
 
     def generate_cond_from_condition_column_info(self, condition_info, batch):
+        # NOTE: generate_cond_from_condition_column_info is used for synthesizing data after ctgan is trained.
+        # See synthesizer sample function, when condition_column and condition_value are both given.
         vec = np.zeros((batch, self.n_opt), dtype='float32')
         id = self.interval[condition_info["discrete_column_id"]][0] + condition_info["value_id"]
         vec[:, id] = 1
