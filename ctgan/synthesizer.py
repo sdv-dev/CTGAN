@@ -46,7 +46,8 @@ class CTGANSynthesizer(object):
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.trained_epoches = 0
 
-    def _gumbel_softmax(self, logits, tau=1, hard=False, eps=1e-10, dim=-1):
+    @staticmethod
+    def _gumbel_softmax(logits, tau=1, hard=False, eps=1e-10, dim=-1):
         """Deals with the instability of the gumbel_softmax for older versions of torch
            https://drive.google.com/file/d/1AA5wPfZ1kquaRtVruCd6BiYZGcDeNxyP/view?usp=sharing
 
@@ -60,7 +61,7 @@ class CTGANSynthesizer(object):
         Returns:
                 Sampled tensor of same shape as logits from the Gumbel-Softmax distribution.
         """
-
+    
         if version.parse(torch.__version__) < version.parse("1.2.0"):
             for i in range(10):
                 transformed = functional.gumbel_softmax(logits, tau=tau, hard=hard,
