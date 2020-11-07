@@ -96,3 +96,7 @@ def test_categorical_nan():
     assert len(values) == 3
     assert any(pd.isnull(x) for x in values)
     assert {"b", "c"}.issubset(values)
+
+
+if __name__ == "__main__":
+    test_ctgan_dataframe()
