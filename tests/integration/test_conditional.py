@@ -5,7 +5,6 @@ from ctgan.conditional import ConditionalGenerator
 
 
 def test_conditional_generator():
-
     # create toy example with 3 categorical columns.
     # there are 7 total categories
     data = pd.DataFrame({
@@ -22,7 +21,8 @@ def test_conditional_generator():
     transformer.fit(data, discrete_columns)
     data = transformer.transform(data)
 
-    test_cond_gen = ConditionalGenerator(data, transformer.output_info, True)
+    # Note that log_frequency=True converts the proportions of each categorical column to log scale.
+    test_cond_gen = ConditionalGenerator(data, transformer.output_info, log_frequency=True)
     assert test_cond_gen.n_opt == 7  # sum of number of categories in all categorical columns
     assert test_cond_gen.n_col == 3  # number of columns
 
