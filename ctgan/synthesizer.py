@@ -45,6 +45,21 @@ class CTGANSynthesizer(object):
         self.batch_size = batch_size
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.trained_epoches = 0
+    
+    def _gumbel_softmax(self, logits, tau=1, hard=False, eps=1e-10, dim=-1):
+        # Deals with the instability of the gumbel_softmax for older versions of torch
+        # https://drive.google.com/file/d/1AA5wPfZ1kquaRtVruCd6BiYZGcDeNxyP/view?usp=sharing
+        transformed = functional.gumbel_softmax(logits, tau=tau, hard=hard, eps=eps, dim=dim)
+        if version.parse(torch.__version__) < version.parse("1.2.0"):
+            for i in range(10):
+                if torch.isnan(transformed).any():
+                    transformed = functional.gumbel_softmax(logits, tau=0.2)
+                else:
+                    break
+            else:
+                raise ValueError("gumbel_softmax returning NaN.")
+        
+        return transformed
 
     def _apply_activate(self, data):
         data_t = []
@@ -56,19 +71,7 @@ class CTGANSynthesizer(object):
                 st = ed
             elif item[1] == 'softmax':
                 ed = st + item[0]
-                transformed = functional.gumbel_softmax(data[:, st:ed], tau=0.2)
-
-                # Deals with the instability of the gumbel_softmax for older versions of torch
-                # https://drive.google.com/file/d/1AA5wPfZ1kquaRtVruCd6BiYZGcDeNxyP/view?usp=sharing
-                if version.parse(torch.__version__) < version.parse("1.2.0"):
-                    for i in range(10):
-                        if torch.isnan(transformed).any():
-                            transformed = functional.gumbel_softmax(data[:, st:ed], tau=0.2)
-                        else:
-                            break
-                    else:
-                        raise ValueError("gumbel_softmax returning NaN.")
-
+                transformed = self._gumbel_softmax(data[:, st:ed], tau=0.2)
                 data_t.append(transformed)
                 st = ed
             else:
