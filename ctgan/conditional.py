@@ -2,6 +2,8 @@ import numpy as np
 
 
 class ConditionalGenerator(object):
+    # ConditionalGenerator does the sampling of categorical columns.
+    # output_info comes from transformer, basically whether the column is continuous or categorical.
     def __init__(self, data, output_info, log_frequency):
         self.model = []
 
