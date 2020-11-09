@@ -5,7 +5,11 @@ import pandas as pd
 from rdt.transformers import OneHotEncodingTransformer
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.mixture import BayesianGaussianMixture
-from sklearn.utils.testing import ignore_warnings
+
+# NOTE: 2020-11-09. To fix FutureWarning. Use filterwarnings instead of ignore_warnings.
+# from sklearn.utils.testing import ignore_warnings
+import warnings
+warnings.filterwarnings('ignore', category=ConvergenceWarning)
 
 
 class DataTransformer(object):
@@ -26,7 +30,7 @@ class DataTransformer(object):
         self.n_clusters = n_clusters
         self.epsilon = epsilon
 
-    @ignore_warnings(category=ConvergenceWarning)
+    # @ignore_warnings(category=ConvergenceWarning)
     def _fit_continuous(self, column, data):
         gm = BayesianGaussianMixture(
             self.n_clusters,
@@ -164,7 +168,13 @@ class DataTransformer(object):
             columns_data = data[:, start:start + dimensions]
 
             if 'model' in meta:
-                sigma = sigmas[start] if sigmas else None
+                # NOTE: 2020-11-09.
+                # ValueError: The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()
+                # sigma = sigmas[start] if sigmas else None
+                if sigmas is not None:
+                    sigma = sigmas[start]
+                else:
+                    sigma = None
                 inverted = self._inverse_transform_continuous(meta, columns_data, sigma)
             else:
                 inverted = self._inverse_transform_discrete(meta, columns_data)

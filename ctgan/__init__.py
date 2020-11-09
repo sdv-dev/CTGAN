@@ -8,8 +8,10 @@ __version__ = '0.2.2.dev2'
 
 from ctgan.demo import load_demo
 from ctgan.synthesizer import CTGANSynthesizer
+from ctgan.tvae import TVAESynthesizer
 
 __all__ = (
     'CTGANSynthesizer',
+    'TVAESynthesizer',
     'load_demo'
 )
