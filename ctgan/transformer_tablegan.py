@@ -5,6 +5,7 @@ CATEGORICAL = "categorical"
 CONTINUOUS = "continuous"
 ORDINAL = "ordinal"
 
+
 class Transformer:
 
     @staticmethod
@@ -15,6 +16,7 @@ class Transformer:
         for index in df:
             column = df[index]
 
+            # if index in categorical_columns:
             if index in categorical_columns:
                 mapper = column.value_counts().index.tolist()
                 meta.append({

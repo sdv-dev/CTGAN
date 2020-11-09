@@ -29,6 +29,8 @@ class DataTransformer(object):
     def __init__(self, n_clusters=10, epsilon=0.005):
         self.n_clusters = n_clusters
         self.epsilon = epsilon
+        self.side = 0  # for tablegan
+        self.datalen = 0  # for tablegan
 
     # @ignore_warnings(category=ConvergenceWarning)
     def _fit_continuous(self, column, data):
@@ -131,6 +133,25 @@ class DataTransformer(object):
                 values.append(self._transform_discrete(meta, column_data))
 
         return np.concatenate(values, axis=1).astype(float)
+
+    # For tablegan, there is an additional transformation of training data to square matrices.
+    def transform_tablegan(self, data):
+        print('shape of input data:', data.shape)
+        data = self.transform(data)
+        print('shape of data after VGM transformation:', data.shape)
+        self.datalen = data.shape[1]
+
+        sides = [4, 8, 16, 24, 32]
+        for i in sides:
+            if i * i >= self.datalen:
+                self.side = i
+                break
+
+        data = data.copy().astype('float32')
+        if self.side * self.side > len(data[1]):
+            padding = np.zeros((len(data), self.side * self.side - len(data[1])))
+            data = np.concatenate([data, padding], axis=1)
+        return data.reshape(-1, 1, self.side, self.side)
 
     def _inverse_transform_continuous(self, meta, data, sigma):
         model = meta['model']
