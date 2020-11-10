@@ -10,10 +10,12 @@ from ctgan.demo import load_demo
 from ctgan.synthesizer import CTGANSynthesizer
 from ctgan.tvae import TVAESynthesizer
 from ctgan.tablegan import TableganSynthesizer
+from ctgan.tablegan_original import TableganSynthesizerOriginal
 
 __all__ = (
     'CTGANSynthesizer',
     'TVAESynthesizer',
     'TableganSynthesizer',
+    'TableganSynthesizerOriginal',
     'load_demo'
 )

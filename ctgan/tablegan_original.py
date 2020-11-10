@@ -5,7 +5,7 @@ from torch.nn import (
 from torch.nn.functional import binary_cross_entropy_with_logits
 from torch.optim import Adam
 from torch.utils.data import DataLoader, TensorDataset
-from ctgan.transformer import DataTransformer
+from ctgan.transformer_tablegan import TableganTransformer
 from torchsummary import summary
 
 CATEGORICAL = "categorical"
@@ -28,7 +28,6 @@ class Generator(Module):
         super(Generator, self).__init__()
         self.meta = meta
         self.side = side
-        print(layers)
         self.seq = Sequential(*layers)
         # self.layers = layers
 
@@ -63,7 +62,6 @@ def determine_layers(side, random_dim, num_channels):
     assert side >= 4 and side <= 32
 
     layer_dims = [(1, side), (num_channels, side // 2)]
-    print(layer_dims)
 
     while layer_dims[-1][1] > 3 and len(layer_dims) < 4:
         layer_dims.append((layer_dims[-1][0] * 2, layer_dims[-1][1] // 2))
@@ -116,7 +114,7 @@ def weights_init(m):
         init.constant_(m.bias.data, 0)
 
 
-class TableganSynthesizer(object):
+class TableganSynthesizerOriginal(object):
     """docstring for TableganSynthesizer??"""
 
     def __init__(self,
@@ -131,28 +129,18 @@ class TableganSynthesizer(object):
 
         self.batch_size = batch_size
 
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-    # def fit(self, data, categorical_columns=tuple(), ordinal_columns=tuple(), epochs=300):
-    def fit(self, data, discrete_columns=tuple(), epochs=300, model_summary=False):
-        # sides = [4, 8, 16, 24, 32]
-        # for i in sides:
-        #     if i * i >= data.shape[1]:
-        #         self.side = i
-        #         break
+    def fit(self, data, categorical_columns=tuple(), ordinal_columns=tuple(), epochs=300, model_summary=False):
+        sides = [4, 8, 16, 24, 32]
+        for i in sides:
+            if i * i >= data.shape[1]:
+                self.side = i
+                break
 
-        # self.transformer = TableganTransformer(self.side)
-        # self.transformer.fit(data, categorical_columns, ordinal_columns)
-        # data = self.transformer.transform(data)
-
-        self.transformer = DataTransformer()
-        self.transformer.fit(data, discrete_columns)
-        data = self.transformer.transform_tablegan(data)
-
-        # compute side after transformation
-        self.side = self.transformer.side
-        print('In tablegan.py, fit function, self.size:', self.side)
-        print('shape of data after transforming to square matrix', data.shape)
+        self.transformer = TableganTransformer(self.side)
+        self.transformer.fit(data, categorical_columns, ordinal_columns)
+        data = self.transformer.transform(data)
 
         data = torch.from_numpy(data.astype('float32')).to(self.device)
         dataset = TensorDataset(data)
@@ -170,7 +158,7 @@ class TableganSynthesizer(object):
             print("*" * 100)
             print("GENERATOR")
             # in determine_layers, see side//2.
-            summary(self.generator, (self.random_dim, self.side//2, self.side//2))
+            summary(self.generator, (self.random_dim, self.side // 2, self.side // 2))
             print("*" * 100)
 
             print("DISCRIMINATOR")
@@ -236,9 +224,8 @@ class TableganSynthesizer(object):
                 else:
                     loss_c = None
 
-                # if (id_ + 1) % 50 == 0:
-                if (id_ + 1) % 1 == 0:
-                    print("epoch", i + 1, "step", id_ + 1, loss_d, loss_g, loss_c, flush=True)
+                if((id_ + 1) % 50 == 0):
+                    print("epoch", i + 1, "step", id_ + 1, loss_d, loss_g, loss_c)
 
     def sample(self, n):
         self.generator.eval()
@@ -251,17 +238,5 @@ class TableganSynthesizer(object):
             data.append(fake.detach().cpu().numpy())
 
         data = np.concatenate(data, axis=0)
-        # return self.transformer.inverse_transform(data[:n])
-
-        # 2020-11-09
-        # first, reshape the square matrices to 1D
-        data = data[:n].reshape(-1, self.side * self.side)
-        print('inverse_transform_tablegan, after reshaping to 1D:', data.shape)
-        # second, remove the padded values.
-        # however, this line does not seem to be required.
-        # it'll work just fine by calling inverse_transform directly.
-        data = data[:, :self.transformer.datalen]
-        print('inverse_transform_tablegan, after slicing:', data.shape)
-
-        return self.transformer.inverse_transform(data[:n], None)
+        return self.transformer.inverse_transform(data[:n])
 
