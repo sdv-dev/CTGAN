@@ -1,5 +1,6 @@
 import numpy as np
 import torch
+from packaging import version
 from torch import optim
 from torch.nn import functional
 
@@ -45,6 +46,38 @@ class CTGANSynthesizer(object):
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.trained_epoches = 0
 
+    @staticmethod
+    def _gumbel_softmax(logits, tau=1, hard=False, eps=1e-10, dim=-1):
+        """Deals with the instability of the gumbel_softmax for older versions of torch.
+
+        For more details about the issue:
+        https://drive.google.com/file/d/1AA5wPfZ1kquaRtVruCd6BiYZGcDeNxyP/view?usp=sharing
+
+        Args:
+            logits:
+                […, num_features] unnormalized log probabilities
+            tau:
+                non-negative scalar temperature
+            hard:
+                if True, the returned samples will be discretized as one-hot vectors,
+                but will be differentiated as if it is the soft sample in autograd
+            dim (int):
+                a dimension along which softmax will be computed. Default: -1.
+
+        Returns:
+            Sampled tensor of same shape as logits from the Gumbel-Softmax distribution.
+        """
+
+        if version.parse(torch.__version__) < version.parse("1.2.0"):
+            for i in range(10):
+                transformed = functional.gumbel_softmax(logits, tau=tau, hard=hard,
+                                                        eps=eps, dim=dim)
+                if not torch.isnan(transformed).any():
+                    return transformed
+            raise ValueError("gumbel_softmax returning NaN.")
+
+        return functional.gumbel_softmax(logits, tau=tau, hard=hard, eps=eps, dim=dim)
+
     def _apply_activate(self, data):
         data_t = []
         st = 0
@@ -55,7 +88,8 @@ class CTGANSynthesizer(object):
                 st = ed
             elif item[1] == 'softmax':
                 ed = st + item[0]
-                data_t.append(functional.gumbel_softmax(data[:, st:ed], tau=0.2))
+                transformed = self._gumbel_softmax(data[:, st:ed], tau=0.2)
+                data_t.append(transformed)
                 st = ed
             else:
                 assert 0
