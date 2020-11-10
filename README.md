@@ -5,7 +5,7 @@
 
 [![Development Status](https://img.shields.io/badge/Development%20Status-2%20--%20Pre--Alpha-yellow)](https://pypi.org/search/?c=Development+Status+%3A%3A+2+-+Pre-Alpha)
 [![PyPI Shield](https://img.shields.io/pypi/v/ctgan.svg)](https://pypi.python.org/pypi/ctgan)
-[![Travis CI Shield](https://travis-ci.org/sdv-dev/CTGAN.svg?branch=master)](https://travis-ci.org/sdv-dev/CTGAN)
+[![Travis CI Shield](https://travis-ci.com/sdv-dev/CTGAN.svg?branch=master)](https://travis-ci.com/sdv-dev/CTGAN)
 [![Downloads](https://pepy.tech/badge/ctgan)](https://pepy.tech/project/ctgan)
 [![Coverage Status](https://codecov.io/gh/sdv-dev/CTGAN/branch/master/graph/badge.svg)](https://codecov.io/gh/sdv-dev/CTGAN)
 
