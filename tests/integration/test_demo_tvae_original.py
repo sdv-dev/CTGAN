@@ -1,7 +1,7 @@
 # test the GitHub demo
 import os
 from ctgan import load_demo
-from ctgan import TVAESynthesizer
+from ctgan import TVAESynthesizerOriginal
 import pandas as pd
 import numpy as np
 
@@ -36,7 +36,7 @@ discrete_columns = ['discrete1', 'discrete2', 'discrete3']
 # ]
 
 # Step 2: Fit TVAE to your data
-tvae = TVAESynthesizer()
+tvae = TVAESynthesizerOriginal()
 print('Training tvae is starting')
 tvae.fit(data, discrete_columns, epochs=3000, model_summary=True)
 # tvae.fit(data, discrete_columns, epochs=5)
@@ -44,6 +44,6 @@ print('Training tvae is completed')
 
 # 2. Generate synthetic data
 samples_1 = tvae.sample(1000)
-samples_1.to_csv("test_tvae.csv", header=True, index=None)
+samples_1.to_csv("test_tvae_original.csv", header=True, index=None)
 print('size of sample_1', samples_1.shape)
 
