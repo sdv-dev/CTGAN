@@ -7,6 +7,7 @@ from ctgan.conditional import ConditionalGenerator
 from ctgan.models import Discriminator, Generator
 from ctgan.sampler import Sampler
 from ctgan.transformer import DataTransformer
+from torchsummary import summary
 
 
 class CTGANSynthesizer(object):
@@ -44,6 +45,7 @@ class CTGANSynthesizer(object):
         self.batch_size = batch_size
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.trained_epoches = 0
+        self.pack = 10  # Default value of Discriminator pac. See models.py
 
     def _apply_activate(self, data):
         data_t = []
@@ -96,7 +98,7 @@ class CTGANSynthesizer(object):
 
         return (loss * m).sum() / data.size()[0]
 
-    def fit(self, train_data, discrete_columns=tuple(), epochs=300, log_frequency=True):
+    def fit(self, train_data, discrete_columns=tuple(), epochs=300, log_frequency=True, model_summary=False):
         """Fit the CTGAN Synthesizer models to the training data.
 
         Args:
@@ -120,6 +122,7 @@ class CTGANSynthesizer(object):
             self.transformer.fit(train_data, discrete_columns)
         train_data = self.transformer.transform(train_data)
 
+        print(train_data.shape)
         data_sampler = Sampler(train_data, self.transformer.output_info)
 
         data_dim = self.transformer.output_dimensions
@@ -141,7 +144,8 @@ class CTGANSynthesizer(object):
         if not hasattr(self, "discriminator"):
             self.discriminator = Discriminator(
                 data_dim + self.cond_generator.n_opt,
-                self.dis_dim
+                self.dis_dim,
+                pack=self.pack
             ).to(self.device)
 
         if not hasattr(self, "optimizerG"):
@@ -157,6 +161,18 @@ class CTGANSynthesizer(object):
         assert self.batch_size % 2 == 0
         mean = torch.zeros(self.batch_size, self.embedding_dim, device=self.device)
         std = mean + 1
+
+        if model_summary:
+            print("*" * 100)
+            print("GENERATOR")
+            summary(self.generator, (self.embedding_dim + self.cond_generator.n_opt,))
+            print("*" * 100)
+
+            print("DISCRIMINATOR")
+            this_size = (data_dim + self.cond_generator.n_opt)*self.pack
+            summary(self.discriminator, (this_size,))
+            print("*" * 100)
+
 
         steps_per_epoch = max(len(train_data) // self.batch_size, 1)
         for i in range(epochs):

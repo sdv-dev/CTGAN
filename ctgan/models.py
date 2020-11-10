@@ -40,7 +40,11 @@ class Discriminator(Module):
         self.seq = Sequential(*seq)
 
     def forward(self, input):
-        assert input.size()[0] % self.pack == 0
+        # NOTE: disable assert so that model_summary can be printed.
+        # this is because batch_size of input x is hardcoded in torchsummary.py.
+        # See row 60 of torchsummary.py in torchsummary library
+        # See also if model_summary in synthesizer.py
+        # assert input.size()[0] % self.pack == 0
         return self.seq(input.view(-1, self.packdim))
 
 

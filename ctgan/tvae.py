@@ -4,7 +4,7 @@ from torch.nn import Linear, Module, Parameter, ReLU, Sequential
 from torch.nn.functional import cross_entropy
 from torch.optim import Adam
 from torch.utils.data import DataLoader, TensorDataset
-
+from torchsummary import summary
 from ctgan.transformer import DataTransformer
 
 
@@ -94,7 +94,7 @@ class TVAESynthesizer(object):
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    def fit(self, train_data, discrete_columns=tuple(), epochs=300):
+    def fit(self, train_data, discrete_columns=tuple(), epochs=300, model_summary=False):
         if not hasattr(self, "transformer"):
             self.transformer = DataTransformer()
             self.transformer.fit(train_data, discrete_columns)
@@ -109,6 +109,17 @@ class TVAESynthesizer(object):
         data_dim = self.transformer.output_dimensions
         encoder = Encoder(data_dim, self.compress_dims, self.embedding_dim).to(self.device)
         self.decoder = Decoder(self.embedding_dim, self.compress_dims, data_dim).to(self.device)
+
+        if model_summary:
+            print("*" * 100)
+            print("ENCODER")
+            summary(encoder, (data_dim, ))
+            print("*" * 100)
+
+            print("DECODER")
+            summary(self.decoder, (self.embedding_dim, ))
+            print("*" * 100)
+
         optimizerAE = Adam(
             list(encoder.parameters()) + list(self.decoder.parameters()),
             weight_decay=self.l2scale)
