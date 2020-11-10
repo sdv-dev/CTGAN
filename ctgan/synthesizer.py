@@ -35,15 +35,16 @@ class CTGANSynthesizer(object):
             Model that implements fit, predict, predict_proba
     """
 
-    def __init__(self,
-                 embedding_dim=128,
-                 gen_dim=(256, 256),
-                 dis_dim=(256, 256),
-                 l2scale=1e-6,
-                 batch_size=500,
-                 blackbox_model=None,
-                 preprocessing_pipeline=None,
-                 ):
+    def __init__(
+        self,
+        embedding_dim=128,
+        gen_dim=(256, 256),
+        dis_dim=(256, 256),
+        l2scale=1e-6,
+        batch_size=500,
+        blackbox_model=None,
+        preprocessing_pipeline=None,
+    ):
 
         self.embedding_dim = embedding_dim
         self.gen_dim = gen_dim
@@ -61,11 +62,11 @@ class CTGANSynthesizer(object):
         data_t = []
         st = 0
         for item in self.transformer.output_info:
-            if item[1] == 'tanh':
+            if item[1] == "tanh":
                 ed = st + item[0]
                 data_t.append(torch.tanh(data[:, st:ed]))
                 st = ed
-            elif item[1] == 'softmax':
+            elif item[1] == "softmax":
                 ed = st + item[0]
                 data_t.append(F.gumbel_softmax(data[:, st:ed], tau=0.2))
                 st = ed
@@ -80,11 +81,11 @@ class CTGANSynthesizer(object):
         st_c = 0
         skip = False
         for item in self.transformer.output_info:
-            if item[1] == 'tanh':
+            if item[1] == "tanh":
                 st += item[0]
                 skip = True
 
-            elif item[1] == 'softmax':
+            elif item[1] == "softmax":
                 if skip:
                     skip = False
                     st += item[0]
@@ -95,7 +96,7 @@ class CTGANSynthesizer(object):
                 tmp = F.cross_entropy(
                     data[:, st:ed],
                     torch.argmax(c[:, st_c:ed_c], dim=1),
-                    reduction='none'
+                    reduction="none",
                 )
                 loss.append(tmp)
                 st = ed
@@ -108,8 +109,15 @@ class CTGANSynthesizer(object):
 
         return (loss * m).sum() / data.size()[0]
 
-    def fit(self, train_data, discrete_columns=tuple(), epochs=300, log_frequency=True,
-            confidence_level=-1, verbose=True):
+    def fit(
+        self,
+        train_data,
+        discrete_columns=tuple(),
+        epochs=300,
+        log_frequency=True,
+        confidence_level=-1,
+        verbose=True,
+    ):
         """Fit the CTGAN Synthesizer models to the training data.
 
         Args:
@@ -131,8 +139,8 @@ class CTGANSynthesizer(object):
                 Defaults to ``-1``.
         """
         self.confidence_level = confidence_level
-        loss_other_name = 'loss_bb' if confidence_level != -1 else 'loss_d'
-        history = {'loss_g': [], loss_other_name: []}
+        loss_other_name = "loss_bb" if confidence_level != -1 else "loss_d"
+        history = {"loss_g": [], loss_other_name: []}
 
         # Eli: add Mode-specific Normalization
         if not hasattr(self, "transformer"):
@@ -147,33 +155,31 @@ class CTGANSynthesizer(object):
         # add all attributes
         if not hasattr(self, "cond_generator"):
             self.cond_generator = ConditionalGenerator(
-                train_data,
-                self.transformer.output_info,
-                log_frequency
+                train_data, self.transformer.output_info, log_frequency
             )
 
         if not hasattr(self, "generator"):
             self.generator = Generator(
-                self.embedding_dim + self.cond_generator.n_opt,
-                self.gen_dim,
-                data_dim
+                self.embedding_dim + self.cond_generator.n_opt, self.gen_dim, data_dim
             ).to(self.device)
 
         if not hasattr(self, "discriminator"):
             self.discriminator = Discriminator(
-                data_dim + self.cond_generator.n_opt,
-                self.dis_dim
+                data_dim + self.cond_generator.n_opt, self.dis_dim
             ).to(self.device)
 
         if not hasattr(self, "optimizerG"):
             self.optimizerG = optim.Adam(
-                self.generator.parameters(), lr=2e-4, betas=(0.5, 0.9),
-                weight_decay=self.l2scale
+                self.generator.parameters(),
+                lr=2e-4,
+                betas=(0.5, 0.9),
+                weight_decay=self.l2scale,
             )
 
         if not hasattr(self, "optimizerD"):
             self.optimizerD = optim.Adam(
-                self.discriminator.parameters(), lr=2e-4, betas=(0.5, 0.9))
+                self.discriminator.parameters(), lr=2e-4, betas=(0.5, 0.9)
+            )
 
         assert self.batch_size % 2 == 0
 
@@ -206,7 +212,7 @@ class CTGANSynthesizer(object):
 
                 fake = self.generator(fakez)
                 fakeact = self._apply_activate(fake)
-                real = torch.from_numpy(real.astype('float32')).to(self.device)
+                real = torch.from_numpy(real.astype("float32")).to(self.device)
 
                 # Eli: start here - generated fake and real data
                 if c1 is not None:
@@ -219,7 +225,9 @@ class CTGANSynthesizer(object):
                 y_fake = self.discriminator(fake_cat)
                 y_real = self.discriminator(real_cat)
 
-                pen = self.discriminator.calc_gradient_penalty(real_cat, fake_cat, self.device)
+                pen = self.discriminator.calc_gradient_penalty(
+                    real_cat, fake_cat, self.device
+                )
                 loss_d = -(torch.mean(y_real) - torch.mean(y_fake))
 
                 if self.confidence_level == -1:  # without bb loss
@@ -253,7 +261,9 @@ class CTGANSynthesizer(object):
                     cross_entropy = self._cond_loss(fake, c1, m1)
 
                 if self.confidence_level != -1:
-                    gen_out = self.sample(self.batch_size)  # generate `batch_size` samples
+                    gen_out = self.sample(
+                        self.batch_size
+                    )  # generate `batch_size` samples
                     loss_bb = self._calc_bb_confidence_loss(gen_out)
                     loss_g = loss_bb + cross_entropy
                 else:  # original loss
@@ -265,13 +275,14 @@ class CTGANSynthesizer(object):
 
             loss_g_val = loss_g.detach().cpu()
             loss_other_val = locals()[loss_other_name].detach().cpu()
-            history['loss_g'].append(loss_g.item())
+            history["loss_g"].append(loss_g.item())
             history[loss_other_name].append(loss_other_val.item())
 
             if verbose:
                 print(
                     f"Epoch {self.trained_epoches}, Loss G: {loss_g_val}, {loss_other_name}: {loss_other_val}",
-                    flush=True)
+                    flush=True,
+                )
 
         return history
 
@@ -288,9 +299,13 @@ class CTGANSynthesizer(object):
 
         if condition_column is not None and condition_value is not None:
             condition_info = self.transformer.covert_column_name_value_to_id(
-                condition_column, condition_value)
-            global_condition_vec = self.cond_generator.generate_cond_from_condition_column_info(
-                condition_info, self.batch_size)
+                condition_column, condition_value
+            )
+            global_condition_vec = (
+                self.cond_generator.generate_cond_from_condition_column_info(
+                    condition_info, self.batch_size
+                )
+            )
         else:
             global_condition_vec = None
 
