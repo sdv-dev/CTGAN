@@ -6,6 +6,7 @@ from torch.nn.functional import binary_cross_entropy_with_logits
 from torch.optim import Adam
 from torch.utils.data import DataLoader, TensorDataset
 from ctgan.transformer_tablegan import TableganTransformer
+from torchsummary import summary
 
 CATEGORICAL = "categorical"
 
@@ -130,7 +131,7 @@ class TableganSynthesizerOriginal(object):
 
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-    def fit(self, data, categorical_columns=tuple(), ordinal_columns=tuple(), epochs=300):
+    def fit(self, data, categorical_columns=tuple(), ordinal_columns=tuple(), epochs=300, model_summary=False):
         sides = [4, 8, 16, 24, 32]
         for i in sides:
             if i * i >= data.shape[1]:
@@ -152,6 +153,21 @@ class TableganSynthesizerOriginal(object):
         discriminator = Discriminator(self.transformer.meta, self.side, layers_D).to(self.device)
         classifier = Classifier(
             self.transformer.meta, self.side, layers_C, self.device).to(self.device)
+
+        if model_summary:
+            print("*" * 100)
+            print("GENERATOR")
+            # in determine_layers, see side//2.
+            summary(self.generator, (self.random_dim, self.side // 2, self.side // 2))
+            print("*" * 100)
+
+            print("DISCRIMINATOR")
+            summary(discriminator, (1, self.side, self.side))
+            print("*" * 100)
+
+            print("CLASSIFIER")
+            summary(classifier, (1, self.side, self.side))
+            print("*" * 100)
 
         optimizer_params = dict(lr=2e-4, betas=(0.5, 0.9), eps=1e-3, weight_decay=self.l2scale)
         optimizerG = Adam(self.generator.parameters(), **optimizer_params)

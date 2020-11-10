@@ -235,5 +235,3 @@ class DataTransformer(object):
     def load(cls, path):
         with open(path + "/data_transform.pl", "rb") as f:
             return pickle.load(f)
-
-

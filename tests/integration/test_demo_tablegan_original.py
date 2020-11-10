@@ -25,7 +25,7 @@ discrete_columns = [1, 2, 3]
 # Step 2: Fit tableGan to your data
 tablegan = TableganSynthesizerOriginal()
 print('Training tablegan is starting')
-tablegan.fit(data, categorical_columns=discrete_columns, epochs=5)
+tablegan.fit(data, categorical_columns=discrete_columns, epochs=5, model_summary=True)
 print('Training tablegan is completed')
 
 # 2. Generate synthetic data
