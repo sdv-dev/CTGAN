@@ -34,14 +34,27 @@ class DataTransformer(object):
 
     # @ignore_warnings(category=ConvergenceWarning)
     def _fit_continuous(self, column, data):
+        # (JY)
+        # 'gm' gives approximate parameters of a Gaussian mixture distribution
+        # 'epsilon' is threshold to prevent mixtures with many negligible components
+        # 'weight_concentration_prior': the higher concentration puts more mass in
+        # the centre and will lead to more components being active,
+        # a lower concentration parameter will lead to more mass at the edge
+        # of the mixture weights simplex
         gm = BayesianGaussianMixture(
             self.n_clusters,
             weight_concentration_prior_type='dirichlet_process',
             weight_concentration_prior=0.001,
             n_init=1
         )
+        # (JY)
+        # 'gm.fit(data)' estimates model parameters using 'data' and predict labels
+        # for 'data'; fits the model 'n_init' times and sets parameters with which
+        # the model has largest likelihood or lower bound; after fitting, predicts
+        # the most probable label for the input data points
         gm.fit(data)
         components = gm.weights_ > self.epsilon
+        # (JY) 'num_components' is the optimal number of modes identified
         num_components = components.sum()
 
         return {
