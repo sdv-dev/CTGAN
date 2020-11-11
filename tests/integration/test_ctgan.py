@@ -96,15 +96,3 @@ def test_categorical_nan():
     assert len(values) == 3
     assert any(pd.isnull(x) for x in values)
     assert {"b", "c"}.issubset(values)
-
-def test_synthesizer_sample():
-    data = pd.DataFrame({
-        'discrete': np.random.choice(['a', 'b', 'c'], 100)
-    })
-    discrete_columns = ['discrete']
-
-    ctgan = CTGANSynthesizer()
-    ctgan.fit(data, discrete_columns, epochs=1)
-
-    samples = ctgan.sample(1000, 'discrete', 'a')
-    assert isinstance(samples, pd.DataFrame)
