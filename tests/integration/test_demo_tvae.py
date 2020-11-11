@@ -38,12 +38,12 @@ discrete_columns = ['discrete1', 'discrete2', 'discrete3']
 # Step 2: Fit TVAE to your data
 tvae = TVAESynthesizer()
 print('Training tvae is starting')
-tvae.fit(data, discrete_columns, epochs=3000, model_summary=True)
+tvae.fit(data, discrete_columns, epochs=5, model_summary=True)
 # tvae.fit(data, discrete_columns, epochs=5)
 print('Training tvae is completed')
 
 # 2. Generate synthetic data
-samples_1 = tvae.sample(1000)
-samples_1.to_csv("test_tvae.csv", header=True, index=None)
+samples_1 = tvae.sample(10)
+# samples_1.to_csv("test_tvae.csv", header=True, index=None)
 print('size of sample_1', samples_1.shape)
 

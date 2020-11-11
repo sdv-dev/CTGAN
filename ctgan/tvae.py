@@ -52,7 +52,7 @@ class Decoder(Module):
         return self.seq(input), self.sigma
 
 
-def loss_function(recon_x, x, sigmas, mu, logvar, output_info, factor, concat_size=0):
+def loss_function(recon_x, x, sigmas, mu, logvar, output_info, factor):
     st = 0
     loss = []
     for item in output_info:
@@ -71,7 +71,7 @@ def loss_function(recon_x, x, sigmas, mu, logvar, output_info, factor, concat_si
         else:
             assert 0
 
-    assert st == (recon_x.size()[1] - concat_size)
+    assert st == recon_x.size()[1]
     KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
     return sum(loss) * factor / x.size()[0], KLD / x.size()[0]
 
@@ -116,40 +116,6 @@ class TVAESynthesizer(object):
 
         return torch.cat(data_t, dim=1)
 
-    # def _cond_loss(self, data, c, m):
-    #     loss = []
-    #     st = 0
-    #     st_c = 0
-    #     skip = False
-    #     for item in self.transformer.output_info:
-    #         if item[1] == 'tanh':
-    #             st += item[0]
-    #             skip = True
-    #
-    #         elif item[1] == 'softmax':
-    #             if skip:
-    #                 skip = False
-    #                 st += item[0]
-    #                 continue
-    #
-    #             ed = st + item[0]
-    #             ed_c = st_c + item[0]
-    #             tmp = functional.cross_entropy(
-    #                 data[:, st:ed],
-    #                 torch.argmax(c[:, st_c:ed_c], dim=1),
-    #                 reduction='none'
-    #             )
-    #             loss.append(tmp)
-    #             st = ed
-    #             st_c = ed_c
-    #
-    #         else:
-    #             assert 0
-    #
-    #     loss = torch.stack(loss, dim=1)
-    #
-    #     return (loss * m).sum() / data.size()[0]
-
     def fit(self, train_data, discrete_columns=tuple(), epochs=300, log_frequency=True, model_summary=False):
         if not hasattr(self, "transformer"):
             self.transformer = DataTransformer()
@@ -171,19 +137,18 @@ class TVAESynthesizer(object):
         # dataset = TensorDataset(torch.from_numpy(train_data.astype('float32')).to(self.device))
         # loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True, drop_last=True)
 
-        # Note: additional columns are appended to input data from conditional generator
-        # and also in the latent space (see sample function)
-        encoder = Encoder(data_dim+self.cond_generator.n_opt, self.compress_dims, self.embedding_dim).to(self.device)
-        self.decoder = Decoder(self.embedding_dim, self.compress_dims, data_dim+self.cond_generator.n_opt).to(self.device)
+        # Note: vectors from conditional generator are appended latent space
+        encoder = Encoder(data_dim, self.compress_dims, self.embedding_dim).to(self.device)
+        self.decoder = Decoder(self.embedding_dim+self.cond_generator.n_opt, self.compress_dims, data_dim).to(self.device)
 
         if model_summary:
             print("*" * 100)
             print("ENCODER")
-            summary(encoder, (data_dim+self.cond_generator.n_opt, ))
+            summary(encoder, (data_dim, ))
             print("*" * 100)
 
             print("DECODER")
-            summary(self.decoder, (self.embedding_dim, ))
+            summary(self.decoder, (self.embedding_dim+self.cond_generator.n_opt, ))
             print("*" * 100)
 
         optimizerAE = Adam(
@@ -212,17 +177,16 @@ class TVAESynthesizer(object):
                 optimizerAE.zero_grad()
                 real = torch.from_numpy(real.astype('float32')).to(self.device)
 
-                if c1 is not None:
-                    real_cat = torch.cat([real, c2], dim=1)
-                else:
-                    real_cat = real
-
-                mu, std, logvar = encoder(real_cat)
+                mu, std, logvar = encoder(real)
                 eps = torch.randn_like(std)
                 emb = eps * std + mu
+                # NEW
+                # Conditional vector is added to latent space.
+                if c1 is not None:
+                    emb = torch.cat([emb, c2], dim=1)
                 rec, sigmas = self.decoder(emb)
                 loss_1, loss_2 = loss_function(
-                    rec, real_cat, sigmas, mu, logvar, self.transformer.output_info, self.loss_factor, concat_size=self.cond_generator.n_opt)
+                    rec, real, sigmas, mu, logvar, self.transformer.output_info, self.loss_factor)
                 loss = loss_1 + loss_2
                 loss.backward()
                 optimizerAE.step()
@@ -231,54 +195,38 @@ class TVAESynthesizer(object):
             print("Epoch %d, Loss: %.4f" % (i, loss.detach().cpu()), flush=True)
 
     def sample(self, samples, condition_column=None, condition_value=None):
-        # self.decoder.eval()
-        #
-        # if condition_column is not None and condition_value is not None:
-        #     condition_info = self.transformer.covert_column_name_value_to_id(
-        #         condition_column, condition_value)
-        #     global_condition_vec = self.cond_generator.generate_cond_from_condition_column_info(
-        #         condition_info, self.batch_size)
-        # else:
-        #     global_condition_vec = None
-        #
-        # steps = samples // self.batch_size + 1
-        # data = []
-        # for _ in range(steps):
-        #     mean = torch.zeros(self.batch_size, self.embedding_dim)
-        #     std = mean + 1
-        #     fakez = torch.normal(mean=mean, std=std).to(self.device)
-        #
-        #     if global_condition_vec is not None:
-        #         condvec = global_condition_vec.copy()
-        #     else:
-        #         condvec = self.cond_generator.sample_zero(self.batch_size)
-        #
-        #     if condvec is None:
-        #         pass
-        #     else:
-        #         c1 = condvec
-        #         c1 = torch.from_numpy(c1).to(self.device)
-        #         fakez = torch.cat([fakez, c1], dim=1)
-        #
-        #     fake, sigmas = self.decoder(fakez)
-        #     fakeact = self._apply_activate(fake)
-        #     data.append(fakeact.detach().cpu().numpy())
-        #
-        # data = np.concatenate(data, axis=0)
-        # data = data[:samples]
-        # return self.transformer.inverse_transform(data, sigmas.detach().cpu().numpy())
-
         self.decoder.eval()
+
+        if condition_column is not None and condition_value is not None:
+            condition_info = self.transformer.covert_column_name_value_to_id(
+                condition_column, condition_value)
+            global_condition_vec = self.cond_generator.generate_cond_from_condition_column_info(
+                condition_info, self.batch_size)
+        else:
+            global_condition_vec = None
 
         steps = samples // self.batch_size + 1
         data = []
         for _ in range(steps):
             mean = torch.zeros(self.batch_size, self.embedding_dim)
             std = mean + 1
-            noise = torch.normal(mean=mean, std=std).to(self.device)
-            fake, sigmas = self.decoder(noise)
-            fake = torch.tanh(fake)
-            data.append(fake.detach().cpu().numpy())
+            fakez = torch.normal(mean=mean, std=std).to(self.device)
+
+            if global_condition_vec is not None:
+                condvec = global_condition_vec.copy()
+            else:
+                condvec = self.cond_generator.sample_zero(self.batch_size)
+
+            if condvec is None:
+                pass
+            else:
+                c1 = condvec
+                c1 = torch.from_numpy(c1).to(self.device)
+                fakez = torch.cat([fakez, c1], dim=1)
+
+            fake, sigmas = self.decoder(fakez)
+            fakeact = self._apply_activate(fake)
+            data.append(fakeact.detach().cpu().numpy())
 
         data = np.concatenate(data, axis=0)
         data = data[:samples]
