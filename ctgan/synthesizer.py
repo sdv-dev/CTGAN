@@ -273,10 +273,10 @@ class CTGANSynthesizer(object):
 
     def sample(self, n, condition_column=None, condition_value=None):
         """Sample data similar to the training data.
-        
+
         Choosing a condition_column and condition_value will increase the probability of the
         discrete condition_value happening in the condition_column.
-        
+
         Args:
             n (int):
                 Number of rows to sample.
