@@ -106,4 +106,10 @@ ENV/
 .*.swp
 
 # PyCharm IDE
-.idea
+*/.idea
+.idea/*
+/.idea
+*/.idea/workspace.xml
+.idea/workspace.xml
+*/.idea/tasks.xml
+/**/.idea/*
