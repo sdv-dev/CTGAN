@@ -15,6 +15,7 @@ from ctgan.synthesizer import CTGANSynthesizer  # use _gumbel_softmax
 CATEGORICAL = "categorical"
 
 # NOTE: Added conditional generator to the code.
+# NOTE: This is a backup created before Tianming adds min-max normalization to tablegan.py.
 
 class Discriminator(Module):
     def __init__(self, meta, side, layers):
