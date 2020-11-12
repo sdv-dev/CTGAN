@@ -19,7 +19,11 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="72bec8f5-acc9-4974-af70-2701389bd64f" name="Default Changelist" comment="added tablegan with conditional generator" />
+    <list default="true" id="72bec8f5-acc9-4974-af70-2701389bd64f" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ctgan/tablegan_original.py" beforeDir="false" afterPath="$PROJECT_DIR$/ctgan/tablegan_original.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/integration/test_demo_tablegan_original.py" beforeDir="false" afterPath="$PROJECT_DIR$/tests/integration/test_demo_tablegan_original.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -303,7 +307,14 @@
       <option name="project" value="LOCAL" />
       <updated>1605157100298</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="test commit/merge untracked files">
+      <created>1605157466271</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1605157466271</updated>
+    </task>
+    <option name="localTasksCounter" value="18" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -333,7 +344,8 @@
     <MESSAGE value="Increased range of sides array." />
     <MESSAGE value="Test merge." />
     <MESSAGE value="added tablegan with conditional generator" />
-    <option name="LAST_COMMIT_MESSAGE" value="added tablegan with conditional generator" />
+    <MESSAGE value="test commit/merge untracked files" />
+    <option name="LAST_COMMIT_MESSAGE" value="test commit/merge untracked files" />
   </component>
   <component name="WindowStateProjectService">
     <state x="506" y="225" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1604728851471">
@@ -344,10 +356,10 @@
       <screen x="0" y="23" width="1680" height="959" />
     </state>
     <state x="541" y="358" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/0.23.1680.959@0.23.1680.959" timestamp="1604915126678" />
-    <state x="272" y="69" key="CommitChangelistDialog2" timestamp="1605157218368">
+    <state x="272" y="69" key="CommitChangelistDialog2" timestamp="1605157466155">
       <screen x="0" y="23" width="1680" height="957" />
     </state>
-    <state x="272" y="69" key="CommitChangelistDialog2/0.23.1680.957@0.23.1680.957" timestamp="1605157218368" />
+    <state x="272" y="69" key="CommitChangelistDialog2/0.23.1680.957@0.23.1680.957" timestamp="1605157466155" />
     <state x="405" y="58" key="CommitChangelistDialog2/0.23.1680.959@0.23.1680.959" timestamp="1604937221177" />
     <state x="91" y="97" key="DiffContextDialog" timestamp="1605087938776">
       <screen x="0" y="23" width="1680" height="957" />
@@ -358,32 +370,32 @@
       <screen x="0" y="23" width="1680" height="957" />
     </state>
     <state x="661" y="248" key="FileChooserDialogImpl/0.23.1680.957@0.23.1680.957" timestamp="1604726813315" />
-    <state width="1544" height="286" key="GridCell.Tab.0.bottom" timestamp="1605157124801">
+    <state width="1544" height="286" key="GridCell.Tab.0.bottom" timestamp="1605157923215">
       <screen x="0" y="23" width="1680" height="957" />
     </state>
     <state width="830" height="266" key="GridCell.Tab.0.bottom/0.0.1680.1050@0.0.1680.1050" timestamp="1605023460598" />
-    <state width="1544" height="286" key="GridCell.Tab.0.bottom/0.23.1680.957@0.23.1680.957" timestamp="1605157124801" />
+    <state width="1544" height="286" key="GridCell.Tab.0.bottom/0.23.1680.957@0.23.1680.957" timestamp="1605157923215" />
     <state width="1544" height="286" key="GridCell.Tab.0.bottom/0.23.1680.959@0.23.1680.959" timestamp="1605084303282" />
     <state width="1400" height="325" key="GridCell.Tab.0.bottom/0.23.1680.961@0.23.1680.961" timestamp="1604984791597" />
-    <state width="1544" height="286" key="GridCell.Tab.0.center" timestamp="1605157124800">
+    <state width="1544" height="286" key="GridCell.Tab.0.center" timestamp="1605157923214">
       <screen x="0" y="23" width="1680" height="957" />
     </state>
     <state width="830" height="266" key="GridCell.Tab.0.center/0.0.1680.1050@0.0.1680.1050" timestamp="1605023460597" />
-    <state width="1544" height="286" key="GridCell.Tab.0.center/0.23.1680.957@0.23.1680.957" timestamp="1605157124800" />
+    <state width="1544" height="286" key="GridCell.Tab.0.center/0.23.1680.957@0.23.1680.957" timestamp="1605157923214" />
     <state width="1544" height="286" key="GridCell.Tab.0.center/0.23.1680.959@0.23.1680.959" timestamp="1605084303281" />
     <state width="1400" height="325" key="GridCell.Tab.0.center/0.23.1680.961@0.23.1680.961" timestamp="1604984791596" />
-    <state width="1544" height="286" key="GridCell.Tab.0.left" timestamp="1605157124799">
+    <state width="1544" height="286" key="GridCell.Tab.0.left" timestamp="1605157923214">
       <screen x="0" y="23" width="1680" height="957" />
     </state>
     <state width="830" height="266" key="GridCell.Tab.0.left/0.0.1680.1050@0.0.1680.1050" timestamp="1605023460596" />
-    <state width="1544" height="286" key="GridCell.Tab.0.left/0.23.1680.957@0.23.1680.957" timestamp="1605157124799" />
+    <state width="1544" height="286" key="GridCell.Tab.0.left/0.23.1680.957@0.23.1680.957" timestamp="1605157923214" />
     <state width="1544" height="286" key="GridCell.Tab.0.left/0.23.1680.959@0.23.1680.959" timestamp="1605084303280" />
     <state width="1400" height="325" key="GridCell.Tab.0.left/0.23.1680.961@0.23.1680.961" timestamp="1604984791596" />
-    <state width="1544" height="286" key="GridCell.Tab.0.right" timestamp="1605157124801">
+    <state width="1544" height="286" key="GridCell.Tab.0.right" timestamp="1605157923215">
       <screen x="0" y="23" width="1680" height="957" />
     </state>
     <state width="830" height="266" key="GridCell.Tab.0.right/0.0.1680.1050@0.0.1680.1050" timestamp="1605023460598" />
-    <state width="1544" height="286" key="GridCell.Tab.0.right/0.23.1680.957@0.23.1680.957" timestamp="1605157124801" />
+    <state width="1544" height="286" key="GridCell.Tab.0.right/0.23.1680.957@0.23.1680.957" timestamp="1605157923215" />
     <state width="1544" height="286" key="GridCell.Tab.0.right/0.23.1680.959@0.23.1680.959" timestamp="1605084303281" />
     <state width="1400" height="325" key="GridCell.Tab.0.right/0.23.1680.961@0.23.1680.961" timestamp="1604984791597" />
     <state width="1544" height="322" key="GridCell.Tab.1.bottom" timestamp="1605156365018">
@@ -402,6 +414,14 @@
       <screen x="0" y="23" width="1680" height="957" />
     </state>
     <state width="1544" height="322" key="GridCell.Tab.1.right/0.23.1680.957@0.23.1680.957" timestamp="1605156365018" />
+    <state x="153" y="113" key="MergeDialog" timestamp="1605157673705">
+      <screen x="0" y="23" width="1680" height="957" />
+    </state>
+    <state x="153" y="113" key="MergeDialog/0.23.1680.957@0.23.1680.957" timestamp="1605157673705" />
+    <state x="465" y="275" key="MultipleFileMergeDialog" timestamp="1605157673753">
+      <screen x="0" y="23" width="1680" height="957" />
+    </state>
+    <state x="465" y="275" key="MultipleFileMergeDialog/0.23.1680.957@0.23.1680.957" timestamp="1605157673753" />
     <state x="673" y="120" key="SettingsEditor" timestamp="1604765730053">
       <screen x="0" y="23" width="1680" height="957" />
     </state>

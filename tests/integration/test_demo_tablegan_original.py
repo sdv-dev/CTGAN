@@ -1,5 +1,5 @@
 import os
-# from ctgan import load_demo
+from ctgan import load_demo
 from ctgan import TableganSynthesizerOriginal
 import numpy as np
 import pandas as pd
@@ -20,12 +20,29 @@ data = pd.DataFrame({
 data = data.values
 
 # index of columns
-discrete_columns = [1, 2, 3]
+# discrete_columns = [1, 2, 3]
+discrete_columns = ['discrete1', 'discrete2', 'discrete3']
+
+# # 1. Model the data
+# # Step 1: Prepare your data
+# data = load_demo()
+#
+# discrete_columns = [
+#     'workclass',
+#     'education',
+#     'marital-status',
+#     'occupation',
+#     'relationship',
+#     'race',
+#     'sex',
+#     'native-country',
+#     'income'
+# ]
 
 # Step 2: Fit tableGan to your data
 tablegan = TableganSynthesizerOriginal()
 print('Training tablegan is starting')
-tablegan.fit(data, categorical_columns=discrete_columns, epochs=5, model_summary=True)
+tablegan.fit(data, discrete_columns=discrete_columns, epochs=5, model_summary=True)
 print('Training tablegan is completed')
 
 # 2. Generate synthetic data

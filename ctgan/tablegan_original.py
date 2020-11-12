@@ -134,7 +134,8 @@ class TableganSynthesizerOriginal(object):
 
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-    def fit(self, data, categorical_columns=tuple(), ordinal_columns=tuple(), epochs=300, model_summary=False):
+    # def fit(self, data, categorical_columns=tuple(), ordinal_columns=tuple(), epochs=300, model_summary=False):
+    def fit(self, data, discrete_columns=tuple(), epochs=300, model_summary=False):
         sides = [4, 8, 16, 24, 32]
         for i in sides:
             if i * i >= data.shape[1]:
@@ -142,7 +143,7 @@ class TableganSynthesizerOriginal(object):
                 break
 
         self.transformer = TableganTransformer(self.side)
-        self.transformer.fit(data, categorical_columns, ordinal_columns)
+        self.transformer.fit(data, discrete_columns)
         data = self.transformer.transform(data)
 
         data = torch.from_numpy(data.astype('float32')).to(self.device)
