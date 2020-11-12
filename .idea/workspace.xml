@@ -21,6 +21,8 @@
   <component name="ChangeListManager">
     <list default="true" id="72bec8f5-acc9-4974-af70-2701389bd64f" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ctgan/tablegan.py" beforeDir="false" afterPath="$PROJECT_DIR$/ctgan/tablegan.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ctgan/tablegan_wo_cond_gen.py" beforeDir="false" afterPath="$PROJECT_DIR$/ctgan/tablegan_wo_cond_gen.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -66,6 +68,27 @@
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyIntegratedToolsModulesConfigurable" />
   </component>
   <component name="RunManager" selected="Python.test_demo_tablegan">
+    <configuration name="test_demo_ctgan" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="CTGAN" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests/integration" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tests/integration/test_demo_ctgan.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="test_demo_tablegan" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="CTGAN" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -100,27 +123,6 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tests/integration/test_demo_tablegan_original.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
-    <configuration name="test_demo_tvae" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
-      <module name="CTGAN" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/tests/integration" />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/tests/integration/test_demo_tvae.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -174,10 +176,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="Python.test_demo_tablegan" />
+        <item itemvalue="Python.test_demo_ctgan" />
         <item itemvalue="Python.test_demo_tablegan_original" />
         <item itemvalue="Python.test_deterministic_ctgan" />
         <item itemvalue="Python.test_demo_tvae_original" />
-        <item itemvalue="Python.test_demo_tvae" />
       </list>
     </recent_temporary>
   </component>
@@ -326,7 +328,14 @@
       <option name="project" value="LOCAL" />
       <updated>1605158370862</updated>
     </task>
-    <option name="localTasksCounter" value="20" />
+    <task id="LOCAL-00020" summary="created a tablegan_backup.py">
+      <created>1605159916257</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1605159916257</updated>
+    </task>
+    <option name="localTasksCounter" value="21" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -358,7 +367,8 @@
     <MESSAGE value="added tablegan with conditional generator" />
     <MESSAGE value="test commit/merge untracked files" />
     <MESSAGE value="updated tablegan original and transformer_tablegan." />
-    <option name="LAST_COMMIT_MESSAGE" value="updated tablegan original and transformer_tablegan." />
+    <MESSAGE value="created a tablegan_backup.py" />
+    <option name="LAST_COMMIT_MESSAGE" value="created a tablegan_backup.py" />
   </component>
   <component name="WindowStateProjectService">
     <state x="506" y="225" key="#com.intellij.openapi.updateSettings.impl.PluginUpdateInfoDialog" timestamp="1604728851471">
@@ -369,11 +379,11 @@
       <screen x="0" y="23" width="1680" height="959" />
     </state>
     <state x="541" y="358" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1/0.23.1680.959@0.23.1680.959" timestamp="1604915126678" />
-    <state x="272" y="69" key="CommitChangelistDialog2" timestamp="1605158370736">
-      <screen x="0" y="23" width="1680" height="957" />
+    <state x="405" y="58" key="CommitChangelistDialog2" timestamp="1605159916064">
+      <screen x="0" y="23" width="1680" height="959" />
     </state>
     <state x="272" y="69" key="CommitChangelistDialog2/0.23.1680.957@0.23.1680.957" timestamp="1605158370736" />
-    <state x="405" y="58" key="CommitChangelistDialog2/0.23.1680.959@0.23.1680.959" timestamp="1604937221177" />
+    <state x="405" y="58" key="CommitChangelistDialog2/0.23.1680.959@0.23.1680.959" timestamp="1605159916064" />
     <state x="91" y="97" key="DiffContextDialog" timestamp="1605087938776">
       <screen x="0" y="23" width="1680" height="957" />
     </state>
@@ -439,11 +449,11 @@
       <screen x="0" y="23" width="1680" height="957" />
     </state>
     <state x="673" y="120" key="SettingsEditor/0.23.1680.957@0.23.1680.957" timestamp="1604765730053" />
-    <state x="418" y="222" key="Vcs.Push.Dialog.v2" timestamp="1605158372223">
-      <screen x="0" y="23" width="1680" height="957" />
+    <state x="418" y="222" key="Vcs.Push.Dialog.v2" timestamp="1605159918475">
+      <screen x="0" y="23" width="1680" height="959" />
     </state>
     <state x="418" y="222" key="Vcs.Push.Dialog.v2/0.23.1680.957@0.23.1680.957" timestamp="1605158372223" />
-    <state x="418" y="222" key="Vcs.Push.Dialog.v2/0.23.1680.959@0.23.1680.959" timestamp="1604936929367" />
+    <state x="418" y="222" key="Vcs.Push.Dialog.v2/0.23.1680.959@0.23.1680.959" timestamp="1605159918475" />
     <state x="626" y="427" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1605157378661">
       <screen x="0" y="23" width="1680" height="957" />
     </state>

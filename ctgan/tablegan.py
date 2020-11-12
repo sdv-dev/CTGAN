@@ -297,6 +297,8 @@ class TableganSynthesizer(object):
                 noise, _ = self.get_noise_real(False)
                 # noise = torch.randn(self.batch_size, self.random_dim, 1, 1, device=self.device)
                 fake = self.generator(noise)
+                fake = self._apply_activate(fake)
+
                 optimizerG.zero_grad()
                 y_fake = discriminator(fake)
                 loss_g = -(torch.log(y_fake + 1e-4).mean())
@@ -312,6 +314,7 @@ class TableganSynthesizer(object):
                 if classifier.valid:
                     noise, real = self.get_noise_real(True)
                     fake = self.generator(noise)
+                    fake = self._apply_activate(fake)
 
                     real_pre, real_label = classifier(real)
                     fake_pre, fake_label = classifier(fake)

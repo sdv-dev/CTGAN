@@ -7,6 +7,7 @@ from torch.optim import Adam
 from torch.utils.data import DataLoader, TensorDataset
 from ctgan.transformer import DataTransformer
 from torchsummary import summary
+from ctgan.synthesizer import CTGANSynthesizer
 
 CATEGORICAL = "categorical"
 
@@ -136,6 +137,24 @@ class TableganSynthesizerWOCondGen(object):
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
+    def _apply_activate(self, data):
+        data_t = []
+        st = 0
+        for item in self.transformer.output_info:
+            if item[1] == 'tanh':
+                ed = st + item[0]
+                data_t.append(torch.tanh(data[:, st:ed]))
+                st = ed
+            elif item[1] == 'softmax':
+                ed = st + item[0]
+                transformed = CTGANSynthesizer()._gumbel_softmax(data[:, st:ed], tau=0.2)
+                data_t.append(transformed)
+                st = ed
+            else:
+                assert 0
+
+        return torch.cat(data_t, dim=1)
+
     # def fit(self, data, categorical_columns=tuple(), ordinal_columns=tuple(), epochs=300):
     def fit(self, data, discrete_columns=tuple(), epochs=300, model_summary=False):
         # sides = [4, 8, 16, 24, 32]
@@ -198,6 +217,7 @@ class TableganSynthesizerWOCondGen(object):
                 real = data[0].to(self.device)
                 noise = torch.randn(self.batch_size, self.random_dim, 1, 1, device=self.device)
                 fake = self.generator(noise)
+                fake = self._apply_activate(fake)
 
                 optimizerD.zero_grad()
                 y_real = discriminator(real)
@@ -209,6 +229,8 @@ class TableganSynthesizerWOCondGen(object):
 
                 noise = torch.randn(self.batch_size, self.random_dim, 1, 1, device=self.device)
                 fake = self.generator(noise)
+                fake = self._apply_activate(fake)
+
                 optimizerG.zero_grad()
                 y_fake = discriminator(fake)
                 loss_g = -(torch.log(y_fake + 1e-4).mean())
@@ -221,6 +243,8 @@ class TableganSynthesizerWOCondGen(object):
 
                 noise = torch.randn(self.batch_size, self.random_dim, 1, 1, device=self.device)
                 fake = self.generator(noise)
+                fake = self._apply_activate(fake)
+
                 if classifier.valid:
                     real_pre, real_label = classifier(real)
                     fake_pre, fake_label = classifier(fake)
