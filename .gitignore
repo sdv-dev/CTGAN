@@ -113,3 +113,6 @@ ENV/
 .idea/workspace.xml
 */.idea/tasks.xml
 /**/.idea/*
+
+# MAC
+.DS_Store
