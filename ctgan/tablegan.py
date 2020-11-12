@@ -4,10 +4,9 @@ from torch.nn import (
     BatchNorm2d, Conv2d, ConvTranspose2d, LeakyReLU, Module, ReLU, Sequential, Sigmoid, Tanh, init)
 from torch.nn.functional import binary_cross_entropy_with_logits
 from torch.optim import Adam
-from torch.utils.data import DataLoader, TensorDataset
-##from ctgan.transformer import DataTransformer
-## use transformer_tablegan first
-from ctgan.transformer_tablegan import TableganTransformer
+# from torch.utils.data import DataLoader, TensorDataset
+from ctgan.transformer import DataTransformer
+# from ctgan.transformer_tablegan import TableganTransformer
 from torchsummary import summary
 from ctgan.conditional import ConditionalGenerator
 from ctgan.sampler import Sampler
