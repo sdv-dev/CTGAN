@@ -1,9 +1,8 @@
-# test the GitHub demo
 import os
 from ctgan import load_demo
-from ctgan import TVAESynthesizerOriginal
-import pandas as pd
+from ctgan import TableganSynthesizerWOCondGen
 import numpy as np
+import pandas as pd
 
 cwd = os.getcwd()
 print("Current working directory is:", cwd)
@@ -35,15 +34,14 @@ discrete_columns = ['discrete1', 'discrete2', 'discrete3']
 #     'income'
 # ]
 
-# Step 2: Fit TVAE to your data
-tvae = TVAESynthesizerOriginal()
-print('Training tvae is starting')
-tvae.fit(data, discrete_columns, epochs=5, model_summary=True)
-# tvae.fit(data, discrete_columns, epochs=5)
-print('Training tvae is completed')
+# Step 2: Fit tableGan to your data
+tablegan = TableganSynthesizerWOCondGen()
+print('Training tablegan is starting')
+# NOTE: This runs much slower than ctgan and tvae
+tablegan.fit(data, discrete_columns=discrete_columns, epochs=1, model_summary=True)
+print('Training tablegan is completed')
 
 # 2. Generate synthetic data
-samples_1 = tvae.sample(1000)
-# samples_1.to_csv("test_tvae_original.csv", header=True, index=None)
+samples_1 = tablegan.sample(10)
 print('size of sample_1', samples_1.shape)
 

@@ -10,6 +10,9 @@ from torchsummary import summary
 
 CATEGORICAL = "categorical"
 
+# NOTE: This synthesizer was transferred from SDGym repository.
+# It uses transformer_tablegan.py and normalizes continuous data using min-max method.
+# To use this synthesizer, the input data must be in array format and column indices must be provided.
 
 class Discriminator(Module):
     def __init__(self, meta, side, layers):

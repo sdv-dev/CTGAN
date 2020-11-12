@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 
+# NOTE: This transformer is used in transformer_original.py
+
 CATEGORICAL = "categorical"
 CONTINUOUS = "continuous"
 ORDINAL = "ordinal"

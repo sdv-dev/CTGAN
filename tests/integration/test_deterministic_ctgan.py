@@ -4,10 +4,10 @@ import numpy as np
 import torch
 
 # # NOTE: To test settings that would enable deterministic training
-# # See: https://pytorch.org/docs/stable/notes/randomness.html
-# torch.manual_seed(0)
-# np.random.seed(0)
-# # torch.set_deterministic(True) # may require a newer version v1.7.
+# See: https://pytorch.org/docs/stable/notes/randomness.html
+torch.manual_seed(0)
+np.random.seed(0)
+# torch.set_deterministic(True)  # may require a newer version v1.7.
 
 print(torch.__version__)
 

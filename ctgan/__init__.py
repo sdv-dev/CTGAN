@@ -11,6 +11,7 @@ from ctgan.synthesizer import CTGANSynthesizer
 from ctgan.tvae import TVAESynthesizer
 from ctgan.tvae_original import TVAESynthesizerOriginal
 from ctgan.tablegan import TableganSynthesizer
+from ctgan.tablegan_wo_cond_gen import TableganSynthesizerWOCondGen
 from ctgan.tablegan_original import TableganSynthesizerOriginal
 
 __all__ = (
@@ -18,6 +19,7 @@ __all__ = (
     'TVAESynthesizer',
     'TVAESynthesizerOriginal',
     'TableganSynthesizer',
+    'TableganSynthesizerWOCondGen',
     'TableganSynthesizerOriginal',
     'load_demo'
 )

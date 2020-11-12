@@ -10,6 +10,7 @@ from torchsummary import summary
 from ctgan.transformer import DataTransformer
 from ctgan.conditional import ConditionalGenerator
 from ctgan.sampler import Sampler
+from ctgan.synthesizer import CTGANSynthesizer  # use _gumbel_softmax
 
 
 class Encoder(Module):
@@ -109,7 +110,8 @@ class TVAESynthesizer(object):
                 st = ed
             elif item[1] == 'softmax':
                 ed = st + item[0]
-                data_t.append(functional.gumbel_softmax(data[:, st:ed], tau=0.2))
+                transformed = CTGANSynthesizer()._gumbel_softmax(data[:, st:ed], tau=0.2)
+                data_t.append(transformed)
                 st = ed
             else:
                 assert 0
