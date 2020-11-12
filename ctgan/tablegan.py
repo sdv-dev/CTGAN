@@ -5,7 +5,9 @@ from torch.nn import (
 from torch.nn.functional import binary_cross_entropy_with_logits
 from torch.optim import Adam
 from torch.utils.data import DataLoader, TensorDataset
-from ctgan.transformer import DataTransformer
+##from ctgan.transformer import DataTransformer
+## use transformer_tablegan first
+from ctgan.transformer_tablegan import TableganTransformer
 from torchsummary import summary
 
 CATEGORICAL = "categorical"
