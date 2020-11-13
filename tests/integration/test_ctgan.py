@@ -97,6 +97,7 @@ def test_categorical_nan():
     assert any(pd.isnull(x) for x in values)
     assert {"b", "c"}.issubset(values)
 
+
 def test_synthesizer_sample():
     data = pd.DataFrame({
         'discrete': np.random.choice(['a', 'b', 'c'], 100)
