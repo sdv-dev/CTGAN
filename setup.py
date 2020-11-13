@@ -18,6 +18,7 @@ install_requires = [
     'rdt>=0.2.7,<0.3',
     'numpy<2,>=1.17.4',
     'pandas<2,>=0.24',
+    'packaging',
 ]
 
 setup_requires = [
