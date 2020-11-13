@@ -1,9 +1,11 @@
+import pickle
+
 import numpy as np
 import pandas as pd
+from rdt.transformers import OneHotEncodingTransformer
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.mixture import BayesianGaussianMixture
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.utils._testing import ignore_warnings
+from sklearn.utils.testing import ignore_warnings
 
 
 class DataTransformer(object):
@@ -45,9 +47,10 @@ class DataTransformer(object):
         }
 
     def _fit_discrete(self, column, data):
-        ohe = OneHotEncoder(sparse=False)
+        ohe = OneHotEncodingTransformer()
+        data = data[:, 0]
         ohe.fit(data)
-        categories = len(ohe.categories_[0])
+        categories = len(set(data))
 
         return {
             'name': column,
@@ -66,6 +69,7 @@ class DataTransformer(object):
         else:
             self.dataframe = True
 
+        self.dtypes = data.infer_objects().dtypes
         self.meta = []
         for column in data.columns:
             column_data = data[[column]].values
@@ -108,7 +112,7 @@ class DataTransformer(object):
 
     def _transform_discrete(self, column_meta, data):
         encoder = column_meta['encoder']
-        return encoder.transform(data)
+        return encoder.transform(data[:, 0])
 
     def transform(self, data):
         if not isinstance(data, pd.DataFrame):
@@ -149,7 +153,7 @@ class DataTransformer(object):
 
     def _inverse_transform_discrete(self, meta, data):
         encoder = meta['encoder']
-        return encoder.inverse_transform(data)
+        return encoder.reverse_transform(data)
 
     def inverse_transform(self, data, sigmas):
         start = 0
@@ -170,7 +174,33 @@ class DataTransformer(object):
             start += dimensions
 
         output = np.column_stack(output)
-        if self.dataframe:
-            output = pd.DataFrame(output, columns=column_names)
+        output = pd.DataFrame(output, columns=column_names).astype(self.dtypes)
+        if not self.dataframe:
+            output = output.values
 
         return output
+
+    def save(self, path):
+        with open(path + "/data_transform.pl", "wb") as f:
+            pickle.dump(self, f)
+
+    def covert_column_name_value_to_id(self, column_name, value):
+        discrete_counter = 0
+        column_id = 0
+        for info in self.meta:
+            if info["name"] == column_name:
+                break
+            if len(info["output_info"]) == 1:  # is discrete column
+                discrete_counter += 1
+            column_id += 1
+
+        return {
+            "discrete_column_id": discrete_counter,
+            "column_id": column_id,
+            "value_id": np.argmax(info["encoder"].transform(np.array([value]))[0])
+        }
+
+    @classmethod
+    def load(cls, path):
+        with open(path + "/data_transform.pl", "rb") as f:
+            return pickle.load(f)
