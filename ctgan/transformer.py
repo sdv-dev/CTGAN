@@ -197,7 +197,7 @@ class DataTransformer(object):
         return {
             "discrete_column_id": discrete_counter,
             "column_id": column_id,
-            "value_id": np.argmax(info["encoder"].transform([[value]])[0])
+            "value_id": np.argmax(info["encoder"].transform(np.array([value]))[0])
         }
 
     @classmethod
