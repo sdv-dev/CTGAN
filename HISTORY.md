@@ -1,6 +1,6 @@
 # History
 
-## v0.2.2 - 2020-11-10
+## v0.2.2 - 2020-11-13
 
 In this release we introduce several minor improvements to make CTGAN more versatile and
 propertly support new types of data, such as categorical NaN values, as well as conditional
