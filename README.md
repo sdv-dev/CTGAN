@@ -94,7 +94,7 @@ Before being able to use CTGAN you will need to prepare your data as specified a
 
 For this example, we will be loading some data using the `ctgan.load_demo` function.
 
-```python
+```python3
 from ctgan import load_demo
 
 data = load_demo()
@@ -117,7 +117,7 @@ variables.
 
 For this example:
 
-```python
+```python3
 discrete_columns = [
     'workclass',
     'education',
@@ -134,20 +134,26 @@ discrete_columns = [
 ### Step 2: Fit CTGAN to your data
 
 Once you have the data ready, you need to import and create an instance of the `CTGANSynthesizer`
-class and fit it passing your data and the list of discrete columns.
+class.
 
-```python
+```python3
 from ctgan import CTGANSynthesizer
 
 ctgan = CTGANSynthesizer()
+```
+
+And then call its `fit` method passing your data and the list of discrete columns
+
+```python
 ctgan.fit(data, discrete_columns)
 ```
 
-This process is likely to take a long time to run.
+**NOTE**: This process is likely to take a long time to run.
+
 If you want to make the process shorter, or longer, you can control the number of training epochs
 that the model will be performing by adding it to the `fit` call:
 
-```python
+```python3
 ctgan.fit(data, discrete_columns, epochs=5)
 ```
 
@@ -156,7 +162,7 @@ ctgan.fit(data, discrete_columns, epochs=5)
 Once the process has finished, all you need to do is call the `sample` method of your
 `CTGANSynthesizer` instance indicating the number of rows that you want to generate.
 
-```python
+```python3
 samples = ctgan.sample(1000)
 ```
 
@@ -179,7 +185,7 @@ the probability of getting one value in one discrete column.
 
 For example, the following code **increase the probability** of workclass = " Private".
 
-```python
+```python3
 samples = ctgan.sample(1000, 'workclass', ' Private')
 ```
 
@@ -187,21 +193,19 @@ samples = ctgan.sample(1000, 'workclass', ' Private')
 
 ## 4. Save and load the synthesizer
 
-To save a trained ctgan synthesizer, use
+To save a trained ctgan synthesizer, you can call the `save` method passing a path to the file
+in which the model will be saved:
 
-```python
-ctgan.save(path_to_a_folder)
+```python3
+ctgan.save('ctgan.pkl')
 ```
 
-To restore a saved synthesizer, use
+Later on, you can restore the saved synthetsizer by passing the path to the `load`
+model of the `CTGANSynthetizer` method:
 
-```python
-ctgan = CTGANSynthesizer()
-ctgan.fit(data, discrete_columns, epochs=0, load_path=path_to_a_folder)
+```python3
+ctgan = CTGANSynthesizer.load('ctgan.pkl')
 ```
-
-**Please make sure the saved model and the loaded model are for the
-same dataset.**
 
 # Join our community
 
