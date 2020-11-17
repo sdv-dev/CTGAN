@@ -18,6 +18,7 @@ install_requires = [
     'rdt>=0.2.7,<0.3',
     'numpy<2,>=1.17.4',
     'pandas<2,>=0.24',
+    'packaging',
 ]
 
 setup_requires = [
@@ -96,6 +97,6 @@ setup(
     test_suite='tests',
     tests_require=tests_require,
     url='https://github.com/sdv-dev/CTGAN',
-    version='0.2.2.dev3',
+    version='0.2.3.dev0',
     zip_safe=False,
 )
