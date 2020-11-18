@@ -1,0 +1,29 @@
+name: Generate Docs
+
+on:
+  push:
+    branches: [ stable ]
+
+jobs:
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Python
+      uses: actions/setup-python@v1
+      with:
+        python-version: 3.8
+
+    - name: Build
+      run: |
+        sudo apt-get install graphviz pandoc
+        python -m pip install --upgrade pip
+        pip install -e .[dev]
+        make docs
+    - name: Deploy
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{secrets.GITHUB_TOKEN}}
+        publish_dir: docs/_build/html
