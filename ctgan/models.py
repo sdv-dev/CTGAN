@@ -3,8 +3,9 @@ from torch.nn import BatchNorm1d, Dropout, LeakyReLU, Linear, Module, ReLU, Sequ
 
 
 class Discriminator(Module):
-
-    def calc_gradient_penalty(self, real_data, fake_data, device='cpu', pac=10, lambda_=10):
+    def calc_gradient_penalty(
+        self, real_data, fake_data, device="cpu", pac=10, lambda_=10
+    ):
 
         alpha = torch.rand(real_data.size(0) // pac, 1, 1, device=device)
         alpha = alpha.repeat(1, pac, real_data.size(1))
@@ -15,14 +16,17 @@ class Discriminator(Module):
         disc_interpolates = self(interpolates)
 
         gradients = torch.autograd.grad(
-            outputs=disc_interpolates, inputs=interpolates,
+            outputs=disc_interpolates,
+            inputs=interpolates,
             grad_outputs=torch.ones(disc_interpolates.size(), device=device),
-            create_graph=True, retain_graph=True, only_inputs=True
+            create_graph=True,
+            retain_graph=True,
+            only_inputs=True,
         )[0]
 
-        gradient_penalty = ((
-            gradients.view(-1, pac * real_data.size(1)).norm(2, dim=1) - 1
-        ) ** 2).mean() * lambda_
+        gradient_penalty = (
+            (gradients.view(-1, pac * real_data.size(1)).norm(2, dim=1) - 1) ** 2
+        ).mean() * lambda_
 
         return gradient_penalty
 

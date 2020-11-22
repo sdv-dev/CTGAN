@@ -44,6 +44,7 @@ class CTGANSynthesizer(object):
         batch_size=500,
         blackbox_model=None,
         preprocessing_pipeline=None,
+        bb_loss="logloss",
     ):
 
         self.embedding_dim = embedding_dim
@@ -117,6 +118,7 @@ class CTGANSynthesizer(object):
         log_frequency=True,
         confidence_level=-1,
         verbose=True,
+        gen_lr=2e-4,
     ):
         """Fit the CTGAN Synthesizer models to the training data.
 
@@ -171,7 +173,7 @@ class CTGANSynthesizer(object):
         if not hasattr(self, "optimizerG"):
             self.optimizerG = optim.Adam(
                 self.generator.parameters(),
-                lr=2e-4,
+                lr=gen_lr,
                 betas=(0.5, 0.9),
                 weight_decay=self.l2scale,
             )
@@ -378,3 +380,11 @@ class CTGANSynthesizer(object):
         conf_loss = torch.nn.L1Loss()(y_conf_gen, y_conf_wanted)
 
         return conf_loss
+
+    def _get_loss_by_name(self, loss_name):
+        if loss_name == "logloss":
+            return torch.nn.BCELoss()
+        elif loss_name == "l1":
+            return torch.nn.L1Loss()
+        elif loss_name == "l2":
+            return torch.nn.L1Loss()
