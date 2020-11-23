@@ -2,10 +2,11 @@ import pickle
 
 import numpy as np
 import pandas as pd
-from rdt.transformers import OneHotEncodingTransformer
 from sklearn.exceptions import ConvergenceWarning
 from sklearn.mixture import BayesianGaussianMixture
 from sklearn.utils.testing import ignore_warnings
+
+from rdt.transformers import OneHotEncodingTransformer
 
 
 class DataTransformer(object):

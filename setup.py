@@ -58,6 +58,8 @@ development_requires = [
     # Advanced testing
     'coverage>=4.5.1,<6',
     'tox>=2.9.1,<4',
+
+    'invoke',
 ]
 
 setup(
