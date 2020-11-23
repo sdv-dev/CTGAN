@@ -10,7 +10,7 @@ from invoke import task
 
 @task
 def pytest(c):
-    c.run('python -m pytest --reruns 5 --cov=ctgan')
+    c.run('python -m pytest --cov=ctgan')
 
 
 @task
