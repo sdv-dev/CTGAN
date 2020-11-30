@@ -50,13 +50,13 @@ class DataTransformer(object):
         ohe = OneHotEncodingTransformer()
         data = data[:, 0]
         ohe.fit(data)
-        categories = len(set(data))
+        num_categories = len(ohe.dummies)
 
         return {
             'name': column,
             'encoder': ohe,
-            'output_info': [(categories, 'softmax')],
-            'output_dimensions': categories
+            'output_info': [(num_categories, 'softmax')],
+            'output_dimensions': num_categories
         }
 
     def fit(self, data, discrete_columns=tuple()):
