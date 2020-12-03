@@ -33,8 +33,8 @@ class CTGANSynthesizer(object):
         batch_size (int):
             Number of data samples to process in each step.
         n_discriminator (int):
-            Number of discriminator updates to do for each generator update.
-            Defaults to 5.
+            Number of discriminator updates to do for each generator update. WGAN paper 
+            defaults to 5. Defaults to 1.
     """
 
     def __init__(self, embedding_dim=128, gen_dim=(256, 256), dis_dim=(256, 256),
