@@ -33,7 +33,7 @@ class CTGANSynthesizer(object):
         batch_size (int):
             Number of data samples to process in each step.
         n_discriminator (int):
-            Number of discriminator updates to do for each generator update. WGAN paper 
+            Number of discriminator updates to do for each generator update. WGAN paper
             defaults to 5. Defaults to 1.
     """
 
