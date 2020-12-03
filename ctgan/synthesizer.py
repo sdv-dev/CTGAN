@@ -29,16 +29,17 @@ class CTGANSynthesizer(object):
             Size of the output samples for each one of the Discriminator Layers. A Linear Layer
             will be created for each one of the values provided. Defaults to (256, 256).
         l2scale (float):
-            Wheight Decay for the Adam Optimizer. Defaults to 1e-6.
+            Weight Decay for the Adam Optimizer. Defaults to 1e-6.
         batch_size (int):
             Number of data samples to process in each step.
-        n_discriminator (int):
-            Number of discriminator updates to do for each generator update. WGAN paper
-            defaults to 5. Defaults to 1.
+        discriminator_steps (int):
+            Number of discriminator updates to do for each generator update.
+            From the WGAN paper: https://arxiv.org/abs/1701.07875. WGAN paper
+            default is 5. Default used is 1 to match original CTGAN implementation.
     """
 
     def __init__(self, embedding_dim=128, gen_dim=(256, 256), dis_dim=(256, 256),
-                 l2scale=1e-6, batch_size=500, n_discriminator=1):
+                 l2scale=1e-6, batch_size=500, discriminator_steps=1):
 
         self.embedding_dim = embedding_dim
         self.gen_dim = gen_dim
@@ -48,7 +49,7 @@ class CTGANSynthesizer(object):
         self.batch_size = batch_size
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.trained_epoches = 0
-        self.n_discriminator = n_discriminator
+        self.discriminator_steps = discriminator_steps
 
     @staticmethod
     def _gumbel_softmax(logits, tau=1, hard=False, eps=1e-10, dim=-1):
@@ -201,7 +202,7 @@ class CTGANSynthesizer(object):
             self.trained_epoches += 1
             for id_ in range(steps_per_epoch):
 
-                for n in range(self.n_discriminator):
+                for n in range(self.discriminator_steps):
                     fakez = torch.normal(mean=mean, std=std)
 
                     condvec = self.cond_generator.sample(self.batch_size)
