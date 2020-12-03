@@ -36,10 +36,13 @@ class CTGANSynthesizer(object):
             Number of discriminator updates to do for each generator update.
             From the WGAN paper: https://arxiv.org/abs/1701.07875. WGAN paper
             default is 5. Default used is 1 to match original CTGAN implementation.
+        log_frequency (boolean):
+            Whether to use log frequency of categorical levels in conditional
+            sampling. Defaults to ``True``.
     """
 
     def __init__(self, embedding_dim=128, gen_dim=(256, 256), dis_dim=(256, 256),
-                 l2scale=1e-6, batch_size=500, discriminator_steps=1):
+                 l2scale=1e-6, batch_size=500, discriminator_steps=1, log_frequency=True):
 
         self.embedding_dim = embedding_dim
         self.gen_dim = gen_dim
@@ -47,6 +50,7 @@ class CTGANSynthesizer(object):
 
         self.l2scale = l2scale
         self.batch_size = batch_size
+        self.log_frequency = log_frequency
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.trained_epoches = 0
         self.discriminator_steps = discriminator_steps
@@ -135,7 +139,7 @@ class CTGANSynthesizer(object):
 
         return (loss * m).sum() / data.size()[0]
 
-    def fit(self, train_data, discrete_columns=tuple(), epochs=300, log_frequency=True):
+    def fit(self, train_data, discrete_columns=tuple(), epochs=300):
         """Fit the CTGAN Synthesizer models to the training data.
 
         Args:
@@ -149,9 +153,6 @@ class CTGANSynthesizer(object):
                 a ``pandas.DataFrame``, this list should contain the column names.
             epochs (int):
                 Number of training epochs. Defaults to 300.
-            log_frequency (boolean):
-                Whether to use log frequency of categorical levels in conditional
-                sampling. Defaults to ``True``.
         """
 
         if not hasattr(self, "transformer"):
@@ -167,7 +168,7 @@ class CTGANSynthesizer(object):
             self.cond_generator = ConditionalGenerator(
                 train_data,
                 self.transformer.output_info,
-                log_frequency
+                self.log_frequency
             )
 
         if not hasattr(self, "generator"):
