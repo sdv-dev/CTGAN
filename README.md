@@ -52,6 +52,17 @@ This will pull and install the latest stable release from [PyPI](https://pypi.or
 If you want to install from source or contribute to the project please read the
 [Contributing Guide](CONTRIBUTING.rst).
 
+## Install with conda
+
+**CTGAN** can also be installed using [conda](https://docs.conda.io/en/latest/):
+
+```bash
+conda install -c sdv-dev -c conda-forge ctgan
+```
+
+This will pull and install the latest stable release from [Anaconda](https://anaconda.org/).
+
+
 # Data Format
 
 **CTGAN** expects the input data to be a table given as either a `numpy.ndarray` or a

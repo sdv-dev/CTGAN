@@ -1,5 +1,5 @@
 {% set name = "ctgan" %}
-{% set version = "0.2.2" %}
+{% set version = "0.2.3.dev0" %}
 
 package:
   name: "{{ name|lower }}"
@@ -7,10 +7,10 @@ package:
 
 source:
   url: "https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz"
-  sha256: 5f63935e32e4cc3d7e09294cabf4421e1f15bf21e0c8dc9cc5dcac6c07dd7d8e
 
 build:
   number: 0
+  noarch: python
   entry_points:
     - ctgan=ctgan.__main__:main
   script: "{{ PYTHON }} -m pip install . -vv"
@@ -23,25 +23,17 @@ requirements:
     - python
     - rdt >=0.2.7,<0.3
     - scikit-learn <0.24,>=0.21
-    - torch <2,>=1.0
+    - pytorch <2,>=1.0
     - torchvision <1,>=0.4.2
+    - pytest-runner
   run:
     - numpy <2,>=1.17.4
     - pandas <2,>=0.24
     - python
     - rdt >=0.2.7,<0.3
     - scikit-learn <0.24,>=0.21
-    - torch <2,>=1.0
+    - pytorch <2,>=1.0
     - torchvision <1,>=0.4.2
-
-test:
-  imports:
-    - ctgan
-  commands:
-    - ctgan --help
-  requires:
-    - pytest >=3.4.2
-    - pytest-cov >=2.6.0
 
 about:
   home: "https://github.com/sdv-dev/CTGAN"
@@ -54,4 +46,4 @@ about:
 
 extra:
   recipe-maintainers:
-    - your-github-id-here
+    - sdv-dev
