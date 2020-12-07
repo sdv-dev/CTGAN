@@ -17,7 +17,7 @@ install_requires = [
     'scikit-learn<0.24,>=0.21',
     'rdt>=0.2.7,<0.3',
     'numpy<2,>=1.17.4',
-    'pandas<2,>=0.24',
+    'pandas<1.1.5,>=0.24',
     'packaging',
 ]
 
