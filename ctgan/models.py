@@ -60,11 +60,11 @@ class Residual(Module):
 
 
 class Generator(Module):
-    def __init__(self, embedding_dim, gen_dims, data_dim):
+    def __init__(self, embedding_dim, generator_dims, data_dim):
         super(Generator, self).__init__()
         dim = embedding_dim
         seq = []
-        for item in list(gen_dims):
+        for item in list(generator_dims):
             seq += [Residual(dim, item)]
             dim += item
         seq.append(Linear(dim, data_dim))

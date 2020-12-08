@@ -1,36 +1,32 @@
-import warnings
 from collections import namedtuple
 
 import numpy as np
 import pandas as pd
-from sklearn.exceptions import ConvergenceWarning
 from sklearn.mixture import BayesianGaussianMixture
 from sklearn.preprocessing import OneHotEncoder
-
-warnings.filterwarnings("ignore", category=ConvergenceWarning)
 
 SpanInfo = namedtuple("SpanInfo", ["dim", "activation_fn"])
 ColumnTransformInfo = namedtuple(
     "ColumnTransformInfo", ["column_name", "column_type",
                             "transform", "transform_aux",
-                            "output_info", "output_dim"])
+                            "output_info", "output_dimensions"])
 
 
 class DataTransformer(object):
     """Data Transformer.
 
-    Model continuous columns with a Bayesian GMM and normalized to a scalar
-    [0, 1] and a vector.
+    Model continuous columns with a Bayesian GMM and normalized to a scalar [0, 1] and a vector.
     Discrete columns are encoded using a scikit-learn OneHotEncoder.
     """
 
     def __init__(self, max_clusters=10, weight_threshold=0.005):
-        """Args:
-        Create a data transformer.
-        max_clusters (int):
-            Maximum number of Gaussian distributions in Bayesian GMM.
-        weight_threshold (float):
-            Weight threshold for a Gaussian distribution to be kept.
+        """Create a data transformer.
+
+        Args:
+            max_clusters (int):
+                Maximum number of Gaussian distributions in Bayesian GMM.
+            weight_threshold (float):
+                Weight threshold for a Gaussian distribution to be kept.
         """
         self._max_clusters = max_clusters
         self._weight_threshold = weight_threshold
@@ -49,7 +45,7 @@ class DataTransformer(object):
             column_name=column_name, column_type="continuous", transform=gm,
             transform_aux=valid_component_indicator,
             output_info=[SpanInfo(1, 'tanh'), SpanInfo(num_components, 'softmax')],
-            output_dim=1 + num_components)
+            output_dimensions=1 + num_components)
 
     def _fit_discrete(self, column_name, raw_column_data):
         """Fit one hot encoder for continuous column."""
@@ -61,13 +57,15 @@ class DataTransformer(object):
             column_name=column_name, column_type="discrete", transform=ohe,
             transform_aux=None,
             output_info=[SpanInfo(num_categories, 'softmax')],
-            output_dim=num_categories)
+            output_dimensions=num_categories)
 
     def fit(self, raw_data, discrete_columns=tuple()):
-        """fit GMM for continuous columns and One hot encoder for discrete columns.
-        this step also counts the #columns in matrix data, and span information."""
-        self._output_info_list = []
-        self._output_dim = 0
+        """Fit GMM for continuous columns and One hot encoder for discrete columns.
+
+        This step also counts the #columns in matrix data, and span information.
+        """
+        self.output_info_list = []
+        self.output_dimensions = 0
 
         if not isinstance(raw_data, pd.DataFrame):
             self._output_as_dataframe = False
@@ -87,8 +85,8 @@ class DataTransformer(object):
                 column_transform_info = self._fit_continuous(
                     column_name, raw_column_data)
 
-            self._output_info_list.append(column_transform_info.output_info)
-            self._output_dim += column_transform_info.output_dim
+            self.output_info_list.append(column_transform_info.output_info)
+            self.output_dimensions += column_transform_info.output_dimensions
             self._column_transform_info_list.append(column_transform_info)
 
     def _transform_continuous(self, column_transform_info, raw_column_data):
@@ -125,7 +123,7 @@ class DataTransformer(object):
         return [ohe.transform(raw_column_data)]
 
     def transform(self, raw_data):
-        """take raw data and output a matrix data."""
+        """Take raw data and output a matrix data."""
         if not isinstance(raw_data, pd.DataFrame):
             raw_data = pd.DataFrame(raw_data)
 
@@ -168,15 +166,16 @@ class DataTransformer(object):
         return ohe.inverse_transform(column_data)
 
     def inverse_transform(self, data):
-        """take matrix data and output raw data.
-        (output uses the same type as input to the transform function.
-        Either np array or pd dataframe.)
+        """Take matrix data and output raw data.
+
+        Output uses the same type as input to the transform function.
+        Either np array or pd dataframe.
         """
         st = 0
         recovered_column_data_list = []
         column_names = []
         for column_transform_info in self._column_transform_info_list:
-            dim = column_transform_info.output_dim
+            dim = column_transform_info.output_dimensions
             column_data = data[:, st:st + dim]
 
             if column_transform_info.column_type == 'continuous':
@@ -198,11 +197,3 @@ class DataTransformer(object):
             recovered_data = recovered_data.values
 
         return recovered_data
-
-    def output_info(self):
-        """return a list of SpanInfo."""
-        return self._output_info_list
-
-    def output_dim(self):
-        """return the number of columns in matrix data."""
-        return self._output_dim
