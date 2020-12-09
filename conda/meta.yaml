@@ -1,0 +1,51 @@
+{% set name = 'ctgan' %}
+{% set version = '0.2.3.dev0' %}
+
+package:
+  name: "{{ name|lower }}"
+  version: "{{ version }}"
+
+source:
+  url: "https://pypi.io/packages/source/{{ name[0] }}/{{ name }}/{{ name }}-{{ version }}.tar.gz"
+
+build:
+  number: 0
+  noarch: python
+  entry_points:
+    - ctgan=ctgan.__main__:main
+  script: "{{ PYTHON }} -m pip install . -vv"
+
+requirements:
+  host:
+    - numpy <2,>=1.17.4
+    - pandas <1.1.5,>=0.24
+    - pip
+    - python
+    - rdt >=0.2.7,<0.3
+    - scikit-learn <0.24,>=0.21
+    - pytorch <2,>=1.0
+    - torchvision <1,>=0.4.2
+    - packaging
+    - pytest-runner
+  run:
+    - numpy <2,>=1.17.4
+    - pandas <1.1.5,>=0.24
+    - python
+    - rdt >=0.2.7,<0.3
+    - scikit-learn <0.24,>=0.21
+    - pytorch <2,>=1.0
+    - torchvision <1,>=0.4.2
+    - packaging
+
+about:
+  home: "https://github.com/sdv-dev/CTGAN"
+  license: MIT
+  license_family: MIT
+  license_file: 
+  summary: "Conditional GAN for Tabular Data"
+  doc_url: 
+  dev_url: 
+
+extra:
+  recipe-maintainers:
+    - sdv-dev

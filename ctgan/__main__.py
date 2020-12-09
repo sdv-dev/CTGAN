@@ -16,9 +16,8 @@ def _parse_args():
     parser.add_argument('-m', '--metadata', help='Path to the metadata')
     parser.add_argument('-d', '--discrete',
                         help='Comma separated list of discrete columns without whitespaces.')
-
     parser.add_argument('-n', '--num-samples', type=int,
-                        help='Number of rows to sample. Defaults to the training data size.')
+                        help='Number of rows to sample. Defaults to the training data size')
 
     parser.add_argument('--generator_lr', type=float, default=2e-4,
                         help='Learning rate for the generator.')
@@ -32,15 +31,24 @@ def _parse_args():
 
     parser.add_argument('--embedding_dim', type=int, default=128,
                         help='Dimension of input z to the generator.')
-    parser.add_argument('--generator_dims', type=str, default='256,256',
+    parser.add_argument('--generator_dim', type=str, default='256,256',
                         help='Dimension of each generator layer. '
                         'Comma separated integers with no whitespaces.')
-    parser.add_argument('--discriminator_dims', type=str, default='256,256',
+    parser.add_argument('--discriminator_dim', type=str, default='256,256',
                         help='Dimension of each discriminator layer. '
                         'Comma separated integers with no whitespaces.')
 
-    parser.add_argument('--bs', type=int, default=500,
+    parser.add_argument('--batch_size', type=int, default=500,
                         help='Batch size. Must be an even number.')
+    parser.add_argument('--save', default=None, type=str,
+                        help='A filename to save the trained synthesizer.')
+    parser.add_argument('--load', default=None, type=str,
+                        help='A filename to load a trained synthesizer.')
+
+    parser.add_argument("--sample_condition_column", default=None, type=str,
+                        help="Select a discrete column name.")
+    parser.add_argument("--sample_condition_column_value", default=None, type=str,
+                        help="Specify the value of the selected discrete column.")
 
     parser.add_argument('data', help='Path to training data')
     parser.add_argument('output', help='Path of the output file')
@@ -55,17 +63,30 @@ def main():
     else:
         data, discrete_columns = read_csv(args.data, args.metadata, args.header, args.discrete)
 
-    generator_dims = [int(x) for x in args.generator_dims.split(',')]
-    discriminator_dims = [int(x) for x in args.discriminator_dims.split(',')]
-    model = CTGANSynthesizer(
-        embedding_dim=args.embedding_dim, generator_dims=generator_dims,
-        discriminator_dims=discriminator_dims, generator_lr=args.generator_lr,
-        generator_decay=args.generator_decay, discriminator_lr=args.discriminator_lr,
-        discriminator_decay=args.discriminator_decay, batch_size=args.bs)
+    if args.load:
+        model = CTGANSynthesizer.load(args.load)
+    else:
+        generator_dims = [int(x) for x in args.generator_dims.split(',')]
+        discriminator_dims = [int(x) for x in args.discriminator_dims.split(',')]
+        model = CTGANSynthesizer(
+            embedding_dim=args.embedding_dim, generator_dims=generator_dims,
+            discriminator_dims=discriminator_dims, generator_lr=args.generator_lr,
+            generator_decay=args.generator_decay, discriminator_lr=args.discriminator_lr,
+            discriminator_decay=args.discriminator_decay, batch_size=args.batch_size)
     model.fit(data, discrete_columns, args.epochs)
 
+    if args.save is not None:
+        model.save(args.save)
+
     num_samples = args.num_samples or len(data)
-    sampled = model.sample(num_samples)
+
+    if args.sample_condition_column is not None:
+        assert args.sample_condition_column_value is not None
+
+    sampled = model.sample(
+        num_samples,
+        args.sample_condition_column,
+        args.sample_condition_column_value)
 
     if args.tsv:
         write_tsv(sampled, args.metadata, args.output)
@@ -73,5 +94,5 @@ def main():
         sampled.to_csv(args.output, index=False)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

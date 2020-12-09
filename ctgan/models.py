@@ -4,9 +4,20 @@ from torch.nn import BatchNorm1d, Dropout, LeakyReLU, Linear, Module, ReLU, Sequ
 
 class Discriminator(Module):
 
-    def calc_gradient_penalty(self, real_data, fake_data, device='cpu',
-                              pac=10, lambda_=10):
+    def __init__(self, input_dim, dis_dims, pack=10):
+        super(Discriminator, self).__init__()
+        dim = input_dim * pack
+        self.pack = pack
+        self.packdim = dim
+        seq = []
+        for item in list(dis_dims):
+            seq += [Linear(dim, item), LeakyReLU(0.2), Dropout(0.5)]
+            dim = item
 
+        seq += [Linear(dim, 1)]
+        self.seq = Sequential(*seq)
+
+    def calc_gradient_penalty(self, real_data, fake_data, device='cpu', pac=10, lambda_=10):
         alpha = torch.rand(real_data.size(0) // pac, 1, 1, device=device)
         alpha = alpha.repeat(1, pac, real_data.size(1))
         alpha = alpha.view(-1, real_data.size(1))
@@ -27,25 +38,13 @@ class Discriminator(Module):
 
         return gradient_penalty
 
-    def __init__(self, input_dim, dis_dims, pack=10):
-        super(Discriminator, self).__init__()
-        dim = input_dim * pack
-        self.pack = pack
-        self.packdim = dim
-        seq = []
-        for item in list(dis_dims):
-            seq += [Linear(dim, item), LeakyReLU(0.2), Dropout(0.5)]
-            dim = item
-
-        seq += [Linear(dim, 1)]
-        self.seq = Sequential(*seq)
-
     def forward(self, input):
         assert input.size()[0] % self.pack == 0
         return self.seq(input.view(-1, self.packdim))
 
 
 class Residual(Module):
+
     def __init__(self, i, o):
         super(Residual, self).__init__()
         self.fc = Linear(i, o)
@@ -60,11 +59,12 @@ class Residual(Module):
 
 
 class Generator(Module):
-    def __init__(self, embedding_dim, generator_dims, data_dim):
+
+    def __init__(self, embedding_dim, generator_dim, data_dim):
         super(Generator, self).__init__()
         dim = embedding_dim
         seq = []
-        for item in list(generator_dims):
+        for item in list(generator_dim):
             seq += [Residual(dim, item)]
             dim += item
         seq.append(Linear(dim, data_dim))

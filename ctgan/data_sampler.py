@@ -81,7 +81,6 @@ class DataSampler(object):
 
     def sample_condvec(self, batch):
         """Generate the conditional vector for training.
-
         Returns:
             cond (batch x #categories):
                 The conditional vector.
@@ -128,7 +127,6 @@ class DataSampler(object):
 
     def sample_data(self, n, col, opt):
         """Sample data from original training data satisfying the sampled conditional vector.
-
         Returns:
             n rows of matrix data.
         """
@@ -144,3 +142,10 @@ class DataSampler(object):
 
     def dim_cond_vec(self):
         return self._n_categories
+
+    def generate_cond_from_condition_column_info(self, condition_info, batch):
+        vec = np.zeros((batch, self._n_categories), dtype='float32')
+        id = self._discrete_column_matrix_st[condition_info["discrete_column_id"]
+                                             ] + condition_info["value_id"]
+        vec[:, id] = 1
+        return vec
