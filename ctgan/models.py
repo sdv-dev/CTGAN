@@ -4,7 +4,8 @@ from torch.nn import BatchNorm1d, Dropout, LeakyReLU, Linear, Module, ReLU, Sequ
 
 class Discriminator(Module):
 
-    def calc_gradient_penalty(self, real_data, fake_data, device='cpu', pac=10, lambda_=10):
+    def calc_gradient_penalty(self, real_data, fake_data, device='cpu',
+                              pac=10, lambda_=10):
 
         alpha = torch.rand(real_data.size(0) // pac, 1, 1, device=device)
         alpha = alpha.repeat(1, pac, real_data.size(1))
@@ -59,11 +60,11 @@ class Residual(Module):
 
 
 class Generator(Module):
-    def __init__(self, embedding_dim, gen_dims, data_dim):
+    def __init__(self, embedding_dim, generator_dims, data_dim):
         super(Generator, self).__init__()
         dim = embedding_dim
         seq = []
-        for item in list(gen_dims):
+        for item in list(generator_dims):
             seq += [Residual(dim, item)]
             dim += item
         seq.append(Linear(dim, data_dim))
