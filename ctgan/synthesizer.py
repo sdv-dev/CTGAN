@@ -11,6 +11,7 @@ from ctgan.models import Discriminator, Generator
 
 class CTGANSynthesizer(object):
     """Conditional Table GAN Synthesizer.
+
     This is the core class of the CTGAN project, where the different components
     are orchestrated together.
     For more details about the process, please check the [Modeling Tabular data using
@@ -67,6 +68,7 @@ class CTGANSynthesizer(object):
     @staticmethod
     def _gumbel_softmax(logits, tau=1, hard=False, eps=1e-10, dim=-1):
         """Deals with the instability of the gumbel_softmax for older versions of torch.
+
         For more details about the issue:
         https://drive.google.com/file/d/1AA5wPfZ1kquaRtVruCd6BiYZGcDeNxyP/view?usp=sharing
         Args:
@@ -140,6 +142,7 @@ class CTGANSynthesizer(object):
 
     def fit(self, train_data, discrete_columns=tuple(), epochs=300):
         """Fit the CTGAN Synthesizer models to the training data.
+
         Args:
             train_data (numpy.ndarray or pandas.DataFrame):
                 Training Data. It must be a 2-dimensional numpy array or a pandas.DataFrame.
@@ -151,9 +154,8 @@ class CTGANSynthesizer(object):
             epochs (int):
                 Number of training epochs. Defaults to 300.
         """
-        if not hasattr(self, "_transformer"):
-            self._transformer = DataTransformer()
-            self._transformer.fit(train_data, discrete_columns)
+        self._transformer = DataTransformer()
+        self._transformer.fit(train_data, discrete_columns)
 
         train_data = self._transformer.transform(train_data)
 
@@ -164,29 +166,26 @@ class CTGANSynthesizer(object):
 
         data_dim = self._transformer.output_dimensions
 
-        if not hasattr(self, "_generator"):
-            self._generator = Generator(
-                self._embedding_dim + self._data_sampler.dim_cond_vec(),
-                self._generator_dim,
-                data_dim
-            ).to(self._device)
+        self._generator = Generator(
+            self._embedding_dim + self._data_sampler.dim_cond_vec(),
+            self._generator_dim,
+            data_dim
+        ).to(self._device)
 
-        if not hasattr(self, "_discriminator"):
-            self._discriminator = Discriminator(
-                data_dim + self._data_sampler.dim_cond_vec(),
-                self._discriminator_dim
-            ).to(self._device)
+        self._discriminator = Discriminator(
+            data_dim + self._data_sampler.dim_cond_vec(),
+            self._discriminator_dim
+        ).to(self._device)
 
-        if not hasattr(self, "_optimizerG"):
-            self._optimizerG = optim.Adam(
-                self._generator.parameters(), lr=self._generator_lr, betas=(0.5, 0.9),
-                weight_decay=self._generator_decay
-            )
+        self._optimizerG = optim.Adam(
+            self._generator.parameters(), lr=self._generator_lr, betas=(0.5, 0.9),
+            weight_decay=self._generator_decay
+        )
 
-        if not hasattr(self, "_optimizerD"):
-            self._optimizerD = optim.Adam(
-                self._discriminator.parameters(), lr=self._discriminator_lr,
-                betas=(0.5, 0.9), weight_decay=self._discriminator_decay)
+        self._optimizerD = optim.Adam(
+            self._discriminator.parameters(), lr=self._discriminator_lr,
+            betas=(0.5, 0.9), weight_decay=self._discriminator_decay
+        )
 
         mean = torch.zeros(self._batch_size, self._embedding_dim, device=self._device)
         std = mean + 1
@@ -275,6 +274,7 @@ class CTGANSynthesizer(object):
 
     def sample(self, n, condition_column=None, condition_value=None):
         """Sample data similar to the training data.
+
         Choosing a condition_column and condition_value will increase the probability of the
         discrete condition_value happening in the condition_column.
         Args:

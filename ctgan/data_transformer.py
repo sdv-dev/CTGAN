@@ -1,4 +1,3 @@
-import pickle
 from collections import namedtuple
 
 import numpy as np
@@ -15,12 +14,14 @@ ColumnTransformInfo = namedtuple(
 
 class DataTransformer(object):
     """Data Transformer.
+
     Model continuous columns with a BayesianGMM and normalized to a scalar [0, 1] and a vector.
     Discrete columns are encoded using a scikit-learn OneHotEncoder.
     """
 
     def __init__(self, max_clusters=10, weight_threshold=0.005):
         """Create a data transformer.
+
         Args:
             max_clusters (int):
                 Maximum number of Gaussian distributions in Bayesian GMM.
@@ -62,6 +63,7 @@ class DataTransformer(object):
 
     def fit(self, raw_data, discrete_columns=tuple()):
         """Fit GMM for continuous columns and One hot encoder for discrete columns.
+
         This step also counts the #columns in matrix data, and span information.
         """
         self.output_info_list = []
@@ -167,6 +169,7 @@ class DataTransformer(object):
 
     def inverse_transform(self, data):
         """Take matrix data and output raw data.
+
         Output uses the same type as input to the transform function.
         Either np array or pd dataframe.
         """
@@ -197,10 +200,6 @@ class DataTransformer(object):
 
         return recovered_data
 
-    def save(self, path):
-        with open(path + "/data_transform.pl", "wb") as f:
-            pickle.dump(self, f)
-
     def convert_column_name_value_to_id(self, column_name, value):
         discrete_counter = 0
         column_id = 0
@@ -216,8 +215,3 @@ class DataTransformer(object):
             "column_id": column_id,
             "value_id": np.argmax(column_transform_info.transform.transform(np.array([value]))[0])
         }
-
-    @classmethod
-    def load(cls, path):
-        with open(path + "/data_transform.pl", "rb") as f:
-            return pickle.load(f)

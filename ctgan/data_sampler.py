@@ -81,6 +81,7 @@ class DataSampler(object):
 
     def sample_condvec(self, batch):
         """Generate the conditional vector for training.
+
         Returns:
             cond (batch x #categories):
                 The conditional vector.
@@ -127,6 +128,7 @@ class DataSampler(object):
 
     def sample_data(self, n, col, opt):
         """Sample data from original training data satisfying the sampled conditional vector.
+
         Returns:
             n rows of matrix data.
         """
