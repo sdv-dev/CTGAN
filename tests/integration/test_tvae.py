@@ -18,7 +18,7 @@ from ctgan.synthesizers import TVAESynthesizer
 def test_tvae_dataframe():
     data = pd.DataFrame({
         'continuous': np.random.random(100),
-        'discrete': np.random.choice(['a', 'b', 'c'], 100)
+        'discrete': np.random.choice(['a', 'b'], 100)
     })
     discrete_columns = ['discrete']
 
@@ -30,13 +30,13 @@ def test_tvae_dataframe():
     assert sampled.shape == (100, 2)
     assert isinstance(sampled, pd.DataFrame)
     assert set(sampled.columns) == {'continuous', 'discrete'}
-    assert set(sampled['discrete'].unique()) == {'a', 'b', 'c'}
+    assert set(sampled['discrete'].unique()) == {'a', 'b'}
 
 
 def test_tvae_numpy():
     data = pd.DataFrame({
         'continuous': np.random.random(100),
-        'discrete': np.random.choice(['a', 'b', 'c'], 100)
+        'discrete': np.random.choice(['a', 'b'], 100)
     })
     discrete_columns = [1]
 
@@ -47,12 +47,12 @@ def test_tvae_numpy():
 
     assert sampled.shape == (100, 2)
     assert isinstance(sampled, np.ndarray)
-    assert set(np.unique(sampled[:, 1])) == {'a', 'b', 'c'}
+    assert set(np.unique(sampled[:, 1])) == {'a', 'b'}
 
 
 def test_synthesizer_sample():
     data = pd.DataFrame({
-        'discrete': np.random.choice(['a', 'b', 'c'], 100)
+        'discrete': np.random.choice(['a', 'b'], 100)
     })
     discrete_columns = ['discrete']
 
