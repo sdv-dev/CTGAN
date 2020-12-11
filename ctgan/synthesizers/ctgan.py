@@ -42,12 +42,16 @@ class CTGANSynthesizer(object):
         log_frequency (boolean):
             Whether to use log frequency of categorical levels in conditional
             sampling. Defaults to ``True``.
+        verbose (boolean):
+            Whether to have print statements for progress results. Defaults to ``False``.
+        epochs (int):
+            Number of training epochs. Defaults to 300.
     """
 
     def __init__(self, embedding_dim=128, generator_dim=(256, 256), discriminator_dim=(256, 256),
                  generator_lr=2e-4, generator_decay=1e-6, discriminator_lr=2e-4,
                  discriminator_decay=0, batch_size=500, discriminator_steps=1, log_frequency=True,
-                 verbose=False):
+                 verbose=False, epochs=300):
 
         assert batch_size % 2 == 0
 
@@ -64,6 +68,7 @@ class CTGANSynthesizer(object):
         self._discriminator_steps = discriminator_steps
         self._log_frequency = log_frequency
         self._verbose = verbose
+        self._epochs = epochs
         self._device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.trained_epoches = 0
 
@@ -142,7 +147,7 @@ class CTGANSynthesizer(object):
 
         return (loss * m).sum() / data.size()[0]
 
-    def fit(self, train_data, discrete_columns=tuple(), epochs=300):
+    def fit(self, train_data, discrete_columns=tuple()):
         """Fit the CTGAN Synthesizer models to the training data.
 
         Args:
@@ -153,8 +158,6 @@ class CTGANSynthesizer(object):
                 Vector. If ``train_data`` is a Numpy array, this list should
                 contain the integer indices of the columns. Otherwise, if it is
                 a ``pandas.DataFrame``, this list should contain the column names.
-            epochs (int):
-                Number of training epochs. Defaults to 300.
         """
         self._transformer = DataTransformer()
         self._transformer.fit(train_data, discrete_columns)
@@ -193,7 +196,7 @@ class CTGANSynthesizer(object):
         std = mean + 1
 
         steps_per_epoch = max(len(train_data) // self._batch_size, 1)
-        for i in range(epochs):
+        for i in range(self._epochs):
             self.trained_epoches += 1
             for id_ in range(steps_per_epoch):
 
