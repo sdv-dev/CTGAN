@@ -166,6 +166,7 @@ that the model will be performing when creating the object:
 
 ```python3
 ctgan = CTGANSynthesizer(epochs=5)
+ctgan.fit(data, discrete_columns)
 ```
 
 ## 2. Generate synthetic data
