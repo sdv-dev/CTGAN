@@ -403,27 +403,7 @@ class CTGANSynthesizer(BaseSynthesizer):
 
         return self._transformer.inverse_transform(data)
 
-    def save(self, path):
-        assert hasattr(self, "_generator")
-        assert hasattr(self, "_discriminator")
-        assert hasattr(self, "_transformer")
-
-        # always save a cpu model.
-        device_bak = self._device
-        self._device = torch.device("cpu")
+    def set_device(self, device):
+        self._device = device
         self._generator.to(self._device)
         self._discriminator.to(self._device)
-
-        torch.save(self, path)
-
-        self._device = device_bak
-        self._generator.to(self._device)
-        self._discriminator.to(self._device)
-
-    @classmethod
-    def load(cls, path):
-        model = torch.load(path)
-        model._device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        model._generator.to(model._device)
-        model._discriminator.to(model._device)
-        return model

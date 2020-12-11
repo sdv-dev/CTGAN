@@ -95,18 +95,18 @@ class TVAESynthesizer(BaseSynthesizer):
         self.loss_factor = 2
         self.epochs = epochs
 
-        self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        self._device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
     def fit(self, train_data, discrete_columns=tuple()):
         self.transformer = DataTransformer()
         self.transformer.fit(train_data, discrete_columns)
         train_data = self.transformer.transform(train_data)
-        dataset = TensorDataset(torch.from_numpy(train_data.astype('float32')).to(self.device))
+        dataset = TensorDataset(torch.from_numpy(train_data.astype('float32')).to(self._device))
         loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True, drop_last=True)
 
         data_dim = self.transformer.output_dimensions
-        encoder = Encoder(data_dim, self.compress_dims, self.embedding_dim).to(self.device)
-        self.decoder = Decoder(self.embedding_dim, self.compress_dims, data_dim).to(self.device)
+        encoder = Encoder(data_dim, self.compress_dims, self.embedding_dim).to(self._device)
+        self.decoder = Decoder(self.embedding_dim, self.compress_dims, data_dim).to(self._device)
         optimizerAE = Adam(
             list(encoder.parameters()) + list(self.decoder.parameters()),
             weight_decay=self.l2scale)
@@ -114,7 +114,7 @@ class TVAESynthesizer(BaseSynthesizer):
         for i in range(self.epochs):
             for id_, data in enumerate(loader):
                 optimizerAE.zero_grad()
-                real = data[0].to(self.device)
+                real = data[0].to(self._device)
                 mu, std, logvar = encoder(real)
                 eps = torch.randn_like(std)
                 emb = eps * std + mu
@@ -134,7 +134,7 @@ class TVAESynthesizer(BaseSynthesizer):
         for _ in range(steps):
             mean = torch.zeros(self.batch_size, self.embedding_dim)
             std = mean + 1
-            noise = torch.normal(mean=mean, std=std).to(self.device)
+            noise = torch.normal(mean=mean, std=std).to(self._device)
             fake, sigmas = self.decoder(noise)
             fake = torch.tanh(fake)
             data.append(fake.detach().cpu().numpy())
@@ -142,3 +142,7 @@ class TVAESynthesizer(BaseSynthesizer):
         data = np.concatenate(data, axis=0)
         data = data[:samples]
         return self.transformer.inverse_transform(data, sigmas.detach().cpu().numpy())
+
+    def set_device(self, device):
+        self._device = device
+        self.decoder.to(self._device)
