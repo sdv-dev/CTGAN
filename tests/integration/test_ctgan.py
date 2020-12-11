@@ -12,7 +12,7 @@ model are not checked.
 import numpy as np
 import pandas as pd
 
-from ctgan.ctgan import CTGANSynthesizer
+from ctgan.synthesizers import CTGANSynthesizer
 
 
 def test_ctgan_dataframe():

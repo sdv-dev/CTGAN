@@ -148,7 +148,7 @@ Once you have the data ready, you need to import and create an instance of the `
 class.
 
 ```python3
-from ctgan import CTGANSynthesizer
+from ctgan.synthesizers import CTGANSynthesizer
 
 ctgan = CTGANSynthesizer()
 ```

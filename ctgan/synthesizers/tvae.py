@@ -5,7 +5,7 @@ from torch.nn.functional import cross_entropy
 from torch.optim import Adam
 from torch.utils.data import DataLoader, TensorDataset
 
-from synthesizers.base import BaseSynthesizer
+from ctgan.synthesizers import BaseSynthesizer
 from ctgan.data_transformer import DataTransformer
 
 
