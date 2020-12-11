@@ -12,7 +12,7 @@ model are not checked.
 import numpy as np
 import pandas as pd
 
-from ctgan.synthesizers import TVAESynthesizer
+from ctgan.synthesizers.tvae import TVAESynthesizer
 
 
 def test_tvae_dataframe():

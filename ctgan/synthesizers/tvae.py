@@ -6,7 +6,7 @@ from torch.optim import Adam
 from torch.utils.data import DataLoader, TensorDataset
 
 from ctgan.data_transformer import DataTransformer
-from ctgan.synthesizers import BaseSynthesizer
+from ctgan.synthesizers.base import BaseSynthesizer
 
 
 class Encoder(Module):
