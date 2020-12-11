@@ -109,3 +109,21 @@ def test_synthesizer_sample():
 
     samples = ctgan.sample(1000, 'discrete', 'a')
     assert isinstance(samples, pd.DataFrame)
+
+def test_save_load():
+    data = pd.DataFrame({
+        'continuous': np.random.random(100),
+        'discrete': np.random.choice(['a', 'b', 'c'], 100)
+    })
+    discrete_columns = ['discrete']
+
+    ctgan = CTGANSynthesizer(epochs=1)
+    ctgan.fit(data, discrete_columns)
+
+    ctgan.save("test.pkl")
+
+    ctgan = CTGANSynthesizer.load("test.pkl")
+
+    sampled = ctgan.sample(1000)
+    assert set(sampled.columns) == {'continuous', 'discrete'}
+    assert set(sampled['discrete'].unique()) == {'a', 'b', 'c'}

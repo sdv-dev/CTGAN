@@ -1,7 +1,4 @@
-import logging
 import torch
-
-LOGGER = logging.getLogger(__name__)
 
 
 class BaseSynthesizer:
@@ -19,4 +16,6 @@ class BaseSynthesizer:
     @classmethod
     def load(cls, path):
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        return torch.load(path).set_device(device)
+        model = torch.load(path)
+        model.set_device(device)
+        return model
