@@ -46,7 +46,8 @@ class CTGANSynthesizer(object):
 
     def __init__(self, embedding_dim=128, generator_dim=(256, 256), discriminator_dim=(256, 256),
                  generator_lr=2e-4, generator_decay=1e-6, discriminator_lr=2e-4,
-                 discriminator_decay=0, batch_size=500, discriminator_steps=1, log_frequency=True):
+                 discriminator_decay=0, batch_size=500, discriminator_steps=1, log_frequency=True,
+                 verbose=False):
 
         assert batch_size % 2 == 0
 
@@ -62,6 +63,7 @@ class CTGANSynthesizer(object):
         self._batch_size = batch_size
         self._discriminator_steps = discriminator_steps
         self._log_frequency = log_frequency
+        self._verbose = verbose
         self._device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.trained_epoches = 0
 
@@ -268,9 +270,10 @@ class CTGANSynthesizer(object):
                 loss_g.backward()
                 self._optimizerG.step()
 
-            print(f"Epoch {i+1}, Loss G: {loss_g.detach().cpu(): .4f},"
-                  f"Loss D: {loss_d.detach().cpu(): .4f}",
-                  flush=True)
+            if self._verbose:
+                print(f"Epoch {i+1}, Loss G: {loss_g.detach().cpu(): .4f},"
+                      f"Loss D: {loss_d.detach().cpu(): .4f}",
+                      flush=True)
 
     def sample(self, n, condition_column=None, condition_value=None):
         """Sample data similar to the training data.

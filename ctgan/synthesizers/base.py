@@ -8,5 +8,5 @@ class BaseSynthesizer:
 
     This should contain the save/load methods.
     """
-    
+
     pass

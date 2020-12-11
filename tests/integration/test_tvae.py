@@ -22,7 +22,7 @@ def test_tvae_dataframe():
     })
     discrete_columns = ['discrete']
 
-    tvae = TVAESynthesizer(epochs=20)
+    tvae = TVAESynthesizer(epochs=50)
     tvae.fit(data, discrete_columns)
 
     sampled = tvae.sample(100)
@@ -40,7 +40,7 @@ def test_tvae_numpy():
     })
     discrete_columns = [1]
 
-    tvae = TVAESynthesizer(epochs=20)
+    tvae = TVAESynthesizer(epochs=50)
     tvae.fit(data.values, discrete_columns)
 
     sampled = tvae.sample(100)
