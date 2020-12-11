@@ -162,10 +162,10 @@ ctgan.fit(data, discrete_columns)
 **NOTE**: This process is likely to take a long time to run.
 
 If you want to make the process shorter, or longer, you can control the number of training epochs
-that the model will be performing by adding it to the `fit` call:
+that the model will be performing when creating the object:
 
 ```python3
-ctgan.fit(data, discrete_columns, epochs=5)
+ctgan = CTGANSynthesizer(epochs=5)
 ```
 
 ## 2. Generate synthetic data
