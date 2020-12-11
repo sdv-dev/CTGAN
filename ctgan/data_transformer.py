@@ -142,12 +142,16 @@ class DataTransformer(object):
 
         return np.concatenate(column_data_list, axis=1).astype(float)
 
-    def _inverse_transform_continuous(self, column_transform_info, column_data):
+    def _inverse_transform_continuous(self, column_transform_info, column_data, sigmas, st):
         gm = column_transform_info.transform
         valid_component_indicator = column_transform_info.transform_aux
 
         selected_normalized_value = column_data[:, 0]
         selected_component_probs = column_data[:, 1:]
+
+        if sigmas is not None:
+            sig = sigmas[st]
+            selected_normalized_value = np.random.normal(selected_normalized_value, sig)
 
         selected_normalized_value = np.clip(selected_normalized_value, -1, 1)
         component_probs = np.ones((len(column_data), self._max_clusters)) * -100
@@ -167,7 +171,7 @@ class DataTransformer(object):
         ohe = column_transform_info.transform
         return ohe.reverse_transform(column_data)
 
-    def inverse_transform(self, data):
+    def inverse_transform(self, data, sigmas=None):
         """Take matrix data and output raw data.
 
         Output uses the same type as input to the transform function.
@@ -182,7 +186,7 @@ class DataTransformer(object):
 
             if column_transform_info.column_type == 'continuous':
                 recovered_column_data = self._inverse_transform_continuous(
-                    column_transform_info, column_data)
+                    column_transform_info, column_data, sigmas, st)
             else:
                 assert column_transform_info.column_type == 'discrete'
                 recovered_column_data = self._inverse_transform_discrete(
