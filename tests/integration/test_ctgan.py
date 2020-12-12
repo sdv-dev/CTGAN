@@ -120,9 +120,9 @@ def test_save_load():
 
     ctgan = CTGANSynthesizer(epochs=1)
     ctgan.fit(data, discrete_columns)
-    ctgan.save("test.pkl")
+    ctgan.save("test_ctgan.pkl")
 
-    ctgan = CTGANSynthesizer.load("test.pkl")
+    ctgan = CTGANSynthesizer.load("test_ctgan.pkl")
 
     sampled = ctgan.sample(1000)
     assert set(sampled.columns) == {'continuous', 'discrete'}
