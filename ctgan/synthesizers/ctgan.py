@@ -1,9 +1,9 @@
 import numpy as np
 import torch
+import warnings
 from packaging import version
 from torch import optim
 from torch.nn import BatchNorm1d, Dropout, LeakyReLU, Linear, Module, ReLU, Sequential, functional
-import warnings
 
 from ctgan.data_sampler import DataSampler
 from ctgan.data_transformer import DataTransformer
@@ -144,7 +144,7 @@ class CTGANSynthesizer(BaseSynthesizer):
         self._verbose = verbose
         self._epochs = epochs
         self._device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        self.trained_epoches = 0
+        self.trained_epochs = 0
 
     @staticmethod
     def _gumbel_softmax(logits, tau=1, hard=False, eps=1e-10, dim=-1):
@@ -233,10 +233,14 @@ class CTGANSynthesizer(BaseSynthesizer):
                 contain the integer indices of the columns. Otherwise, if it is
                 a ``pandas.DataFrame``, this list should contain the column names.
         """
-        if epochs:
-            warnings.warn("Passing 'epochs' to 'fit' will be deprecated in future versions. "
-                          "Please pass it to the class constructor instead.", FutureWarning)
-            self._epochs = epochs
+        if epochs is None:
+            epochs = self._epochs
+        else:
+            warning.warn(
+                ('`epochs` argument in `fit` method has been deprecated and will be removed '
+                'in a future version. Please pass `epochs` to the constructor instead'),
+                DeprecationWarning
+            )
 
         self._transformer = DataTransformer()
         self._transformer.fit(train_data, discrete_columns)
@@ -275,8 +279,8 @@ class CTGANSynthesizer(BaseSynthesizer):
         std = mean + 1
 
         steps_per_epoch = max(len(train_data) // self._batch_size, 1)
-        for i in range(self._epochs):
-            self.trained_epoches += 1
+        for i in range(epochs):
+            self.trained_epochs += 1
             for id_ in range(steps_per_epoch):
 
                 for n in range(self._discriminator_steps):
