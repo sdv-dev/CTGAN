@@ -3,6 +3,7 @@ import torch
 from packaging import version
 from torch import optim
 from torch.nn import BatchNorm1d, Dropout, LeakyReLU, Linear, Module, ReLU, Sequential, functional
+import warnings
 
 from ctgan.data_sampler import DataSampler
 from ctgan.data_transformer import DataTransformer
@@ -220,7 +221,7 @@ class CTGANSynthesizer(BaseSynthesizer):
 
         return (loss * m).sum() / data.size()[0]
 
-    def fit(self, train_data, discrete_columns=tuple()):
+    def fit(self, train_data, discrete_columns=tuple(), epochs=None):
         """Fit the CTGAN Synthesizer models to the training data.
 
         Args:
@@ -232,6 +233,11 @@ class CTGANSynthesizer(BaseSynthesizer):
                 contain the integer indices of the columns. Otherwise, if it is
                 a ``pandas.DataFrame``, this list should contain the column names.
         """
+        if epochs:
+            warnings.warn("Passing 'epochs' to 'fit' will be deprecated in future versions. "
+                          "Please pass it to the class constructor instead.", FutureWarning)
+            self._epochs = epochs
+
         self._transformer = DataTransformer()
         self._transformer.fit(train_data, discrete_columns)
 
