@@ -52,22 +52,21 @@ class Decoder(Module):
 def loss_function(recon_x, x, sigmas, mu, logvar, output_info, factor):
     st = 0
     loss = []
-    for item in output_info:
-        if item[1] == 'tanh':
-            ed = st + item[0]
-            std = sigmas[st]
-            loss.append(((x[:, st] - torch.tanh(recon_x[:, st])) ** 2 / 2 / (std ** 2)).sum())
-            loss.append(torch.log(std) * x.size()[0])
-            st = ed
+    for column_info in output_info:
+        for span_info in column_info:
+            if len(column_info) != 1 or span_info.activation_fn != "softmax":
+                ed = st + span_info.dim
+                std = sigmas[st]
+                loss.append(((x[:, st] - torch.tanh(recon_x[:, st])) ** 2 / 2 / (std ** 2)).sum())
+                loss.append(torch.log(std) * x.size()[0])
+                st = ed
 
-        elif item[1] == 'softmax':
-            ed = st + item[0]
-            loss.append(cross_entropy(
-                recon_x[:, st:ed], torch.argmax(x[:, st:ed], dim=-1), reduction='sum'))
-            st = ed
+            else:
+                ed = st + span_info.dim
+                loss.append(cross_entropy(
+                    recon_x[:, st:ed], torch.argmax(x[:, st:ed], dim=-1), reduction='sum'))
+                st = ed
 
-        else:
-            assert 0
     assert st == recon_x.size()[1]
     KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
     return sum(loss) * factor / x.size()[0], KLD / x.size()[0]
@@ -120,7 +119,9 @@ class TVAESynthesizer(BaseSynthesizer):
                 emb = eps * std + mu
                 rec, sigmas = self.decoder(emb)
                 loss_1, loss_2 = loss_function(
-                    rec, real, sigmas, mu, logvar, self.transformer.output_info, self.loss_factor)
+                    rec, real, sigmas, mu, logvar,
+                    self.transformer.output_info_list, self.loss_factor
+                )
                 loss = loss_1 + loss_2
                 loss.backward()
                 optimizerAE.step()

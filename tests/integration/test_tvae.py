@@ -17,12 +17,12 @@ from ctgan.synthesizers.tvae import TVAESynthesizer
 
 def test_tvae_dataframe():
     data = pd.DataFrame({
-        'continuous': np.random.random(100),
-        'discrete': np.random.choice(['a', 'b'], 100)
+        'continuous': np.random.random(1000),
+        'discrete': np.random.choice(['a', 'b'], 1000)
     })
     discrete_columns = ['discrete']
 
-    tvae = TVAESynthesizer(epochs=100)
+    tvae = TVAESynthesizer(epochs=10)
     tvae.fit(data, discrete_columns)
 
     sampled = tvae.sample(100)
@@ -35,12 +35,12 @@ def test_tvae_dataframe():
 
 def test_tvae_numpy():
     data = pd.DataFrame({
-        'continuous': np.random.random(100),
-        'discrete': np.random.choice(['a', 'b'], 100)
+        'continuous': np.random.random(1000),
+        'discrete': np.random.choice(['a', 'b'], 1000)
     })
     discrete_columns = [1]
 
-    tvae = TVAESynthesizer(epochs=100)
+    tvae = TVAESynthesizer(epochs=10)
     tvae.fit(data.values, discrete_columns)
 
     sampled = tvae.sample(100)

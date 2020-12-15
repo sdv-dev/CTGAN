@@ -236,9 +236,9 @@ class CTGANSynthesizer(BaseSynthesizer):
         if epochs is None:
             epochs = self._epochs
         else:
-            warning.warn(
+            warnings.warn(
                 ('`epochs` argument in `fit` method has been deprecated and will be removed '
-                'in a future version. Please pass `epochs` to the constructor instead'),
+                 'in a future version. Please pass `epochs` to the constructor instead'),
                 DeprecationWarning
             )
 
