@@ -12,7 +12,7 @@ model are not checked.
 import numpy as np
 import pandas as pd
 
-from ctgan.synthesizer import CTGANSynthesizer
+from ctgan.synthesizers.ctgan import CTGANSynthesizer
 
 
 def test_ctgan_dataframe():
@@ -22,8 +22,8 @@ def test_ctgan_dataframe():
     })
     discrete_columns = ['discrete']
 
-    ctgan = CTGANSynthesizer()
-    ctgan.fit(data, discrete_columns, epochs=1)
+    ctgan = CTGANSynthesizer(epochs=1)
+    ctgan.fit(data, discrete_columns)
 
     sampled = ctgan.sample(100)
 
@@ -40,8 +40,8 @@ def test_ctgan_numpy():
     })
     discrete_columns = [1]
 
-    ctgan = CTGANSynthesizer()
-    ctgan.fit(data.values, discrete_columns, epochs=1)
+    ctgan = CTGANSynthesizer(epochs=1)
+    ctgan.fit(data.values, discrete_columns)
 
     sampled = ctgan.sample(100)
 
@@ -59,15 +59,15 @@ def test_log_frequency():
 
     discrete_columns = ['discrete']
 
-    ctgan = CTGANSynthesizer()
-    ctgan.fit(data, discrete_columns, epochs=100)
+    ctgan = CTGANSynthesizer(epochs=100)
+    ctgan.fit(data, discrete_columns)
 
     sampled = ctgan.sample(10000)
     counts = sampled['discrete'].value_counts()
     assert counts['a'] < 6500
 
-    ctgan = CTGANSynthesizer(log_frequency=False)
-    ctgan.fit(data, discrete_columns, epochs=100)
+    ctgan = CTGANSynthesizer(log_frequency=False, epochs=100)
+    ctgan.fit(data, discrete_columns)
 
     sampled = ctgan.sample(10000)
     counts = sampled['discrete'].value_counts()
@@ -82,8 +82,8 @@ def test_categorical_nan():
     })
     discrete_columns = ['discrete']
 
-    ctgan = CTGANSynthesizer()
-    ctgan.fit(data, discrete_columns, epochs=1)
+    ctgan = CTGANSynthesizer(epochs=1)
+    ctgan.fit(data, discrete_columns)
 
     sampled = ctgan.sample(100)
 
@@ -104,8 +104,26 @@ def test_synthesizer_sample():
     })
     discrete_columns = ['discrete']
 
-    ctgan = CTGANSynthesizer()
-    ctgan.fit(data, discrete_columns, epochs=1)
+    ctgan = CTGANSynthesizer(epochs=1)
+    ctgan.fit(data, discrete_columns)
 
     samples = ctgan.sample(1000, 'discrete', 'a')
     assert isinstance(samples, pd.DataFrame)
+
+
+def test_save_load():
+    data = pd.DataFrame({
+        'continuous': np.random.random(100),
+        'discrete': np.random.choice(['a', 'b', 'c'], 100)
+    })
+    discrete_columns = ['discrete']
+
+    ctgan = CTGANSynthesizer(epochs=1)
+    ctgan.fit(data, discrete_columns)
+    ctgan.save("test_ctgan.pkl")
+
+    ctgan = CTGANSynthesizer.load("test_ctgan.pkl")
+
+    sampled = ctgan.sample(1000)
+    assert set(sampled.columns) == {'continuous', 'discrete'}
+    assert set(sampled['discrete'].unique()) == {'a', 'b', 'c'}

@@ -148,7 +148,7 @@ Once you have the data ready, you need to import and create an instance of the `
 class.
 
 ```python3
-from ctgan import CTGANSynthesizer
+from ctgan.synthesizers.ctgan import CTGANSynthesizer
 
 ctgan = CTGANSynthesizer()
 ```
@@ -162,10 +162,11 @@ ctgan.fit(data, discrete_columns)
 **NOTE**: This process is likely to take a long time to run.
 
 If you want to make the process shorter, or longer, you can control the number of training epochs
-that the model will be performing by adding it to the `fit` call:
+that the model will be performing by specifying it when creating an instance:
 
 ```python3
-ctgan.fit(data, discrete_columns, epochs=5)
+ctgan = CTGANSynthesizer(epochs=5)
+ctgan.fit(data, discrete_columns)
 ```
 
 ## 2. Generate synthetic data

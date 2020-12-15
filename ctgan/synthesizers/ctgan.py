@@ -1,15 +1,90 @@
+import warnings
+
 import numpy as np
 import torch
 from packaging import version
 from torch import optim
-from torch.nn import functional
+from torch.nn import BatchNorm1d, Dropout, LeakyReLU, Linear, Module, ReLU, Sequential, functional
 
 from ctgan.data_sampler import DataSampler
 from ctgan.data_transformer import DataTransformer
-from ctgan.models import Discriminator, Generator
+from ctgan.synthesizers.base import BaseSynthesizer
 
 
-class CTGANSynthesizer(object):
+class Discriminator(Module):
+
+    def __init__(self, input_dim, dis_dims, pack=10):
+        super(Discriminator, self).__init__()
+        dim = input_dim * pack
+        self.pack = pack
+        self.packdim = dim
+        seq = []
+        for item in list(dis_dims):
+            seq += [Linear(dim, item), LeakyReLU(0.2), Dropout(0.5)]
+            dim = item
+
+        seq += [Linear(dim, 1)]
+        self.seq = Sequential(*seq)
+
+    def calc_gradient_penalty(self, real_data, fake_data, device='cpu', pac=10, lambda_=10):
+        alpha = torch.rand(real_data.size(0) // pac, 1, 1, device=device)
+        alpha = alpha.repeat(1, pac, real_data.size(1))
+        alpha = alpha.view(-1, real_data.size(1))
+
+        interpolates = alpha * real_data + ((1 - alpha) * fake_data)
+
+        disc_interpolates = self(interpolates)
+
+        gradients = torch.autograd.grad(
+            outputs=disc_interpolates, inputs=interpolates,
+            grad_outputs=torch.ones(disc_interpolates.size(), device=device),
+            create_graph=True, retain_graph=True, only_inputs=True
+        )[0]
+
+        gradient_penalty = ((
+            gradients.view(-1, pac * real_data.size(1)).norm(2, dim=1) - 1
+        ) ** 2).mean() * lambda_
+
+        return gradient_penalty
+
+    def forward(self, input):
+        assert input.size()[0] % self.pack == 0
+        return self.seq(input.view(-1, self.packdim))
+
+
+class Residual(Module):
+
+    def __init__(self, i, o):
+        super(Residual, self).__init__()
+        self.fc = Linear(i, o)
+        self.bn = BatchNorm1d(o)
+        self.relu = ReLU()
+
+    def forward(self, input):
+        out = self.fc(input)
+        out = self.bn(out)
+        out = self.relu(out)
+        return torch.cat([out, input], dim=1)
+
+
+class Generator(Module):
+
+    def __init__(self, embedding_dim, generator_dim, data_dim):
+        super(Generator, self).__init__()
+        dim = embedding_dim
+        seq = []
+        for item in list(generator_dim):
+            seq += [Residual(dim, item)]
+            dim += item
+        seq.append(Linear(dim, data_dim))
+        self.seq = Sequential(*seq)
+
+    def forward(self, input):
+        data = self.seq(input)
+        return data
+
+
+class CTGANSynthesizer(BaseSynthesizer):
     """Conditional Table GAN Synthesizer.
 
     This is the core class of the CTGAN project, where the different components
@@ -42,11 +117,16 @@ class CTGANSynthesizer(object):
         log_frequency (boolean):
             Whether to use log frequency of categorical levels in conditional
             sampling. Defaults to ``True``.
+        verbose (boolean):
+            Whether to have print statements for progress results. Defaults to ``False``.
+        epochs (int):
+            Number of training epochs. Defaults to 300.
     """
 
     def __init__(self, embedding_dim=128, generator_dim=(256, 256), discriminator_dim=(256, 256),
                  generator_lr=2e-4, generator_decay=1e-6, discriminator_lr=2e-4,
-                 discriminator_decay=0, batch_size=500, discriminator_steps=1, log_frequency=True):
+                 discriminator_decay=0, batch_size=500, discriminator_steps=1, log_frequency=True,
+                 verbose=False, epochs=300):
 
         assert batch_size % 2 == 0
 
@@ -62,8 +142,10 @@ class CTGANSynthesizer(object):
         self._batch_size = batch_size
         self._discriminator_steps = discriminator_steps
         self._log_frequency = log_frequency
+        self._verbose = verbose
+        self._epochs = epochs
         self._device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        self.trained_epoches = 0
+        self.trained_epochs = 0
 
     @staticmethod
     def _gumbel_softmax(logits, tau=1, hard=False, eps=1e-10, dim=-1):
@@ -140,7 +222,7 @@ class CTGANSynthesizer(object):
 
         return (loss * m).sum() / data.size()[0]
 
-    def fit(self, train_data, discrete_columns=tuple(), epochs=300):
+    def fit(self, train_data, discrete_columns=tuple(), epochs=None):
         """Fit the CTGAN Synthesizer models to the training data.
 
         Args:
@@ -151,9 +233,16 @@ class CTGANSynthesizer(object):
                 Vector. If ``train_data`` is a Numpy array, this list should
                 contain the integer indices of the columns. Otherwise, if it is
                 a ``pandas.DataFrame``, this list should contain the column names.
-            epochs (int):
-                Number of training epochs. Defaults to 300.
         """
+        if epochs is None:
+            epochs = self._epochs
+        else:
+            warnings.warn(
+                ('`epochs` argument in `fit` method has been deprecated and will be removed '
+                 'in a future version. Please pass `epochs` to the constructor instead'),
+                DeprecationWarning
+            )
+
         self._transformer = DataTransformer()
         self._transformer.fit(train_data, discrete_columns)
 
@@ -192,7 +281,7 @@ class CTGANSynthesizer(object):
 
         steps_per_epoch = max(len(train_data) // self._batch_size, 1)
         for i in range(epochs):
-            self.trained_epoches += 1
+            self.trained_epochs += 1
             for id_ in range(steps_per_epoch):
 
                 for n in range(self._discriminator_steps):
@@ -268,9 +357,10 @@ class CTGANSynthesizer(object):
                 loss_g.backward()
                 self._optimizerG.step()
 
-            print(f"Epoch {i+1}, Loss G: {loss_g.detach().cpu(): .4f},"
-                  f"Loss D: {loss_d.detach().cpu(): .4f}",
-                  flush=True)
+            if self._verbose:
+                print(f"Epoch {i+1}, Loss G: {loss_g.detach().cpu(): .4f},"
+                      f"Loss D: {loss_d.detach().cpu(): .4f}",
+                      flush=True)
 
     def sample(self, n, condition_column=None, condition_value=None):
         """Sample data similar to the training data.
@@ -324,27 +414,7 @@ class CTGANSynthesizer(object):
 
         return self._transformer.inverse_transform(data)
 
-    def save(self, path):
-        assert hasattr(self, "_generator")
-        assert hasattr(self, "_discriminator")
-        assert hasattr(self, "_transformer")
-
-        # always save a cpu model.
-        device_bak = self._device
-        self._device = torch.device("cpu")
+    def set_device(self, device):
+        self._device = device
         self._generator.to(self._device)
         self._discriminator.to(self._device)
-
-        torch.save(self, path)
-
-        self._device = device_bak
-        self._generator.to(self._device)
-        self._discriminator.to(self._device)
-
-    @classmethod
-    def load(cls, path):
-        model = torch.load(path)
-        model._device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-        model._generator.to(model._device)
-        model._discriminator.to(model._device)
-        return model
