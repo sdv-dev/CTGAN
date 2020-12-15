@@ -1,6 +1,7 @@
+import warnings
+
 import numpy as np
 import torch
-import warnings
 from packaging import version
 from torch import optim
 from torch.nn import BatchNorm1d, Dropout, LeakyReLU, Linear, Module, ReLU, Sequential, functional
