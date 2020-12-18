@@ -416,5 +416,7 @@ class CTGANSynthesizer(BaseSynthesizer):
 
     def set_device(self, device):
         self._device = device
-        self._generator.to(self._device)
-        self._discriminator.to(self._device)
+        if hasattr(self, '_generator'):
+            self._generator.to(self._device)
+        if hasattr(self, '_discriminator'):
+            self._discriminator.to(self._device)
