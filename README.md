@@ -26,7 +26,7 @@ CTGAN is a collection of Deep Learning based Synthetic Data Generators for s
 
 Currently, this library implements the **CTGAN** and **TVAE** models proposed in the [Modeling Tabular data using Conditional GAN](https://arxiv.org/abs/1907.00503) paper. For more information about these models, please check out the respective user guides:
 * [CTGAN User Guide](https://sdv.dev/SDV/user_guides/single_table/ctgan.html).
-* [TVAE User Guide](https://sdv.dev/SDV/user_guides/single_table/ctgan.html).
+* [TVAE User Guide](https://sdv.dev/SDV/user_guides/single_table/tvae.html).
 
 # Install
 
