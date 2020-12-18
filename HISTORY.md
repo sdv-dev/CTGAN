@@ -1,5 +1,31 @@
 # History
 
+## v0.3.0 - 2020-12-18
+
+In this release we add a new TVAE model which was presented in the original CTGAN paper.
+It also exposes more hyperparameters and moves epochs and log_frequency from fit to the constructor.
+
+A new verbose argument has been added to optionally disable unnecessary printing, and a new hyperparameter
+called `discriminator_steps` has been added to CTGAN to control the number of optimization steps performed
+in the discriminator for each generator epoch.
+
+The code has also been reorganized and cleaned up for better readability and interpretability.
+
+Special thanks to @Baukebrenninkmeijer @fealho @leix28 @csala for the contributions!
+
+### Improvements
+
+* Add TVAE - [Issue #111](https://github.com/sdv-dev/CTGAN/issues/111) by @fealho
+* Move `log_frequency` to `__init__` - [Issue #102](https://github.com/sdv-dev/CTGAN/issues/102) by @fealho
+* Add discriminator steps hyperparameter - [Issue #101](https://github.com/sdv-dev/CTGAN/issues/101) by @Baukebrenninkmeijer
+* Code cleanup / Expose hyperparameters - [Issue #59](https://github.com/sdv-dev/CTGAN/issues/59) by @fealho and @leix28
+* Publish to conda repo - [Issue #54](https://github.com/sdv-dev/CTGAN/issues/54) by @fealho
+
+### Bugs fixed
+
+* Fixed NaN != NaN counting bug. - [Issue #100](https://github.com/sdv-dev/CTGAN/issues/100) by @fealho
+* Update dependencies and testing - [Issue #90](https://github.com/sdv-dev/CTGAN/issues/90) by @csala
+
 ## v0.2.2 - 2020-11-13
 
 In this release we introduce several minor improvements to make CTGAN more versatile and
