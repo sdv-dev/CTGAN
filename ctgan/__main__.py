@@ -66,11 +66,11 @@ def main():
     if args.load:
         model = CTGANSynthesizer.load(args.load)
     else:
-        generator_dims = [int(x) for x in args.generator_dims.split(',')]
-        discriminator_dims = [int(x) for x in args.discriminator_dims.split(',')]
+        generator_dim = [int(x) for x in args.generator_dim.split(',')]
+        discriminator_dim = [int(x) for x in args.discriminator_dim.split(',')]
         model = CTGANSynthesizer(
-            embedding_dim=args.embedding_dim, generator_dims=generator_dims,
-            discriminator_dims=discriminator_dims, generator_lr=args.generator_lr,
+            embedding_dim=args.embedding_dim, generator_dim=generator_dim,
+            discriminator_dim=discriminator_dim, generator_lr=args.generator_lr,
             generator_decay=args.generator_decay, discriminator_lr=args.discriminator_lr,
             discriminator_decay=args.discriminator_decay, batch_size=args.batch_size,
             epochs=args.epochs)
