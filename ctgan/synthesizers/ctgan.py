@@ -13,13 +13,13 @@ from ctgan.synthesizers.base import BaseSynthesizer
 
 class Discriminator(Module):
 
-    def __init__(self, input_dim, dis_dims, pack=10):
+    def __init__(self, input_dim, discriminator_dim, pack=10):
         super(Discriminator, self).__init__()
         dim = input_dim * pack
         self.pack = pack
         self.packdim = dim
         seq = []
-        for item in list(dis_dims):
+        for item in list(discriminator_dim):
             seq += [Linear(dim, item), LeakyReLU(0.2), Dropout(0.5)]
             dim = item
 
