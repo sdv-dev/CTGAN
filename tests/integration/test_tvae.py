@@ -11,6 +11,7 @@ model are not checked.
 
 import numpy as np
 import pandas as pd
+import tempfile as tf
 
 from ctgan.synthesizers.tvae import TVAESynthesizer
 
@@ -72,9 +73,10 @@ def test_save_load():
 
     tvae = TVAESynthesizer(epochs=1)
     tvae.fit(data, discrete_columns)
-    tvae.save("test_tvae.pkl")
 
-    tvae = TVAESynthesizer.load("test_tvae.pkl")
+    with tf.TemporaryDirectory() as temporary_directory:
+        tvae.save(temporary_directory + "test_tvae.pkl")
+        tvae = TVAESynthesizer.load(temporary_directory + "test_tvae.pkl")
 
     sampled = tvae.sample(1000)
     assert set(sampled.columns) == {'continuous', 'discrete'}
