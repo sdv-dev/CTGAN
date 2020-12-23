@@ -41,7 +41,7 @@ class DataSampler(object):
         # Prepare an interval matrix for efficiently sample conditional vector
         max_category = max(
             [column_info[0].dim for column_info in output_info
-             if is_discrete_column(column_info)])
+             if is_discrete_column(column_info)], default=0)
 
         self._discrete_column_cond_st = np.zeros(n_discrete_columns, dtype='int32')
         self._discrete_column_n_category = np.zeros(
@@ -133,7 +133,7 @@ class DataSampler(object):
             n rows of matrix data.
         """
         if col is None:
-            idx = np.random.randint(len(self._data), n)
+            idx = np.random.randint(len(self._data), size=n)
             return self._data[idx]
 
         idx = []
