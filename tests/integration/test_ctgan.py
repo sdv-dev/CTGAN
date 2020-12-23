@@ -14,6 +14,7 @@ import pandas as pd
 
 from ctgan.synthesizers.ctgan import CTGANSynthesizer
 
+
 def test_ctgan_no_categoricals():
     data = pd.DataFrame({
         'continuous': np.random.random(1000)
