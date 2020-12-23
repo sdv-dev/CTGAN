@@ -9,6 +9,8 @@ but correctness of the data values and the internal behavior of the
 model are not checked.
 """
 
+import tempfile as tf
+
 import numpy as np
 import pandas as pd
 
@@ -120,9 +122,10 @@ def test_save_load():
 
     ctgan = CTGANSynthesizer(epochs=1)
     ctgan.fit(data, discrete_columns)
-    ctgan.save("test_ctgan.pkl")
 
-    ctgan = CTGANSynthesizer.load("test_ctgan.pkl")
+    with tf.TemporaryDirectory() as temporary_directory:
+        ctgan.save(temporary_directory + "test_tvae.pkl")
+        ctgan = CTGANSynthesizer.load(temporary_directory + "test_tvae.pkl")
 
     sampled = ctgan.sample(1000)
     assert set(sampled.columns) == {'continuous', 'discrete'}
