@@ -17,6 +17,21 @@ import pandas as pd
 from ctgan.synthesizers.ctgan import CTGANSynthesizer
 
 
+def test_ctgan_no_categoricals():
+    data = pd.DataFrame({
+        'continuous': np.random.random(1000)
+    })
+
+    ctgan = CTGANSynthesizer(epochs=1)
+    ctgan.fit(data, [])
+
+    sampled = ctgan.sample(100)
+
+    assert sampled.shape == (100, 1)
+    assert isinstance(sampled, pd.DataFrame)
+    assert set(sampled.columns) == {'continuous'}
+
+
 def test_ctgan_dataframe():
     data = pd.DataFrame({
         'continuous': np.random.random(100),
