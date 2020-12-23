@@ -121,7 +121,7 @@ def test_save_load():
 
     ctgan = CTGANSynthesizer(epochs=1)
     ctgan.fit(data, discrete_columns)
-    
+
     with tf.TemporaryDirectory() as temporary_directory:
         ctgan.save(temporary_directory + "test_tvae.pkl")
         ctgan = CTGANSynthesizer.load(temporary_directory + "test_tvae.pkl")

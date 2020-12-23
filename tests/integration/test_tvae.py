@@ -71,7 +71,7 @@ def test_save_load():
     })
     discrete_columns = ['discrete']
 
-    tvae = TVAESynthesizer(epochs=1)
+    tvae = TVAESynthesizer(epochs=10)
     tvae.fit(data, discrete_columns)
 
     with tf.TemporaryDirectory() as temporary_directory:
