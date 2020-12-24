@@ -222,9 +222,9 @@ class CTGANSynthesizer(BaseSynthesizer):
         loss = torch.stack(loss, dim=1)
 
         return (loss * m).sum() / data.size()[0]
-    
+
     def _validate_discrete_columns(self, train_data, discrete_columns):
-        """Checks whether ``discrete_columns`` exists in ``train_data``.
+        """Check whether ``discrete_columns`` exists in ``train_data``.
 
         Args:
             train_data (numpy.ndarray or pandas.DataFrame):
@@ -235,7 +235,7 @@ class CTGANSynthesizer(BaseSynthesizer):
                 contain the integer indices of the columns. Otherwise, if it is
                 a ``pandas.DataFrame``, this list should contain the column names.
         """
-        if isinstance(train_data, pd.DataFrame):    
+        if isinstance(train_data, pd.DataFrame):
             invalid_columns = set(discrete_columns) - set(train_data.columns)
         elif isinstance(train_data, np.ndarray):
             invalid_columns = []
@@ -247,7 +247,6 @@ class CTGANSynthesizer(BaseSynthesizer):
 
         if invalid_columns:
             raise ValueError('Invalid columns found: {}'.format(invalid_columns))
-
 
     def fit(self, train_data, discrete_columns=tuple(), epochs=None):
         """Fit the CTGAN Synthesizer models to the training data.
