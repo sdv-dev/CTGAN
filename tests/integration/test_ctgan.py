@@ -13,6 +13,7 @@ import tempfile as tf
 
 import numpy as np
 import pandas as pd
+import pytest
 
 from ctgan.synthesizers.ctgan import CTGANSynthesizer
 
@@ -145,3 +146,25 @@ def test_save_load():
     sampled = ctgan.sample(1000)
     assert set(sampled.columns) == {'continuous', 'discrete'}
     assert set(sampled['discrete'].unique()) == {'a', 'b', 'c'}
+
+
+def test_wrong_discrete_columns_dataframe():
+    data = pd.DataFrame({
+        'discrete': ['a', 'b']
+    })
+    discrete_columns = ['b', 'c']
+
+    ctgan = CTGANSynthesizer(epochs=1)
+    with pytest.raises(ValueError):
+        ctgan.fit(data, discrete_columns)
+
+
+def test_wrong_discrete_columns_numpy():
+    data = pd.DataFrame({
+        'discrete': ['a', 'b']
+    })
+    discrete_columns = [0, 1]
+
+    ctgan = CTGANSynthesizer(epochs=1)
+    with pytest.raises(ValueError):
+        ctgan.fit(data.to_numpy(), discrete_columns)
