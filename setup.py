@@ -15,9 +15,9 @@ install_requires = [
     'torch<2,>=1.0',
     'torchvision<1,>=0.4.2',
     'scikit-learn<0.24,>=0.21',
-    'rdt>=0.2.7,<0.3',
     'numpy<2,>=1.17.4',
     'pandas<1.1.5,>=0.24',
+    'rdt>=0.2.7,<0.4',
     'packaging',
 ]
 
@@ -99,6 +99,6 @@ setup(
     test_suite='tests',
     tests_require=tests_require,
     url='https://github.com/sdv-dev/CTGAN',
-    version='0.3.0',
+    version='0.3.1.dev3',
     zip_safe=False,
 )

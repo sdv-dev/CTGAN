@@ -1,5 +1,15 @@
 # History
 
+## v0.3.1 - 2021-01-27
+
+### Improvements
+
+* Check discrete_columns valid before fitting - [Issue #35](https://github.com/sdv-dev/CTGAN/issues/35) by @fealho
+
+## Bugs fixed
+
+* ValueError: max() arg is an empty sequence - [Issue #115](https://github.com/sdv-dev/CTGAN/issues/115) by @fealho
+
 ## v0.3.0 - 2020-12-18
 
 In this release we add a new TVAE model which was presented in the original CTGAN paper.
