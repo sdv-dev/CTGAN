@@ -24,7 +24,7 @@ def test_tvae_dataframe():
     })
     discrete_columns = ['discrete']
 
-    tvae = TVAESynthesizer(epochs=10)
+    tvae = TVAESynthesizer(epochs=100)
     tvae.fit(data, discrete_columns)
 
     sampled = tvae.sample(100)
@@ -42,7 +42,7 @@ def test_tvae_numpy():
     })
     discrete_columns = [1]
 
-    tvae = TVAESynthesizer(epochs=10)
+    tvae = TVAESynthesizer(epochs=100)
     tvae.fit(data.values, discrete_columns)
 
     sampled = tvae.sample(100)
@@ -58,7 +58,7 @@ def test_synthesizer_sample():
     })
     discrete_columns = ['discrete']
 
-    tvae = TVAESynthesizer(epochs=1)
+    tvae = TVAESynthesizer(epochs=100)
     tvae.fit(data, discrete_columns)
 
     samples = tvae.sample(1000)
@@ -72,7 +72,7 @@ def test_save_load():
     })
     discrete_columns = ['discrete']
 
-    tvae = TVAESynthesizer(epochs=10)
+    tvae = TVAESynthesizer(epochs=100)
     tvae.fit(data, discrete_columns)
 
     with tf.TemporaryDirectory() as temporary_directory:
