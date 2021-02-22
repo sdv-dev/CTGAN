@@ -9,76 +9,27 @@ but correctness of the data values and the internal behavior of the
 model are not checked.
 """
 
-import tempfile as tf
-
-import numpy as np
 import pandas as pd
+from sklearn import datasets
 
 from ctgan.synthesizers.tvae import TVAESynthesizer
 
 
-def test_tvae_dataframe():
-    data = pd.DataFrame({
-        'continuous': np.random.random(1000),
-        'discrete': np.random.choice(['a', 'b'], 1000)
-    })
-    discrete_columns = ['discrete']
+def test_tvae(tmpdir):
+    iris = datasets.load_iris()
+    data = pd.DataFrame(iris.data, columns=iris.feature_names)
+    data['class'] = pd.Series(iris.target).map(iris.target_names.__getitem__)
 
     tvae = TVAESynthesizer(epochs=10)
-    tvae.fit(data, discrete_columns)
+    tvae.fit(data, ['class'])
+
+    path = str(tmpdir / 'test_tvae.pkl')
+    tvae.save(path)
+    tvae = TVAESynthesizer.load(path)
 
     sampled = tvae.sample(100)
 
-    assert sampled.shape == (100, 2)
+    assert sampled.shape == (100, 5)
     assert isinstance(sampled, pd.DataFrame)
-    assert set(sampled.columns) == {'continuous', 'discrete'}
-    assert set(sampled['discrete'].unique()) == {'a', 'b'}
-
-
-def test_tvae_numpy():
-    data = pd.DataFrame({
-        'continuous': np.random.random(1000),
-        'discrete': np.random.choice(['a', 'b'], 1000)
-    })
-    discrete_columns = [1]
-
-    tvae = TVAESynthesizer(epochs=10)
-    tvae.fit(data.values, discrete_columns)
-
-    sampled = tvae.sample(100)
-
-    assert sampled.shape == (100, 2)
-    assert isinstance(sampled, np.ndarray)
-    assert set(np.unique(sampled[:, 1])) == {'a', 'b'}
-
-
-def test_synthesizer_sample():
-    data = pd.DataFrame({
-        'discrete': np.random.choice(['a', 'b'], 100)
-    })
-    discrete_columns = ['discrete']
-
-    tvae = TVAESynthesizer(epochs=1)
-    tvae.fit(data, discrete_columns)
-
-    samples = tvae.sample(1000)
-    assert isinstance(samples, pd.DataFrame)
-
-
-def test_save_load():
-    data = pd.DataFrame({
-        'continuous': np.random.random(100),
-        'discrete': np.random.choice(['a', 'b'], 100)
-    })
-    discrete_columns = ['discrete']
-
-    tvae = TVAESynthesizer(epochs=10)
-    tvae.fit(data, discrete_columns)
-
-    with tf.TemporaryDirectory() as temporary_directory:
-        tvae.save(temporary_directory + "test_tvae.pkl")
-        tvae = TVAESynthesizer.load(temporary_directory + "test_tvae.pkl")
-
-    sampled = tvae.sample(1000)
-    assert set(sampled.columns) == {'continuous', 'discrete'}
-    assert set(sampled['discrete'].unique()) == {'a', 'b'}
+    assert set(sampled.columns) == set(data.columns)
+    assert set(sampled.dtypes) == set(data.dtypes)
