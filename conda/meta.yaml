@@ -17,34 +17,34 @@ build:
 
 requirements:
   host:
-    - numpy <2,>=1.17.4
-    - pandas <1.1.5,>=0.24
     - pip
-    - python
-    - rdt >=0.2.7,<0.4
-    - scikit-learn <0.24,>=0.21
-    - pytorch <2,>=1.0
-    - torchvision <1,>=0.4.2
-    - packaging
     - pytest-runner
-  run:
-    - numpy <2,>=1.17.4
-    - pandas <1.1.5,>=0.24
-    - python
-    - rdt >=0.2.7,<0.4
-    - scikit-learn <0.24,>=0.21
-    - pytorch <2,>=1.0
-    - torchvision <1,>=0.4.2
     - packaging
+    - python >=3.6,<3.9
+    - numpy >=1.17.4,<2
+    - pandas >=0.24,<1.1.5
+    - scikit-learn >=0.20,<1
+    - pytorch >=1.4,<2
+    - torchvision >=0.5.0,<1
+    - rdt >=0.2.7,<0.5
+  run:
+    - packaging
+    - python >=3.6,<3.9
+    - numpy >=1.17.4,<2
+    - pandas >=0.24,<1.1.5
+    - scikit-learn >=0.20,<1
+    - pytorch >=1.4,<2
+    - torchvision >=0.5.0,<1
+    - rdt >=0.2.7,<0.5
 
 about:
   home: "https://github.com/sdv-dev/CTGAN"
   license: MIT
   license_family: MIT
-  license_file: 
+  license_file:
   summary: "Conditional GAN for Tabular Data"
-  doc_url: 
-  dev_url: 
+  doc_url:
+  dev_url:
 
 extra:
   recipe-maintainers:
