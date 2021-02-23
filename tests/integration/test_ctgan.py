@@ -69,7 +69,6 @@ def test_ctgan_numpy():
 
 
 def test_log_frequency():
-
     data = pd.DataFrame({
         'continuous': np.random.random(1000),
         'discrete': np.repeat(['a', 'b', 'c'], [950, 25, 25])
@@ -168,3 +167,20 @@ def test_wrong_discrete_columns_numpy():
     ctgan = CTGANSynthesizer(epochs=1)
     with pytest.raises(ValueError):
         ctgan.fit(data.to_numpy(), discrete_columns)
+
+
+def test_wrong_sampling_conditions():
+    data = pd.DataFrame({
+        'continuous': np.random.random(100),
+        'discrete': np.random.choice(['a', 'b', 'c'], 100)
+    })
+    discrete_columns = ['discrete']
+
+    ctgan = CTGANSynthesizer(epochs=1)
+    ctgan.fit(data, discrete_columns)
+
+    with pytest.raises(ValueError):
+        ctgan.sample(1, 'cardinal', "doesn't matter")
+
+    with pytest.raises(ValueError):
+        ctgan.sample(1, 'discrete', "d")

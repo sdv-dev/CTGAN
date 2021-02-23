@@ -212,10 +212,18 @@ class DataTransformer(object):
                 break
             if column_transform_info.column_type == "discrete":
                 discrete_counter += 1
+
             column_id += 1
+
+        else:
+            raise ValueError(f"The column_name `{column_name}` doesn't exist in the data.")
+
+        one_hot = column_transform_info.transform.transform(np.array([value]))[0]
+        if sum(one_hot) == 0:
+            raise ValueError(f"The value `{value}` doesn't exist in the column `{column_name}`.")
 
         return {
             "discrete_column_id": discrete_counter,
             "column_id": column_id,
-            "value_id": np.argmax(column_transform_info.transform.transform(np.array([value]))[0])
+            "value_id": np.argmax(one_hot)
         }
