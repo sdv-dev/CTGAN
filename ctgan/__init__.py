@@ -4,7 +4,7 @@
 
 __author__ = 'MIT Data To AI Lab'
 __email__ = 'dailabmit@gmail.com'
-__version__ = '0.4.0.dev1'
+__version__ = '0.4.0.dev2'
 
 from ctgan.demo import load_demo
 from ctgan.synthesizers.ctgan import CTGANSynthesizer
