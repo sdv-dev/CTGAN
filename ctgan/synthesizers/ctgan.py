@@ -14,11 +14,11 @@ from ctgan.synthesizers.base import BaseSynthesizer
 
 class Discriminator(Module):
 
-    def __init__(self, input_dim, discriminator_dim, pack=10):
+    def __init__(self, input_dim, discriminator_dim, pac=10):
         super(Discriminator, self).__init__()
-        dim = input_dim * pack
-        self.pack = pack
-        self.packdim = dim
+        dim = input_dim * pac
+        self.pac = pac
+        self.pacdim = dim
         seq = []
         for item in list(discriminator_dim):
             seq += [Linear(dim, item), LeakyReLU(0.2), Dropout(0.5)]
@@ -49,8 +49,8 @@ class Discriminator(Module):
         return gradient_penalty
 
     def forward(self, input):
-        assert input.size()[0] % self.pack == 0
-        return self.seq(input.view(-1, self.packdim))
+        assert input.size()[0] % self.pac == 0
+        return self.seq(input.view(-1, self.pacdim))
 
 
 class Residual(Module):
@@ -127,7 +127,7 @@ class CTGANSynthesizer(BaseSynthesizer):
     def __init__(self, embedding_dim=128, generator_dim=(256, 256), discriminator_dim=(256, 256),
                  generator_lr=2e-4, generator_decay=1e-6, discriminator_lr=2e-4,
                  discriminator_decay=0, batch_size=500, discriminator_steps=1, log_frequency=True,
-                 verbose=False, epochs=300):
+                 verbose=False, epochs=300, pac=10, cuda=True):
 
         assert batch_size % 2 == 0
 
@@ -145,8 +145,25 @@ class CTGANSynthesizer(BaseSynthesizer):
         self._log_frequency = log_frequency
         self._verbose = verbose
         self._epochs = epochs
-        self._device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         self.trained_epochs = 0
+        self.pac = pac
+
+        if not cuda or not torch.cuda.is_available():
+            device = 'cpu'
+        elif isinstance(cuda, str):
+            device = cuda
+        else:
+            device = 'cuda'
+
+        self._device = torch.device(device)
+
+        #attributes that look questionable (gotta change set_device if we keep this)
+        self._transformer = None
+        self._data_sampler = None
+        self._generator = None
+        self._discriminator = None
+        self._optimizerG = None
+        self._optimizerD = None
 
     @staticmethod
     def _gumbel_softmax(logits, tau=1, hard=False, eps=1e-10, dim=-1):
@@ -291,7 +308,8 @@ class CTGANSynthesizer(BaseSynthesizer):
 
         self._discriminator = Discriminator(
             data_dim + self._data_sampler.dim_cond_vec(),
-            self._discriminator_dim
+            self._discriminator_dim,
+            pac=self.pac
         ).to(self._device)
 
         self._optimizerG = optim.Adam(
@@ -347,7 +365,7 @@ class CTGANSynthesizer(BaseSynthesizer):
                     y_real = self._discriminator(real_cat)
 
                     pen = self._discriminator.calc_gradient_penalty(
-                        real_cat, fake_cat, self._device)
+                        real_cat, fake_cat, self._device, self.pac)
                     loss_d = -(torch.mean(y_real) - torch.mean(y_fake))
 
                     self._optimizerD.zero_grad()
@@ -433,6 +451,7 @@ class CTGANSynthesizer(BaseSynthesizer):
                 c1 = torch.from_numpy(c1).to(self._device)
                 fakez = torch.cat([fakez, c1], dim=1)
 
+            print(fakez)
             fake = self._generator(fakez)
             fakeact = self._apply_activate(fake)
             data.append(fakeact.detach().cpu().numpy())

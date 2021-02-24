@@ -82,7 +82,9 @@ class TVAESynthesizer(BaseSynthesizer):
         decompress_dims=(128, 128),
         l2scale=1e-5,
         batch_size=500,
-        epochs=300
+        epochs=300,
+        loss_factor=2,
+        cuda=True
     ):
 
         self.embedding_dim = embedding_dim
@@ -91,10 +93,17 @@ class TVAESynthesizer(BaseSynthesizer):
 
         self.l2scale = l2scale
         self.batch_size = batch_size
-        self.loss_factor = 2
+        self.loss_factor = loss_factor
         self.epochs = epochs
 
-        self._device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+        if not cuda or not torch.cuda.is_available():
+            device = 'cpu'
+        elif isinstance(cuda, str):
+            device = cuda
+        else:
+            device = 'cuda'
+
+        self._device = torch.device(device)
 
     def fit(self, train_data, discrete_columns=tuple()):
         self.transformer = DataTransformer()
