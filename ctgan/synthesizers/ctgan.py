@@ -122,6 +122,13 @@ class CTGANSynthesizer(BaseSynthesizer):
             Whether to have print statements for progress results. Defaults to ``False``.
         epochs (int):
             Number of training epochs. Defaults to 300.
+        pac (int):
+            Number of samples to group together when applying the discriminator.
+            Defaults to 10.
+        cuda (bool):
+            Whether to attempt to use cuda for GPU computation.
+            If this is False or CUDA is not available, CPU will be used.
+            Defaults to ``True``.
     """
 
     def __init__(self, embedding_dim=128, generator_dim=(256, 256), discriminator_dim=(256, 256),
@@ -157,7 +164,6 @@ class CTGANSynthesizer(BaseSynthesizer):
 
         self._device = torch.device(device)
 
-        #attributes that look questionable (gotta change set_device if we keep this)
         self._transformer = None
         self._data_sampler = None
         self._generator = None
@@ -451,7 +457,6 @@ class CTGANSynthesizer(BaseSynthesizer):
                 c1 = torch.from_numpy(c1).to(self._device)
                 fakez = torch.cat([fakez, c1], dim=1)
 
-            print(fakez)
             fake = self._generator(fakez)
             fakeact = self._apply_activate(fake)
             data.append(fakeact.detach().cpu().numpy())
@@ -463,7 +468,7 @@ class CTGANSynthesizer(BaseSynthesizer):
 
     def set_device(self, device):
         self._device = device
-        if hasattr(self, '_generator'):
+        if self._generator is not None:
             self._generator.to(self._device)
-        if hasattr(self, '_discriminator'):
+        if self._discriminator is not None:
             self._discriminator.to(self._device)
