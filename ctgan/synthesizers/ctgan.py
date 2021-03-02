@@ -168,8 +168,8 @@ class CTGANSynthesizer(BaseSynthesizer):
         self._data_sampler = None
         self._generator = None
         self._discriminator = None
-        self._optimizerG = None
-        self._optimizerD = None
+        _optimizerG = None
+        _optimizerD = None
 
     @staticmethod
     def _gumbel_softmax(logits, tau=1, hard=False, eps=1e-10, dim=-1):
@@ -312,18 +312,18 @@ class CTGANSynthesizer(BaseSynthesizer):
             data_dim
         ).to(self._device)
 
-        self._discriminator = Discriminator(
+        _discriminator = Discriminator(
             data_dim + self._data_sampler.dim_cond_vec(),
             self._discriminator_dim,
             pac=self.pac
         ).to(self._device)
 
-        self._optimizerG = optim.Adam(
+        _optimizerG = optim.Adam(
             self._generator.parameters(), lr=self._generator_lr, betas=(0.5, 0.9),
             weight_decay=self._generator_decay
         )
 
-        self._optimizerD = optim.Adam(
+        _optimizerD = optim.Adam(
             self._discriminator.parameters(), lr=self._discriminator_lr,
             betas=(0.5, 0.9), weight_decay=self._discriminator_decay
         )
@@ -367,17 +367,17 @@ class CTGANSynthesizer(BaseSynthesizer):
                         real_cat = real
                         fake_cat = fake
 
-                    y_fake = self._discriminator(fake_cat)
-                    y_real = self._discriminator(real_cat)
+                    y_fake = _discriminator(fake_cat)
+                    y_real = _discriminator(real_cat)
 
-                    pen = self._discriminator.calc_gradient_penalty(
+                    pen = _discriminator.calc_gradient_penalty(
                         real_cat, fake_cat, self._device, self.pac)
                     loss_d = -(torch.mean(y_real) - torch.mean(y_fake))
 
-                    self._optimizerD.zero_grad()
+                    _optimizerD.zero_grad()
                     pen.backward(retain_graph=True)
                     loss_d.backward()
-                    self._optimizerD.step()
+                    _optimizerD.step()
 
                 fakez = torch.normal(mean=mean, std=std)
                 condvec = self._data_sampler.sample_condvec(self._batch_size)
@@ -394,9 +394,9 @@ class CTGANSynthesizer(BaseSynthesizer):
                 fakeact = self._apply_activate(fake)
 
                 if c1 is not None:
-                    y_fake = self._discriminator(torch.cat([fakeact, c1], dim=1))
+                    y_fake = _discriminator(torch.cat([fakeact, c1], dim=1))
                 else:
-                    y_fake = self._discriminator(fakeact)
+                    y_fake = _discriminator(fakeact)
 
                 if condvec is None:
                     cross_entropy = 0
@@ -405,9 +405,9 @@ class CTGANSynthesizer(BaseSynthesizer):
 
                 loss_g = -torch.mean(y_fake) + cross_entropy
 
-                self._optimizerG.zero_grad()
+                _optimizerG.zero_grad()
                 loss_g.backward()
-                self._optimizerG.step()
+                _optimizerG.step()
 
             if self._verbose:
                 print(f"Epoch {i+1}, Loss G: {loss_g.detach().cpu(): .4f},"
@@ -470,5 +470,3 @@ class CTGANSynthesizer(BaseSynthesizer):
         self._device = device
         if self._generator is not None:
             self._generator.to(self._device)
-        if self._discriminator is not None:
-            self._discriminator.to(self._device)
