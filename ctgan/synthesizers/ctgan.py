@@ -168,8 +168,6 @@ class CTGANSynthesizer(BaseSynthesizer):
         self._data_sampler = None
         self._generator = None
         self._discriminator = None
-        _optimizerG = None
-        _optimizerD = None
 
     @staticmethod
     def _gumbel_softmax(logits, tau=1, hard=False, eps=1e-10, dim=-1):
