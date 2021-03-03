@@ -167,7 +167,6 @@ class CTGANSynthesizer(BaseSynthesizer):
         self._transformer = None
         self._data_sampler = None
         self._generator = None
-        self._discriminator = None
 
     @staticmethod
     def _gumbel_softmax(logits, tau=1, hard=False, eps=1e-10, dim=-1):
@@ -322,7 +321,7 @@ class CTGANSynthesizer(BaseSynthesizer):
         )
 
         _optimizerD = optim.Adam(
-            self._discriminator.parameters(), lr=self._discriminator_lr,
+            _discriminator.parameters(), lr=self._discriminator_lr,
             betas=(0.5, 0.9), weight_decay=self._discriminator_decay
         )
 
