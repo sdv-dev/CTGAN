@@ -152,7 +152,6 @@ class CTGANSynthesizer(BaseSynthesizer):
         self._log_frequency = log_frequency
         self._verbose = verbose
         self._epochs = epochs
-        self.trained_epochs = 0
         self.pac = pac
 
         if not cuda or not torch.cuda.is_available():
@@ -330,7 +329,6 @@ class CTGANSynthesizer(BaseSynthesizer):
 
         steps_per_epoch = max(len(train_data) // self._batch_size, 1)
         for i in range(epochs):
-            self.trained_epochs += 1
             for id_ in range(steps_per_epoch):
 
                 for n in range(self._discriminator_steps):
