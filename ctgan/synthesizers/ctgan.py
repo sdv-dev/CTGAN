@@ -309,19 +309,19 @@ class CTGANSynthesizer(BaseSynthesizer):
             data_dim
         ).to(self._device)
 
-        _discriminator = Discriminator(
+        discriminator = Discriminator(
             data_dim + self._data_sampler.dim_cond_vec(),
             self._discriminator_dim,
             pac=self.pac
         ).to(self._device)
 
-        _optimizerG = optim.Adam(
+        optimizerG = optim.Adam(
             self._generator.parameters(), lr=self._generator_lr, betas=(0.5, 0.9),
             weight_decay=self._generator_decay
         )
 
-        _optimizerD = optim.Adam(
-            _discriminator.parameters(), lr=self._discriminator_lr,
+        optimizerD = optim.Adam(
+            discriminator.parameters(), lr=self._discriminator_lr,
             betas=(0.5, 0.9), weight_decay=self._discriminator_decay
         )
 
@@ -364,17 +364,17 @@ class CTGANSynthesizer(BaseSynthesizer):
                         real_cat = real
                         fake_cat = fake
 
-                    y_fake = _discriminator(fake_cat)
-                    y_real = _discriminator(real_cat)
+                    y_fake = discriminator(fake_cat)
+                    y_real = discriminator(real_cat)
 
-                    pen = _discriminator.calc_gradient_penalty(
+                    pen = discriminator.calc_gradient_penalty(
                         real_cat, fake_cat, self._device, self.pac)
                     loss_d = -(torch.mean(y_real) - torch.mean(y_fake))
 
-                    _optimizerD.zero_grad()
+                    optimizerD.zero_grad()
                     pen.backward(retain_graph=True)
                     loss_d.backward()
-                    _optimizerD.step()
+                    optimizerD.step()
 
                 fakez = torch.normal(mean=mean, std=std)
                 condvec = self._data_sampler.sample_condvec(self._batch_size)
@@ -391,9 +391,9 @@ class CTGANSynthesizer(BaseSynthesizer):
                 fakeact = self._apply_activate(fake)
 
                 if c1 is not None:
-                    y_fake = _discriminator(torch.cat([fakeact, c1], dim=1))
+                    y_fake = discriminator(torch.cat([fakeact, c1], dim=1))
                 else:
-                    y_fake = _discriminator(fakeact)
+                    y_fake = discriminator(fakeact)
 
                 if condvec is None:
                     cross_entropy = 0
@@ -402,9 +402,9 @@ class CTGANSynthesizer(BaseSynthesizer):
 
                 loss_g = -torch.mean(y_fake) + cross_entropy
 
-                _optimizerG.zero_grad()
+                optimizerG.zero_grad()
                 loss_g.backward()
-                _optimizerG.step()
+                optimizerG.step()
 
             if self._verbose:
                 print(f"Epoch {i+1}, Loss G: {loss_g.detach().cpu(): .4f},"
