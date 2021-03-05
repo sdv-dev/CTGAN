@@ -1,5 +1,16 @@
 # History
 
+## v0.4.0 - 2021-02-24
+
+Maintenance relese to upgrade dependencies to ensure compatibility with the rest
+of the SDV libraries.
+
+Also add a validation on the CTGAN `condition_column` and `condition_value` inputs.
+
+### Improvements
+
+* Validate condition_column and condition_value - Issue [#124](https://github.com/sdv-dev/CTGAN/issues/124) by @fealho
+
 ## v0.3.1 - 2021-01-27
 
 ### Improvements
