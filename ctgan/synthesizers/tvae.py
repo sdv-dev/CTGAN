@@ -110,7 +110,9 @@ class TVAESynthesizer(BaseSynthesizer):
         self.transformer.fit(train_data, discrete_columns)
         train_data = self.transformer.transform(train_data)
         dataset = TensorDataset(torch.from_numpy(train_data.astype('float32')).to(self._device))
-        loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True, drop_last=False)
+
+        drop_last = True if len(dataset) > 10 * self.batch_size else False
+        loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True, drop_last=drop_last)
 
         data_dim = self.transformer.output_dimensions
         encoder = Encoder(data_dim, self.compress_dims, self.embedding_dim).to(self._device)
