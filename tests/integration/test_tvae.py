@@ -34,10 +34,11 @@ def test_tvae(tmpdir):
     assert set(sampled.columns) == set(data.columns)
     assert set(sampled.dtypes) == set(data.dtypes)
 
+
 def test_drop_last_false():
     data = pd.DataFrame({
-        '1': ['a', 'b', 'c']*150,
-        '2': ['a', 'b', 'c']*150
+        '1': ['a', 'b', 'c'] * 150,
+        '2': ['a', 'b', 'c'] * 150
     })
 
     tvae = TVAESynthesizer(epochs=300)
@@ -48,5 +49,5 @@ def test_drop_last_false():
     for _, row in sampled.iterrows():
         if row['1'] == row['2']:
             correct += 1
-    
+
     assert correct >= 95
