@@ -84,7 +84,8 @@ class TestLossFunction(TestCase):
             sigmas = tensor of shape (N,)
             mu = tensor of shape (N,)
             logvar = tensor of shape (N,)
-            output_info = list of SpanInfo objects from the data transformer, including at least 1 continuous and 1 discrete
+            output_info = list of SpanInfo objects from the data transformer,
+                          including at least 1 continuous and 1 discrete
             factor = scalar
 
         Output:

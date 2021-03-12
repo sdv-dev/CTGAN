@@ -59,10 +59,12 @@ def test_continuous():
     # verify that the distribution of the samples is close to the distribution of the data
     # using a kstest.
 
+
 def test_categorical():
     """Test training the TVAE synthesizer on a small categorical dataset."""
     # verify that the distribution of the samples is close to the distribution of the data
     # using a cstest.
+
 
 def test_mixed():
     """Test training the TVAE synthesizer on a small mixed-type dataset."""

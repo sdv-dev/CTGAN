@@ -4,6 +4,8 @@ import pandas as pd
 import pytest
 import torch
 
+from unittest.mock import Mock
+
 from ctgan.synthesizers.ctgan import CTGANSynthesizer, Discriminator, Generator, Residual
 
 

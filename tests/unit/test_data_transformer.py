@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-#from ctgan.data_transformer import DataTransformer
+from ctgan.data_transformer import DataTransformer
 
 
 class TestDataTransformer(TestCase):
@@ -29,6 +29,7 @@ class TestDataTransformer(TestCase):
         Side Effects:
             - fit should be called with the data
         """
+        dt = DataTransformer()
 
     def test___fit_discrete_(self):
         """Test '_fit_discrete_' on a simple discrete column.
