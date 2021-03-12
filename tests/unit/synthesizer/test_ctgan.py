@@ -1,10 +1,9 @@
 from unittest import TestCase
+from unittest.mock import Mock
 
 import pandas as pd
 import pytest
 import torch
-
-from unittest.mock import Mock
 
 from ctgan.data_transformer import SpanInfo
 from ctgan.synthesizers.ctgan import CTGANSynthesizer, Discriminator, Generator, Residual
@@ -203,7 +202,8 @@ class TestCTGANSynthesizer(TestCase):
 
         assert result.shape == (100, 6)
         _assert_is_between(result[:, 0:3], 0.0, 1.0)
-        _assert_is_between(result[: 4], -1.0, 1.0)
+        _assert_is_between(result[: 3], -1.0, 1.0)
+        _assert_is_between(result[:, 4:6], 0.0, 1.0)
 
     def test__cond_loss(self):
         """Test `_cond_loss`.
@@ -228,6 +228,34 @@ class TestCTGANSynthesizer(TestCase):
         Note:
             - this is probably broken right now...
         """
+        model = CTGANSynthesizer()
+        model._transformer = Mock()
+        model._transformer.output_info_list = [
+            [SpanInfo(1, 'tanh'), SpanInfo(2, 'softmax')],
+            [SpanInfo(3, 'softmax')],  # this is the categorical column we are conditioning on
+            [SpanInfo(2, 'softmax')],  # this is the categorical column we are conditioning on
+        ]
+
+        data = torch.tensor([
+            # first 3 dims ignored, next 3 dims are the prediction, last 2 dims are ignored
+            [0.0, -1.0, 0.0, 0.05, 0.05, 0.9, 0.1, 0.4],
+        ])
+        c = torch.tensor([
+            # first 3 dims are a one-hot for the categorical, next 2 are for a different categorical that we are not conditioning on
+            # (continuous values are not stored in this tensor)
+            [0.0, 0.0, 1.0, 0.0, 0.0],
+        ])
+        m = torch.tensor([[1, 0]])
+
+        result = model._cond_loss(data, c, m)
+        expected = torch.nn.functional.cross_entropy(
+            torch.tensor([
+                [0.05, 0.05, 0.9],  # 3 categories, one hot
+            ]),
+            torch.tensor([2])
+        )
+
+        assert (result - expected).abs() < 1e-3
 
     def test__validate_discrete_columns(self):
         """Test `_validate_discrete_columns` if the discrete column doesn't exist.
