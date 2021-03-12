@@ -211,7 +211,9 @@ class TestDataTransformer(TestCase):
 
         Output:
             - dictionary containing:
-              - "discrete_column_id" = the index of the target column, considering only discrete columns
-              - "column_id" = the index of the target column (e.g. 3 = the third column in the data)
+              - "discrete_column_id" = the index of the target column,
+                when considering only discrete columns
+              - "column_id" = the index of the target column
+                (e.g. 3 = the third column in the data)
               - "value_id" = the index of the indicator value in the one-hot encoding
         """
