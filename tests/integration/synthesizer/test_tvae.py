@@ -51,3 +51,20 @@ def test_drop_last_false():
             correct += 1
 
     assert correct >= 95
+
+
+# TVAE tests that should be implemented in the future.
+def test_continuous():
+    """Test training the TVAE synthesizer on a small continuous dataset."""
+    # verify that the distribution of the samples is close to the distribution of the data
+    # using a kstest.
+
+def test_categorical():
+    """Test training the TVAE synthesizer on a small categorical dataset."""
+    # verify that the distribution of the samples is close to the distribution of the data
+    # using a cstest.
+
+def test_mixed():
+    """Test training the TVAE synthesizer on a small mixed-type dataset."""
+    # verify that the distribution of the samples is close to the distribution of the data
+    # using a kstest for continuous + a cstest for categorical.

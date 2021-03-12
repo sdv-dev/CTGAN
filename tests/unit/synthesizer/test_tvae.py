@@ -1,5 +1,5 @@
 from unittest import TestCase
-from ctgan.synthesizers.tvae import TVAESynthesizer, Decoder, Encoder, loss_function
+
 
 class TestEncoder(TestCase):
 
@@ -23,7 +23,7 @@ class TestEncoder(TestCase):
             - Set `self.seq`, `self.fc1` and `self.fc2`
         """
 
-    def test_forward(self): 
+    def test_forward(self):
         """Test `test_forward` for a generic case.
 
         Check that the output shapes are correct and that std is positive.
@@ -34,10 +34,10 @@ class TestEncoder(TestCase):
         Setup:
             - Create random tensor
 
-        Input: 
+        Input:
             - input = random tensor of shape (N, data_dim)
 
-        Output: 
+        Output:
             - Tuple of (mu, std, logvar):
               mu - tensor of shape (N, embedding_dim)
               std - tensor of shape (N, embedding_dim), non-negative values
@@ -91,7 +91,6 @@ class TestLossFunction(TestCase):
             reconstruction loss = scalar = f(recon_x, x, sigmas, output_info, factor)
             kld loss = scalar = f(logvar, mu)
         """
-        pass
 
 
 class TestTVAESynthesizer(TestCase):
@@ -119,26 +118,3 @@ class TestTVAESynthesizer(TestCase):
             - Need to be careful when checking whether the encoder is actually set
             to the right device, since it's not saved (it's only used in fit).
         """
-        pass
-
-
-
-
-    def test_continuous(self):
-        """Test training the TVAE synthesizer on a small continuous dataset."""
-        # verify that the distribution of the samples is close to the distribution of the data
-        # using a kstest.
-        pass
-
-    def test_categorical(self):
-        """Test training the TVAE synthesizer on a small categorical dataset."""
-        # verify that the distribution of the samples is close to the distribution of the data
-        # using a cstest.
-        pass
-
-    def test_mixed(self):
-        """Test training the TVAE synthesizer on a small mixed-type dataset."""
-        # verify that the distribution of the samples is close to the distribution of the data
-        # using a kstest for continuous + a cstest for categorical.
-        pass
-

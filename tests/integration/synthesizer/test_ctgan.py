@@ -184,3 +184,42 @@ def test_wrong_sampling_conditions():
 
     with pytest.raises(ValueError):
         ctgan.sample(1, 'discrete', "d")
+
+
+# Below are CTGAN tests that should be implemented in the future
+def test_continuous():
+    """Test training the CTGAN synthesizer on a continuous dataset."""
+    # assert the distribution of the samples is close to the distribution of the data
+    # using kstest:
+    #   - uniform (assert p-value > 0.05)
+    #   - gaussian (assert p-value > 0.05)
+    #   - inversely correlated (assert correlation < 0)
+
+def test_categorical():
+    """Test training the CTGAN synthesizer on a categorical dataset."""
+    # assert the distribution of the samples is close to the distribution of the data
+    # using cstest:
+    #   - uniform (assert p-value > 0.05)
+    #   - very skewed / biased? (assert p-value > 0.05)
+    #   - inversely correlated (assert correlation < 0)
+
+def test_categorical_log_frequency():
+    """Test training the CTGAN synthesizer on a small categorical dataset."""
+    # assert the distribution of the samples is close to the distribution of the data
+    # using cstest:
+    #   - uniform (assert p-value > 0.05)
+    #   - very skewed / biased? (assert p-value > 0.05)
+    #   - inversely correlated (assert correlation < 0)
+
+def test_mixed():
+    """Test training the CTGAN synthesizer on a small mixed-type dataset."""
+    # assert the distribution of the samples is close to the distribution of the data
+    # using a kstest for continuous + a cstest for categorical.
+
+def test_conditional():
+    """Test training the CTGAN synthesizer and sampling conditioned on a categorical."""
+    # verify that conditioning increases the likelihood of getting a sample with the specified
+    # categorical value
+
+def test_batch_size_pack_size():
+    """Test that if batch size is not a multiple of pack size, it raises a sane error."""

@@ -1,8 +1,11 @@
-import torch
-import pytest
-import pandas as pd
 from unittest import TestCase
-from ctgan.synthesizers.ctgan import CTGANSynthesizer, Discriminator, Residual, Generator
+
+import pandas as pd
+import pytest
+import torch
+
+from ctgan.synthesizers.ctgan import CTGANSynthesizer, Discriminator, Generator, Residual
+
 
 class TestDiscriminator(TestCase):
 
@@ -31,7 +34,6 @@ class TestDiscriminator(TestCase):
         assert discriminator.pac == 7
         assert discriminator.pacdim == 350
         assert len(discriminator.seq) == 3 * len(discriminator_dim) + 1
-
 
     def test_forward(self):
         """Test `test_forward` for a generic case.
@@ -128,7 +130,7 @@ class TestGenerator(TestCase):
         generator = Generator(embedding_dim=50, generator_dim=generator_dim, data_dim=7)
 
         assert len(generator.seq) == len(generator_dim) + 1
-    
+
     def test_forward(self):
         """Test `test_forward` for a generic case.
 
@@ -162,6 +164,7 @@ class TestGenerator(TestCase):
         for parameter in generator.parameters():
             assert parameter.grad is not None
 
+
 class TestCTGANSynthesizer(TestCase):
 
     def test__apply_activate_(self):
@@ -179,8 +182,6 @@ class TestCTGANSynthesizer(TestCase):
         Output:
             - tensor = tensor of shape (N, data_dims)
         """
-        pass
-
 
     def test__cond_loss(self):
         """Test `_cond_loss`.
@@ -200,11 +201,10 @@ class TestCTGANSynthesizer(TestCase):
 
         Output:
             loss scalar; this should only be affected by the target column
-        
+
         Note:
             - this is probably broken right now...
         """
-        pass
 
     def test__validate_discrete_columns(self):
         """Test `_validate_discrete_columns` if the discrete column doesn't exist.
@@ -238,7 +238,6 @@ class TestCTGANSynthesizer(TestCase):
         with pytest.raises(ValueError):
             ctgan.fit(data, discrete_columns)
 
-
     def test_sample(self):
         """Test `sample` correctly sets `condition_info` and `global_condition_vec`.
 
@@ -260,7 +259,6 @@ class TestCTGANSynthesizer(TestCase):
         Note:
             - I'm not sure we need this test
         """
-        pass
 
     def test_set_device(self):
         """Test 'set_device' if a GPU is available.
@@ -285,50 +283,3 @@ class TestCTGANSynthesizer(TestCase):
             - Need to be careful when checking whether the encoder is actually set
             to the right device, since it's not saved (it's only used in fit).
         """
-        pass
-
-
-
-
-    def test_continuous(self):
-        """Test training the CTGAN synthesizer on a continuous dataset."""
-        # assert the distribution of the samples is close to the distribution of the data
-        # using kstest:
-        #   - uniform (assert p-value > 0.05)
-        #   - gaussian (assert p-value > 0.05)
-        #   - inversely correlated (assert correlation < 0)
-        pass
-
-    def test_categorical(self):
-        """Test training the CTGAN synthesizer on a categorical dataset."""
-        # assert the distribution of the samples is close to the distribution of the data
-        # using cstest:
-        #   - uniform (assert p-value > 0.05)
-        #   - very skewed / biased? (assert p-value > 0.05)
-        #   - inversely correlated (assert correlation < 0)
-        pass
-
-    def test_categorical_log_frequency(self):
-        """Test training the CTGAN synthesizer on a small categorical dataset."""
-        # assert the distribution of the samples is close to the distribution of the data
-        # using cstest:
-        #   - uniform (assert p-value > 0.05)
-        #   - very skewed / biased? (assert p-value > 0.05)
-        #   - inversely correlated (assert correlation < 0)
-        pass
-
-    def test_mixed(self):
-        """Test training the CTGAN synthesizer on a small mixed-type dataset."""
-        # assert the distribution of the samples is close to the distribution of the data
-        # using a kstest for continuous + a cstest for categorical.
-        pass
-
-    def test_conditional(self):
-        """Test training the CTGAN synthesizer and sampling conditioned on a categorical."""
-        # verify that conditioning increases the likelihood of getting a sample with the specified
-        # categorical value
-        pass
-
-    def test_batch_size_pack_size(self):
-        """Test that if batch size is not a multiple of pack size, it raises a sane error."""
-        pass
