@@ -226,7 +226,8 @@ class TestCTGANSynthesizer(TestCase):
             loss scalar; this should only be affected by the target column
 
         Note:
-            - this is probably broken right now...
+            - even though the implementation of this is probably right, I'm not sure if the idea
+              behind it is correct
         """
         model = CTGANSynthesizer()
         model._transformer = Mock()
@@ -240,11 +241,14 @@ class TestCTGANSynthesizer(TestCase):
             # first 3 dims ignored, next 3 dims are the prediction, last 2 dims are ignored
             [0.0, -1.0, 0.0, 0.05, 0.05, 0.9, 0.1, 0.4],
         ])
+
         c = torch.tensor([
-            # first 3 dims are a one-hot for the categorical, next 2 are for a different categorical that we are not conditioning on
+            # first 3 dims are a one-hot for the categorical,
+            # next 2 are for a different categorical that we are not conditioning on
             # (continuous values are not stored in this tensor)
             [0.0, 0.0, 1.0, 0.0, 0.0],
         ])
+
         m = torch.tensor([[1, 0]])
 
         result = model._cond_loss(data, c, m)
