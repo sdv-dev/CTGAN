@@ -6,7 +6,7 @@ import torch
 
 from unittest.mock import Mock
 
-from ctgan.data_transformer import ColumnTransformInfo, SpanInfo
+from ctgan.data_transformer import SpanInfo
 from ctgan.synthesizers.ctgan import CTGANSynthesizer, Discriminator, Generator, Residual
 
 
@@ -169,7 +169,7 @@ class TestGenerator(TestCase):
 
 
 def _assert_is_between(data, lower, upper):
-    """Asserts all values of the tensor column 'data' are within range."""
+    """Asserts all values of the tensor 'data' are within range."""
     assert all((data >= lower).numpy().tolist())
     assert all((data <= upper).numpy().tolist())
 
@@ -202,9 +202,8 @@ class TestCTGANSynthesizer(TestCase):
         result = model._apply_activate(data)
 
         assert result.shape == (100, 6)
-        _assert_is_between(result[:,0:3], 0.0, 1.0)
-        _assert_is_between(result[:,4], -1.0, 1.0)
-
+        _assert_is_between(result[:, 0:3], 0.0, 1.0)
+        _assert_is_between(result[: 4], -1.0, 1.0)
 
     def test__cond_loss(self):
         """Test `_cond_loss`.
