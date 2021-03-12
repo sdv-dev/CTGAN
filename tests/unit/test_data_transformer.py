@@ -29,7 +29,7 @@ class TestDataTransformer(TestCase):
         Side Effects:
             - fit should be called with the data
         """
-        dt = DataTransformer()
+        DataTransformer()
 
     def test___fit_discrete_(self):
         """Test '_fit_discrete_' on a simple discrete column.
