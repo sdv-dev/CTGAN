@@ -1,9 +1,10 @@
 from unittest import TestCase
+from unittest.mock import Mock, patch
 
-from ctgan.data_transformer import DataTransformer, ColumnTransformInfo, SpanInfo
 import numpy as np
-from unittest.mock import patch, Mock
 import pandas as pd
+
+from ctgan.data_transformer import ColumnTransformInfo, DataTransformer, SpanInfo
 
 
 class TestDataTransformer(TestCase):
