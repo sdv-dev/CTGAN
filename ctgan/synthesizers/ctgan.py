@@ -235,14 +235,11 @@ class CTGANSynthesizer(BaseSynthesizer):
                         torch.argmax(c[:, st_c:ed_c], dim=1),
                         reduction='none'
                     )
-                    print(data[:, st:ed])
-                    print(torch.argmax(c[:, st_c:ed_c], dim=1))
                     loss.append(tmp)
                     st = ed
                     st_c = ed_c
 
         loss = torch.stack(loss, dim=1)
-        print(loss)
 
         return (loss * m).sum() / data.size()[0]
 

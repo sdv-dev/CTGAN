@@ -2,9 +2,7 @@ from unittest import TestCase
 
 from ctgan.data_transformer import DataTransformer, ColumnTransformInfo, SpanInfo
 import numpy as np
-import sklearn
 from unittest.mock import patch, Mock
-import rdt.transformers
 import pandas as pd
 
 
@@ -36,11 +34,11 @@ class TestDataTransformer(TestCase):
             - fit should be called with the data
         """
         bgm_instance = MockBGM.return_value
-        bgm_instance.weights_ = np.array([10.0, 5.0, 0.0]) # 2 non-zero components
+        bgm_instance.weights_ = np.array([10.0, 5.0, 0.0])  # 2 non-zero components
 
         max_clusters = 10
         transformer = DataTransformer(max_clusters, weight_threshold=0.005)
-        info = transformer._fit_continuous("column", np.random.normal((100,1)))
+        info = transformer._fit_continuous("column", np.random.normal((100, 1)))
 
         assert info.column_name == "column"
         assert info.transform == bgm_instance
@@ -77,7 +75,7 @@ class TestDataTransformer(TestCase):
         ohe_instance = MockOHE.return_value
         ohe_instance.dummies = ['a', 'b']
         transformer = DataTransformer()
-        info = transformer._fit_discrete("column", np.array(['a', 'b']*100))
+        info = transformer._fit_discrete("column", np.array(['a', 'b'] * 100))
 
         assert info.column_name == "column"
         assert info.transform == ohe_instance
@@ -180,7 +178,6 @@ class TestDataTransformer(TestCase):
             - assert np.random.choice with appropriate probabilities
         """
 
-
     def test_transform(self):
         """Test 'transform' on a dataframe with one continuous and one discrete columns.
 
@@ -243,13 +240,13 @@ class TestDataTransformer(TestCase):
         transformer._transform_continuous.assert_called_once()
         transformer._transform_discrete.assert_called_once()
         assert result.shape == (3, 6)
-        assert (result[:,0] == np.array([0.1, 0.3, 0.5])).all()
-        assert (result[:,1:4] == np.array([
+        assert (result[:, 0] == np.array([0.1, 0.3, 0.5])).all()
+        assert (result[:, 1:4] == np.array([
             [1, 0, 0],
             [1, 0, 0],
             [1, 0, 0],
         ])).all()
-        assert (result[:,4:6] == np.array([
+        assert (result[:, 4:6] == np.array([
             [0, 1],
             [0, 1],
             [1, 0],
@@ -331,7 +328,7 @@ class TestDataTransformer(TestCase):
         """
         ohe = Mock()
         ohe.transform.return_value = np.array([
-            [0, 1] # one hot encoding, second dimension
+            [0, 1]  # one hot encoding, second dimension
         ])
         transformer = DataTransformer()
         transformer._column_transform_info_list = [
@@ -349,14 +346,14 @@ class TestDataTransformer(TestCase):
             )
         ]
         result = transformer.convert_column_name_value_to_id('y', 'yes')
-        assert result['column_id'] == 1 # this is the 2nd column
-        assert result['discrete_column_id'] == 0 # this is the 1st discrete column
-        assert result['value_id'] == 1 # this is the 2nd dimension in the one hot encoding
+        assert result['column_id'] == 1  # this is the 2nd column
+        assert result['discrete_column_id'] == 0  # this is the 1st discrete column
+        assert result['value_id'] == 1  # this is the 2nd dimension in the one hot encoding
 
     def test_convert_column_name_value_to_id_multiple(self):
         ohe = Mock()
         ohe.transform.return_value = np.array([
-            [0, 1, 0] # one hot encoding, second dimension
+            [0, 1, 0]  # one hot encoding, second dimension
         ])
         transformer = DataTransformer()
         transformer._column_transform_info_list = [
@@ -381,6 +378,6 @@ class TestDataTransformer(TestCase):
         ]
 
         result = transformer.convert_column_name_value_to_id('z', 'yes')
-        assert result['column_id'] == 2 # this is the 3rd column
-        assert result['discrete_column_id'] == 1 # this is the 2nd discrete column
-        assert result['value_id'] == 1 # this is the 1st dimension in the one hot encoding
+        assert result['column_id'] == 2  # this is the 3rd column
+        assert result['discrete_column_id'] == 1  # this is the 2nd discrete column
+        assert result['value_id'] == 1  # this is the 1st dimension in the one hot encoding
