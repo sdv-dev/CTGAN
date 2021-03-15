@@ -1,11 +1,17 @@
 from unittest import TestCase
 
-from ctgan.data_transformer import DataTransformer
+from ctgan.data_transformer import DataTransformer, ColumnTransformInfo, SpanInfo
+import numpy as np
+import sklearn
+from unittest.mock import patch, Mock
+import rdt.transformers
+import pandas as pd
 
 
 class TestDataTransformer(TestCase):
 
-    def test___fit_continuous_(self):
+    @patch('ctgan.data_transformer.BayesianGaussianMixture')
+    def test___fit_continuous_(self, MockBGM):
         """Test '_fit_continuous_' on a simple continuous column.
 
         A 'BayesianGaussianMixture' will be created and fit with the
@@ -29,9 +35,23 @@ class TestDataTransformer(TestCase):
         Side Effects:
             - fit should be called with the data
         """
-        DataTransformer()
+        bgm_instance = MockBGM.return_value
+        bgm_instance.weights_ = np.array([10.0, 5.0, 0.0]) # 2 non-zero components
 
-    def test___fit_discrete_(self):
+        max_clusters = 10
+        transformer = DataTransformer(max_clusters, weight_threshold=0.005)
+        info = transformer._fit_continuous("column", np.random.normal((100,1)))
+
+        assert info.column_name == "column"
+        assert info.transform == bgm_instance
+        assert info.output_dimensions == 3
+        assert info.output_info[0].dim == 1
+        assert info.output_info[0].activation_fn == "tanh"
+        assert info.output_info[1].dim == 2
+        assert info.output_info[1].activation_fn == "softmax"
+
+    @patch('ctgan.data_transformer.OneHotEncodingTransformer')
+    def test___fit_discrete_(self, MockOHE):
         """Test '_fit_discrete_' on a simple discrete column.
 
         A 'OneHotEncodingTransformer' will be created and fit with the
@@ -54,6 +74,16 @@ class TestDataTransformer(TestCase):
         Side Effects:
             - fit should be called with the data
         """
+        ohe_instance = MockOHE.return_value
+        ohe_instance.dummies = ['a', 'b']
+        transformer = DataTransformer()
+        info = transformer._fit_discrete("column", np.array(['a', 'b']*100))
+
+        assert info.column_name == "column"
+        assert info.transform == ohe_instance
+        assert info.output_dimensions == 2
+        assert info.output_info[0].dim == 2
+        assert info.output_info[0].activation_fn == "softmax"
 
     def test_fit(self):
         """Test 'fit' on a np.ndarray with one continuous and one discrete columns.
@@ -84,6 +114,33 @@ class TestDataTransformer(TestCase):
             - Assigns 'self.output_dimensions' the appropriate 'output_dimensions'.
             - Assigns 'self._column_transform_info_list' the appropriate 'column_transform_info'.
         """
+        data = pd.DataFrame({
+            "x": np.random.random(size=100),
+            "y": np.random.choice(["yes", "no"], size=100)
+        })
+
+        transformer = DataTransformer()
+        transformer._fit_continuous = Mock()
+        transformer._fit_continuous.return_value = ColumnTransformInfo(
+            column_name="x", column_type="continuous", transform=None,
+            transform_aux=None,
+            output_info=[SpanInfo(1, 'tanh'), SpanInfo(3, 'softmax')],
+            output_dimensions=1 + 3
+        )
+
+        transformer._fit_discrete = Mock()
+        transformer._fit_discrete.return_value = ColumnTransformInfo(
+            column_name="y", column_type="discrete", transform=None,
+            transform_aux=None,
+            output_info=[SpanInfo(2, 'softmax')],
+            output_dimensions=2
+        )
+
+        transformer.fit(data, discrete_columns=["y"])
+
+        transformer._fit_discrete.assert_called_once()
+        transformer._fit_continuous.assert_called_once()
+        assert transformer.output_dimensions == 6
 
     def test__transform_continuous(self):
         """Test '_transform_continuous'.
@@ -123,6 +180,7 @@ class TestDataTransformer(TestCase):
             - assert np.random.choice with appropriate probabilities
         """
 
+
     def test_transform(self):
         """Test 'transform' on a dataframe with one continuous and one discrete columns.
 
@@ -132,7 +190,7 @@ class TestDataTransformer(TestCase):
         Setup:
             - Mock _column_transform_info_list
             - Mock _transform_discrete
-            - Mock _trarnsform_continuous
+            - Mock _transform_continuous
 
         Input:
             - raw_data = a table with one continuous and one discrete columns.
@@ -143,6 +201,59 @@ class TestDataTransformer(TestCase):
         Side Effects:
             - _transform_discrete and _transform_continuous should each be called once.
         """
+        data = pd.DataFrame({
+            "x": np.array([0.1, 0.3, 0.5]),
+            "y": np.array(["yes", "yes", "no"])
+        })
+
+        transformer = DataTransformer()
+        transformer._column_transform_info_list = [
+            ColumnTransformInfo(
+                column_name="x", column_type="continuous", transform=None,
+                transform_aux=None,
+                output_info=[SpanInfo(1, 'tanh'), SpanInfo(3, 'softmax')],
+                output_dimensions=1 + 3
+            ),
+            ColumnTransformInfo(
+                column_name="y", column_type="discrete", transform=None,
+                transform_aux=None,
+                output_info=[SpanInfo(2, 'softmax')],
+                output_dimensions=2
+            )
+        ]
+
+        transformer._transform_continuous = Mock()
+        selected_normalized_value = np.array([[0.1], [0.3], [0.5]])
+        selected_component_onehot = np.array([
+            [1, 0, 0],
+            [1, 0, 0],
+            [1, 0, 0],
+        ])
+        transformer._transform_continuous.return_value = (selected_normalized_value,
+                                                          selected_component_onehot)
+
+        transformer._transform_discrete = Mock()
+        transformer._transform_discrete.return_value = [np.array([
+            [0, 1],
+            [0, 1],
+            [1, 0],
+        ])]
+
+        result = transformer.transform(data)
+        transformer._transform_continuous.assert_called_once()
+        transformer._transform_discrete.assert_called_once()
+        assert result.shape == (3, 6)
+        assert (result[:,0] == np.array([0.1, 0.3, 0.5])).all()
+        assert (result[:,1:4] == np.array([
+            [1, 0, 0],
+            [1, 0, 0],
+            [1, 0, 0],
+        ])).all()
+        assert (result[:,4:6] == np.array([
+            [0, 1],
+            [0, 1],
+            [1, 0],
+        ])).all()
 
     def test__inverse_transform_continuous(self):
         """Test '_inverse_transform_continuous' with sigmas != None.
@@ -212,9 +323,64 @@ class TestDataTransformer(TestCase):
 
         Output:
             - dictionary containing:
-              - "discrete_column_id" = the index of the target column,
+              - 'discrete_column_id' = the index of the target column,
                 when considering only discrete columns
-              - "column_id" = the index of the target column
+              - 'column_id' = the index of the target column
                 (e.g. 3 = the third column in the data)
-              - "value_id" = the index of the indicator value in the one-hot encoding
+              - 'value_id' = the index of the indicator value in the one-hot encoding
         """
+        ohe = Mock()
+        ohe.transform.return_value = np.array([
+            [0, 1] # one hot encoding, second dimension
+        ])
+        transformer = DataTransformer()
+        transformer._column_transform_info_list = [
+            ColumnTransformInfo(
+                column_name='x', column_type='continuous', transform=None,
+                transform_aux=None,
+                output_info=[SpanInfo(1, 'tanh'), SpanInfo(3, 'softmax')],
+                output_dimensions=1 + 3
+            ),
+            ColumnTransformInfo(
+                column_name='y', column_type='discrete', transform=ohe,
+                transform_aux=None,
+                output_info=[SpanInfo(2, 'softmax')],
+                output_dimensions=2
+            )
+        ]
+        result = transformer.convert_column_name_value_to_id('y', 'yes')
+        assert result['column_id'] == 1 # this is the 2nd column
+        assert result['discrete_column_id'] == 0 # this is the 1st discrete column
+        assert result['value_id'] == 1 # this is the 2nd dimension in the one hot encoding
+
+    def test_convert_column_name_value_to_id_multiple(self):
+        ohe = Mock()
+        ohe.transform.return_value = np.array([
+            [0, 1, 0] # one hot encoding, second dimension
+        ])
+        transformer = DataTransformer()
+        transformer._column_transform_info_list = [
+            ColumnTransformInfo(
+                column_name='x', column_type='continuous', transform=None,
+                transform_aux=None,
+                output_info=[SpanInfo(1, 'tanh'), SpanInfo(3, 'softmax')],
+                output_dimensions=1 + 3
+            ),
+            ColumnTransformInfo(
+                column_name='y', column_type='discrete', transform=ohe,
+                transform_aux=None,
+                output_info=[SpanInfo(2, 'softmax')],
+                output_dimensions=2
+            ),
+            ColumnTransformInfo(
+                column_name='z', column_type='discrete', transform=ohe,
+                transform_aux=None,
+                output_info=[SpanInfo(2, 'softmax')],
+                output_dimensions=2
+            )
+        ]
+
+        result = transformer.convert_column_name_value_to_id('z', 'yes')
+        assert result['column_id'] == 2 # this is the 3rd column
+        assert result['discrete_column_id'] == 1 # this is the 2nd discrete column
+        assert result['value_id'] == 1 # this is the 1st dimension in the one hot encoding

@@ -234,7 +234,7 @@ class TestCTGANSynthesizer(TestCase):
         model._transformer.output_info_list = [
             [SpanInfo(1, 'tanh'), SpanInfo(2, 'softmax')],
             [SpanInfo(3, 'softmax')],  # this is the categorical column we are conditioning on
-            [SpanInfo(2, 'softmax')],  # this is the categorical column we are conditioning on
+            [SpanInfo(2, 'softmax')],  # this is the categorical column we are bry jrbec on
         ]
 
         data = torch.tensor([
@@ -249,6 +249,7 @@ class TestCTGANSynthesizer(TestCase):
             [0.0, 0.0, 1.0, 0.0, 0.0],
         ])
 
+        # this indicates that we are conditioning on the first categorical
         m = torch.tensor([[1, 0]])
 
         result = model._cond_loss(data, c, m)
@@ -283,6 +284,7 @@ class TestCTGANSynthesizer(TestCase):
 
         Note:
             - could create another function for numpy array
+            - TODO: it is currently a integration test, needs to be changed to a proper unit test
         """
         data = pd.DataFrame({
             'discrete': ['a', 'b']
