@@ -112,7 +112,7 @@ class TestGenerator(TestCase):
     def test___init__(self):
         """Test `__init__` for a generic case.
 
-        Make sure 'self.seq' has same length as `generator_dim` + 1.
+        Make sure `self.seq` has same length as `generator_dim` + 1.
 
         Setup:
             - Create Generator

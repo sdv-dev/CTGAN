@@ -229,7 +229,6 @@ class CTGANSynthesizer(BaseSynthesizer):
                 else:
                     ed = st + span_info.dim
                     ed_c = st_c + span_info.dim
-                    # assert sum(data[:, st:ed]) adds up to 1.0
                     tmp = functional.cross_entropy(
                         data[:, st:ed],
                         torch.argmax(c[:, st_c:ed_c], dim=1),

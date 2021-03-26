@@ -227,8 +227,8 @@ class TestDataTransformer(TestCase):
             [1, 0, 0],
             [1, 0, 0],
         ])
-        transformer._transform_continuous.return_value = (selected_normalized_value,
-                                                          selected_component_onehot)
+        return_value = (selected_normalized_value, selected_component_onehot)
+        transformer._transform_continuous.return_value = return_value
 
         transformer._transform_discrete = Mock()
         transformer._transform_discrete.return_value = [np.array([
@@ -240,18 +240,17 @@ class TestDataTransformer(TestCase):
         result = transformer.transform(data)
         transformer._transform_continuous.assert_called_once()
         transformer._transform_discrete.assert_called_once()
+
+        expected = np.array([
+            [0.1, 1, 0, 0, 0, 1],
+            [0.3, 1, 0, 0, 0, 1],
+            [0.5, 1, 0, 0, 1, 0],
+        ])
+
         assert result.shape == (3, 6)
-        assert (result[:, 0] == np.array([0.1, 0.3, 0.5])).all()
-        assert (result[:, 1:4] == np.array([
-            [1, 0, 0],
-            [1, 0, 0],
-            [1, 0, 0],
-        ])).all()
-        assert (result[:, 4:6] == np.array([
-            [0, 1],
-            [0, 1],
-            [1, 0],
-        ])).all()
+        assert (result[:, 0] == expected[:, 0]).all(), "continuous-cdf"
+        assert (result[:, 1:4] == expected[:, 1:4]).all(), "continuous-softmax"
+        assert (result[:, 4:6] == expected[:, 4:6]).all(), "discrete"
 
     def test__inverse_transform_continuous(self):
         """Test '_inverse_transform_continuous' with sigmas != None.
@@ -346,6 +345,7 @@ class TestDataTransformer(TestCase):
                 output_dimensions=2
             )
         ]
+
         result = transformer.convert_column_name_value_to_id('y', 'yes')
         assert result['column_id'] == 1  # this is the 2nd column
         assert result['discrete_column_id'] == 0  # this is the 1st discrete column
