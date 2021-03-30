@@ -1,5 +1,16 @@
 # History
 
+## v0.4.1 - 2021-03-30
+
+This release exposes all the hyperparameters which the user may find useful for both `CTGAN`
+and `TVAE`. Also `TVAE` can now be fitted on datasets that are shorter than the batch
+size and drops the last batch only if the data size is not divisible by the batch size.
+
+### Issues closed
+
+* `TVAE`: Adapt `batch_size` to data size - Issue [#135](https://github.com/sdv-dev/CTGAN/issues/135) by @fealho and @csala
+* `ValueError` from `validate_discre_columns` with `uniqueCombinationConstraint` - Issue [133](https://github.com/sdv-dev/CTGAN/issues/133) by @fealho and @MLjungg
+
 ## v0.4.0 - 2021-02-24
 
 Maintenance relese to upgrade dependencies to ensure compatibility with the rest
