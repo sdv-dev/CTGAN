@@ -54,7 +54,7 @@ def loss_function(recon_x, x, sigmas, mu, logvar, output_info, factor):
     loss = []
     for column_info in output_info:
         for span_info in column_info:
-            if len(column_info) != 1 or span_info.activation_fn != "softmax":
+            if span_info.activation_fn != "softmax":
                 ed = st + span_info.dim
                 std = sigmas[st]
                 loss.append(((x[:, st] - torch.tanh(recon_x[:, st])) ** 2 / 2 / (std ** 2)).sum())

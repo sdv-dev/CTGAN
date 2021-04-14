@@ -51,3 +51,23 @@ def test_drop_last_false():
             correct += 1
 
     assert correct >= 95
+
+
+def test_loss_function():
+    data = pd.DataFrame({
+        '1': [float(i) for i in range(1000)],
+        '2': [float(2 * i) for i in range(1000)]
+    })
+
+    tvae = TVAESynthesizer(epochs=300)
+    tvae.fit(data)
+
+    num_samples = 1000
+    sampled = tvae.sample(num_samples)
+    error = 0
+    for _, row in sampled.iterrows():
+        error += abs(2 * row['1'] - row['2'])
+
+    avg_error = error / num_samples
+
+    assert avg_error < 400
