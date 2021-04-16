@@ -267,7 +267,8 @@ class CTGANSynthesizer(BaseSynthesizer):
         if invalid_columns:
             raise ValueError('Invalid columns found: {}'.format(invalid_columns))
 
-    def fit(self, train_data, discrete_columns=tuple(), epochs=None):
+    def fit(self, train_data, discrete_columns=tuple(), epochs=None,
+            data_transformer_params={}):
         """Fit the CTGAN Synthesizer models to the training data.
 
         Args:
@@ -278,6 +279,8 @@ class CTGANSynthesizer(BaseSynthesizer):
                 Vector. If ``train_data`` is a Numpy array, this list should
                 contain the integer indices of the columns. Otherwise, if it is
                 a ``pandas.DataFrame``, this list should contain the column names.
+            data_transformer_params (dict):
+                Dictionary of parameters for ``DataTransformer`` initialization.
         """
         self._validate_discrete_columns(train_data, discrete_columns)
 
@@ -290,7 +293,7 @@ class CTGANSynthesizer(BaseSynthesizer):
                 DeprecationWarning
             )
 
-        self._transformer = DataTransformer()
+        self._transformer = DataTransformer(**data_transformer_params)
         self._transformer.fit(train_data, discrete_columns)
 
         train_data = self._transformer.transform(train_data)
