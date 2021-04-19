@@ -1,3 +1,5 @@
+import datetime
+import time
 import warnings
 
 import numpy as np
@@ -118,8 +120,8 @@ class CTGANSynthesizer(BaseSynthesizer):
         log_frequency (boolean):
             Whether to use log frequency of categorical levels in conditional
             sampling. Defaults to ``True``.
-        verbose (boolean):
-            Whether to have print statements for progress results. Defaults to ``False``.
+        verbose (int):
+            Frequence of print statements for progress results. Defaults to 0 (no print).
         epochs (int):
             Number of training epochs. Defaults to 300.
         pac (int):
@@ -134,7 +136,7 @@ class CTGANSynthesizer(BaseSynthesizer):
     def __init__(self, embedding_dim=128, generator_dim=(256, 256), discriminator_dim=(256, 256),
                  generator_lr=2e-4, generator_decay=1e-6, discriminator_lr=2e-4,
                  discriminator_decay=1e-6, batch_size=500, discriminator_steps=1,
-                 log_frequency=True, verbose=False, epochs=300, pac=10, cuda=True):
+                 log_frequency=True, verbose=0, epochs=300, pac=10, cuda=True):
 
         assert batch_size % 2 == 0
 
@@ -162,6 +164,8 @@ class CTGANSynthesizer(BaseSynthesizer):
             device = 'cuda'
 
         self._device = torch.device(device)
+        if self._verbose != 0:
+            print(f"Device used: {self._device}")
 
         self._transformer = None
         self._data_sampler = None
@@ -328,6 +332,7 @@ class CTGANSynthesizer(BaseSynthesizer):
         std = mean + 1
 
         steps_per_epoch = max(len(train_data) // self._batch_size, 1)
+        start_time = time.time()
         for i in range(epochs):
             for id_ in range(steps_per_epoch):
 
@@ -404,9 +409,12 @@ class CTGANSynthesizer(BaseSynthesizer):
                 loss_g.backward()
                 optimizerG.step()
 
-            if self._verbose:
+            if self._verbose == 0:
+                pass
+            elif (i + 1) % self._verbose == 0:
                 print(f"Epoch {i+1}, Loss G: {loss_g.detach().cpu(): .4f},"
                       f"Loss D: {loss_d.detach().cpu(): .4f}",
+                      f"{datetime.timedelta(seconds=int(time.time() - start_time))}s",
                       flush=True)
 
     def sample(self, n, condition_column=None, condition_value=None):

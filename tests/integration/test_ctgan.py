@@ -184,3 +184,14 @@ def test_wrong_sampling_conditions():
 
     with pytest.raises(ValueError):
         ctgan.sample(1, 'discrete', "d")
+
+
+def test_verbosity():
+    data = pd.DataFrame({
+        'continuous': np.random.random(100),
+        'discrete': np.random.choice(['a', 'b', 'c'], 100)
+    })
+    discrete_columns = ['discrete']
+
+    ctgan = CTGANSynthesizer(epochs=1, verbose=1)
+    ctgan.fit(data, discrete_columns)
