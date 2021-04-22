@@ -27,8 +27,8 @@ class DataTransformer(object):
                 Maximum number of Gaussian distributions in Bayesian GMM.
             weight_threshold (float):
                 Weight threshold for a Gaussian distribution to be kept.
-            _max_gm_samples (int):
-                Maximum number of sample to use during GMM fit
+            max_gm_samples (int):
+                Maximum number of samples to use during GMM fit.
         """
         self._max_clusters = max_clusters
         self._weight_threshold = weight_threshold
