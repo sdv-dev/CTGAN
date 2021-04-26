@@ -191,7 +191,7 @@ def test_ctgan_data_transformer_params():
         'continuous': np.random.random(1000)
     })
 
-    ctgan = CTGANSynthesizer(epochs=1)
-    ctgan.fit(data, [], data_transformer_params={'max_gm_samples': 100})
+    ctgan = CTGANSynthesizer(epochs=1, data_transformer_params={'max_gm_samples': 100})
+    ctgan.fit(data, [])
 
     assert ctgan._transformer._max_gm_samples == 100
