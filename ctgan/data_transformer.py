@@ -19,7 +19,7 @@ class DataTransformer(object):
     Discrete columns are encoded using a scikit-learn OneHotEncoder.
     """
 
-    def __init__(self, max_clusters=10, weight_threshold=0.005):
+    def __init__(self, max_clusters=10, weight_threshold=0.005, max_gm_samples=None):
         """Create a data transformer.
 
         Args:
@@ -27,12 +27,21 @@ class DataTransformer(object):
                 Maximum number of Gaussian distributions in Bayesian GMM.
             weight_threshold (float):
                 Weight threshold for a Gaussian distribution to be kept.
+            max_gm_samples (int):
+                Maximum number of samples to use during GMM fit.
         """
         self._max_clusters = max_clusters
         self._weight_threshold = weight_threshold
+        self._max_gm_samples = np.inf if max_gm_samples is None else max_gm_samples
 
     def _fit_continuous(self, column_name, raw_column_data):
         """Train Bayesian GMM for continuous column."""
+        if self._max_gm_samples <= raw_column_data.shape[0]:
+            raw_column_data = np.random.choice(
+                raw_column_data,
+                size=self._max_gm_samples,
+                replace=False
+            )
         gm = BayesianGaussianMixture(
             self._max_clusters,
             weight_concentration_prior_type='dirichlet_process',

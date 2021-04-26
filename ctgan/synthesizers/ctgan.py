@@ -1,3 +1,4 @@
+import copy
 import warnings
 
 import numpy as np
@@ -129,12 +130,15 @@ class CTGANSynthesizer(BaseSynthesizer):
             Whether to attempt to use cuda for GPU computation.
             If this is False or CUDA is not available, CPU will be used.
             Defaults to ``True``.
+        data_transformer_params (dict):
+                Dictionary of parameters for ``DataTransformer`` initialization.
     """
 
     def __init__(self, embedding_dim=128, generator_dim=(256, 256), discriminator_dim=(256, 256),
                  generator_lr=2e-4, generator_decay=1e-6, discriminator_lr=2e-4,
                  discriminator_decay=1e-6, batch_size=500, discriminator_steps=1,
-                 log_frequency=True, verbose=False, epochs=300, pac=10, cuda=True):
+                 log_frequency=True, verbose=False, epochs=300, pac=10, cuda=True,
+                 data_transformer_params={}):
 
         assert batch_size % 2 == 0
 
@@ -163,6 +167,7 @@ class CTGANSynthesizer(BaseSynthesizer):
 
         self._device = torch.device(device)
 
+        self._data_transformer_params = copy.deepcopy(data_transformer_params)
         self._transformer = None
         self._data_sampler = None
         self._generator = None
@@ -290,7 +295,7 @@ class CTGANSynthesizer(BaseSynthesizer):
                 DeprecationWarning
             )
 
-        self._transformer = DataTransformer()
+        self._transformer = DataTransformer(**self._data_transformer_params)
         self._transformer.fit(train_data, discrete_columns)
 
         train_data = self._transformer.transform(train_data)

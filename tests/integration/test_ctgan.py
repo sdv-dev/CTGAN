@@ -184,3 +184,14 @@ def test_wrong_sampling_conditions():
 
     with pytest.raises(ValueError):
         ctgan.sample(1, 'discrete', "d")
+
+
+def test_ctgan_data_transformer_params():
+    data = pd.DataFrame({
+        'continuous': np.random.random(1000)
+    })
+
+    ctgan = CTGANSynthesizer(epochs=1, data_transformer_params={'max_gm_samples': 100})
+    ctgan.fit(data, [])
+
+    assert ctgan._transformer._max_gm_samples == 100
