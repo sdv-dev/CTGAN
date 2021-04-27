@@ -39,6 +39,7 @@ class DataTransformer(object):
             weight_concentration_prior=0.001,
             n_init=1
         )
+
         gm.fit(raw_column_data.reshape(-1, 1))
         valid_component_indicator = gm.weights_ > self._weight_threshold
         num_components = valid_component_indicator.sum()
@@ -99,10 +100,8 @@ class DataTransformer(object):
 
         means = gm.means_.reshape((1, self._max_clusters))
         stds = np.sqrt(gm.covariances_).reshape((1, self._max_clusters))
-        normalized_values = ((raw_column_data - means) / (4 * stds)
-                             )[:, valid_component_indicator]
-        component_probs = gm.predict_proba(
-            raw_column_data)[:, valid_component_indicator]
+        normalized_values = ((raw_column_data - means) / (4 * stds))[:, valid_component_indicator]
+        component_probs = gm.predict_proba(raw_column_data)[:, valid_component_indicator]
 
         selected_component = np.zeros(len(raw_column_data), dtype='int')
         for i in range(len(raw_column_data)):
@@ -116,8 +115,7 @@ class DataTransformer(object):
         selected_normalized_value = np.clip(selected_normalized_value, -.99, .99)
 
         selected_component_onehot = np.zeros_like(component_probs)
-        selected_component_onehot[np.arange(len(raw_column_data)),
-                                  selected_component] = 1
+        selected_component_onehot[np.arange(len(raw_column_data)), selected_component] = 1
         return [selected_normalized_value, selected_component_onehot]
 
     def _transform_discrete(self, column_transform_info, raw_column_data):
