@@ -1,5 +1,17 @@
 # History
 
+## v0.4.2 - 2021-04-27
+
+In this release, the way in which the loss function of the TVAE model was computed has been fixed.
+In addition, the default value of the `discriminator_decay` has been changed to a more optimal
+value. Also some improvements to the tests were added.
+
+### Issues closed
+
+* `TVAE`: loss function - Issue [#143](https://github.com/sdv-dev/CTGAN/issues/143) by @fealho and @DingfanChen
+* Set `discriminator_decay` to `1e-6` - Pull request [#145](https://github.com/sdv-dev/CTGAN/pull/145/) by @fealho
+* Adds unit tests - Pull requests [#140](https://github.com/sdv-dev/CTGAN/pull/140) by @fealho
+
 ## v0.4.1 - 2021-03-30
 
 This release exposes all the hyperparameters which the user may find useful for both `CTGAN`
