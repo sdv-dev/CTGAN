@@ -95,7 +95,6 @@ class DataSampler(object):
         if self._n_discrete_columns == 0:
             return None
 
-        batch = batch
         discrete_column_id = np.random.choice(
             np.arange(self._n_discrete_columns), batch)
 
