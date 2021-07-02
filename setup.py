@@ -18,7 +18,7 @@ install_requires = [
     'scikit-learn>=0.23,<1',
     'torch>=1.4,<2',
     'torchvision>=0.5.0,<1',
-    'rdt>=0.4.2,<0.5',
+    'rdt>=0.4.2,<0.6',
 ]
 
 setup_requires = [
