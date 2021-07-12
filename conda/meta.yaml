@@ -1,5 +1,5 @@
 {% set name = 'ctgan' %}
-{% set version = '0.4.3' %}
+{% set version = '0.4.4.dev0' %}
 
 package:
   name: "{{ name|lower }}"
