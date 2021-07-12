@@ -1,5 +1,9 @@
 # History
 
+## v0.4.3 - 2021-07-12
+
+Dependency upgrades to ensure compatibility with the rest of the SDV ecosystem.
+
 ## v0.4.2 - 2021-04-27
 
 In this release, the way in which the loss function of the TVAE model was computed has been fixed.
