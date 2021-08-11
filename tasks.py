@@ -8,7 +8,7 @@ from invoke import task
 
 @task
 def pytest(c):
-    c.run('python -m pytest --cov=ctgan')
+    c.run('python -m pytest --cov=ctgan --cov-report=xml')
 
 
 @task
