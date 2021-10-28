@@ -66,8 +66,7 @@ def minimum(c):
     check_dependencies(c)
     install_minimum(c)
     unit(c)
-    end_to_end(c)
-    numerical(c)
+    integration(c)
 
 
 @task
