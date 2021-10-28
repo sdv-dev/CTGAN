@@ -7,8 +7,18 @@ from invoke import task
 
 
 @task
-def pytest(c):
-    c.run('python -m pytest --cov=ctgan --cov-report=xml')
+def check_dependencies(c):
+    c.run('python -m pip check')
+
+
+@task
+def unit(c):
+    c.run('python -m pytest ./tests/unit --cov=ctgan --cov-report=xml')
+
+
+@task
+def integration(c):
+    c.run('python -m pytest ./tests/integration')
 
 
 @task
@@ -27,7 +37,41 @@ def readme(c):
 
 
 @task
+def install_minimum(c):
+    with open('setup.py', 'r') as setup_py:
+        lines = setup_py.read().splitlines()
+
+    versions = []
+    started = False
+    for line in lines:
+        if started:
+            if line == ']':
+                break
+
+            line = line.strip()
+            line = re.sub(r',?<=?[\d.]*,?', '', line)
+            line = re.sub(r'>=?', '==', line)
+            line = re.sub(r"""['",]""", '', line)
+            versions.append(line)
+
+        elif line.startswith('install_requires = ['):
+            started = True
+
+    c.run(f'python -m pip install {" ".join(versions)}')
+
+
+@task
+def minimum(c):
+    check_dependencies(c)
+    install_minimum(c)
+    unit(c)
+    end_to_end(c)
+    numerical(c)
+
+
+@task
 def lint(c):
+    check_dependencies(c)
     c.run('flake8 ctgan')
     c.run('flake8 tests --ignore=D,SFS2')
     c.run('isort -c --recursive ctgan tests')

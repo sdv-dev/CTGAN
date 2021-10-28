@@ -49,7 +49,7 @@ development_requires = [
 
     # fix style issues
     'autoflake>=1.1,<2',
-    'autopep8>=1.4.3,<2',
+    'autopep8>=1.4.3,<1.6',
 
     # distribute on PyPI
     'twine>=1.10.0,<4',
