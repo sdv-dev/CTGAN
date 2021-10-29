@@ -47,11 +47,6 @@ clean-pyc: ## remove Python file artifacts
 	find . -name '*~' -exec rm -f {} +
 	find . -name '__pycache__' -exec rm -fr {} +
 
-.PHONY: clean-docs
-clean-docs: ## remove previously built docs
-	rm -f docs/api/*.rst
-	-$(MAKE) -C docs clean 2>/dev/null  # this fails if sphinx is not yet installed
-
 .PHONY: clean-coverage
 clean-coverage: ## remove coverage artifacts
 	rm -f .coverage
@@ -64,7 +59,7 @@ clean-test: ## remove test artifacts
 	rm -fr .pytest_cache
 
 .PHONY: clean
-clean: clean-build clean-pyc clean-test clean-coverage clean-docs ## remove all build, test, coverage, docs and Python artifacts
+clean: clean-build clean-pyc clean-test clean-coverage ## remove all build, test, coverage and Python artifacts
 
 
 # INSTALL TARGETS
@@ -132,22 +127,6 @@ coverage: ## check code coverage quickly with the default Python
 	coverage report -m
 	coverage html
 	$(BROWSER) htmlcov/index.html
-
-
-# DOCS TARGETS
-
-.PHONY: docs
-docs: clean-docs ## generate Sphinx HTML documentation, including API docs
-	sphinx-apidoc --separate --no-toc -o docs/api/ ctgan
-	$(MAKE) -C docs html
-
-.PHONY: view-docs
-view-docs: docs ## view docs in browser
-	$(BROWSER) docs/_build/html/index.html
-
-.PHONY: serve-docs
-serve-docs: view-docs ## compile the docs watching for changes
-	watchmedo shell-command -W -R -D -p '*.rst;*.md' -c '$(MAKE) -C docs html' .
 
 
 # RELEASE TARGETS
