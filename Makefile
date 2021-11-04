@@ -99,9 +99,13 @@ fix-lint: ## fix lint issues using autoflake, autopep8, and isort
 
 # TEST TARGETS
 
-.PHONY: test
-test: ## run tests quickly with the default Python
-	invoke pytest
+.PHONY: test-unit
+test-unit: ## run unit tests using pytest
+	invoke unit
+
+.PHONY: test-integration
+test-integration: ## run integration tests using pytest
+	invoke integration
 
 .PHONY: test-readme
 test-readme: ## run the readme snippets
@@ -111,15 +115,16 @@ test-readme: ## run the readme snippets
 check-dependencies: ## test if there are any broken dependencies
 	pip check
 
-.PHONY: test-minimum
-test-minimum: install-minimum check-dependencies test ## run tests using the minimum supported dependencies
+.PHONY: test
+test: test-unit test-integration test-readme ## test everything that needs test dependencies
 
 .PHONY: test-devel
-test-devel: check-dependencies lint ## test everything that needs development dependencies
+test-devel: lint ## test everything that needs development dependencies
 
 .PHONY: test-all
 test-all: ## run tests on every Python version with tox
 	tox -r
+
 
 .PHONY: coverage
 coverage: ## check code coverage quickly with the default Python
