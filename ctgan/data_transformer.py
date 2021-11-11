@@ -83,7 +83,7 @@ class DataTransformer(object):
             raw_column_data = raw_data[column_name].values
             if column_name in discrete_columns:
                 column_transform_info = self._fit_discrete(
-                    column_name, raw_column_data)
+                    column_name, raw_data[column_name])
             else:
                 column_transform_info = self._fit_continuous(
                     column_name, raw_column_data)
