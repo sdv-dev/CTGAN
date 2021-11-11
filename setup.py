@@ -15,11 +15,11 @@ install_requires = [
     'packaging>=21,<22',
     "numpy>=1.19.0,<1.20.0;python_version<'3.7'",
     "numpy>=1.20.0,<2;python_version>='3.7'",
-    'pandas>=1.1,<1.1.5',
-    'scikit-learn>=0.23,<1',
+    'pandas>=1.1.3,<2',
+    'scikit-learn>=0.24,<2',
     'torch>=1.4,<2',
     'torchvision>=0.5.0,<1',
-    'rdt>=0.5.0,<0.6',
+    'rdt>=0.6.1,<0.7',
 ]
 
 setup_requires = [
