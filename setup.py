@@ -12,13 +12,13 @@ with open('HISTORY.md', encoding='utf-8') as history_file:
     history = history_file.read()
 
 install_requires = [
-    'packaging',
-    "numpy>=1.19.0,<1.20.0;python_version<'3.7'",
+    'packaging>=14,<22',
+    "numpy>=1.18.0,<1.20.0;python_version<'3.7'",
     "numpy>=1.20.0,<2;python_version>='3.7'",
     'pandas>=1.1.3,<2',
     'scikit-learn>=0.24,<2',
     'torch>=1.8.0,<2',
-    'torchvision>=0.5.0,<1',
+    'torchvision>=0.8.2,<1',
     'rdt>=0.6.1,<0.7',
 ]
 
