@@ -55,11 +55,11 @@ def install_minimum(c):
         lines = setup_py.read().splitlines()
 
     versions = []
-    started = false
+    started = False
     for line in lines:
         if started:
             if line == ']':
-                started = false
+                started = False
                 continue
 
             line = line.strip()
