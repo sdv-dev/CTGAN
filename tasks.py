@@ -1,10 +1,20 @@
+import glob
+import operator
 import os
 import re
+import platform
 import shutil
 import stat
 from pathlib import Path
 
 from invoke import task
+
+COMPARISONS = {
+    '>=': operator.ge,
+    '>': operator.gt,
+    '<': operator.lt,
+    '<=': operator.le
+}
 
 
 @task
@@ -43,10 +53,10 @@ def _validate_python_version(line):
         python_version = python_version_match.group(0)
         comparison = re.search(r'(>=?|<=?)', python_version).group(0)
         version_number = python_version.split(comparison)[-1].replace("'", "")
-        comparison_function = comparisons[comparison]
+        comparison_function = COMPARISONS[comparison]
         return comparison_function(platform.python_version(), version_number)
 
-    return true
+    return True
 
 
 @task
@@ -76,7 +86,7 @@ def install_minimum(c):
 
         elif (line.startswith('install_requires = [') or
              line.startswith('pomegranate_requires = [')):
-            started = true
+            started = True
 
     c.run(f'python -m pip install {" ".join(versions)}')
 
