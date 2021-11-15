@@ -327,7 +327,7 @@ class TestDataTransformer(TestCase):
               - 'value_id' = the index of the indicator value in the one-hot encoding
         """
         ohe = Mock()
-        ohe.transform.return_value = np.array([
+        ohe._transform.return_value = np.array([
             [0, 1]  # one hot encoding, second dimension
         ])
         transformer = DataTransformer()
@@ -353,7 +353,7 @@ class TestDataTransformer(TestCase):
 
     def test_convert_column_name_value_to_id_multiple(self):
         ohe = Mock()
-        ohe.transform.return_value = np.array([
+        ohe._transform.return_value = np.array([
             [0, 1, 0]  # one hot encoding, second dimension
         ])
         transformer = DataTransformer()
