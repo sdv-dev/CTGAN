@@ -122,7 +122,7 @@ class DataTransformer(object):
     def _transform_discrete(self, column_transform_info, raw_column_data):
         ohe = column_transform_info.transform
         data = pd.DataFrame(raw_column_data, columns=[column_transform_info.column_name])
-        return [ohe.transform(data)]
+        return [ohe.transform(data).values]
 
     def transform(self, raw_data):
         """Take raw data and output a matrix data."""
@@ -134,12 +134,10 @@ class DataTransformer(object):
         for column_transform_info in self._column_transform_info_list:
             column_data = raw_data[[column_transform_info.column_name]].values
             if column_transform_info.column_type == "continuous":
-                column_data_list += self._transform_continuous(
-                    column_transform_info, column_data)
+                column_data_list += self._transform_continuous(column_transform_info, column_data)
             else:
                 assert column_transform_info.column_type == "discrete"
-                column_data_list += self._transform_discrete(
-                    column_transform_info, column_data)
+                column_data_list += self._transform_discrete(column_transform_info, column_data)
 
         return np.concatenate(column_data_list, axis=1).astype(float)
 
@@ -170,7 +168,8 @@ class DataTransformer(object):
 
     def _inverse_transform_discrete(self, column_transform_info, column_data):
         ohe = column_transform_info.transform
-        return ohe._reverse_transform(column_data)
+        data = pd.DataFrame(column_data, columns=list(ohe.get_output_types()))
+        return ohe.reverse_transform(data)[column_transform_info.column_name]
 
     def inverse_transform(self, data, sigmas=None):
         """Take matrix data and output raw data.
@@ -219,7 +218,9 @@ class DataTransformer(object):
         else:
             raise ValueError(f"The column_name `{column_name}` doesn't exist in the data.")
 
-        one_hot = column_transform_info.transform._transform(np.array([value]))[0]
+        ohe = column_transform_info.transform
+        data = pd.DataFrame([value], columns=[column_transform_info.column_name])
+        one_hot = ohe.transform(data).values[0]
         if sum(one_hot) == 0:
             raise ValueError(f"The value `{value}` doesn't exist in the column `{column_name}`.")
 
