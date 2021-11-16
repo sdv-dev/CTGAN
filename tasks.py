@@ -29,7 +29,7 @@ def unit(c):
 
 @task
 def integration(c):
-    c.run('python -m pytest ./tests/integration --reruns 5')
+    c.run('python -m pytest ./tests/integration --reruns 3')
 
 
 @task
