@@ -4,6 +4,7 @@ from torch.nn import Linear, Module, Parameter, ReLU, Sequential
 from torch.nn.functional import cross_entropy
 from torch.optim import Adam
 from torch.utils.data import DataLoader, TensorDataset
+from tqdm import tqdm
 
 from ctgan.data_transformer import DataTransformer
 from ctgan.synthesizers.base import BaseSynthesizer
@@ -84,7 +85,8 @@ class TVAESynthesizer(BaseSynthesizer):
         batch_size=500,
         epochs=300,
         loss_factor=2,
-        cuda=True
+        cuda=True,
+        verbose=False
     ):
 
         self.embedding_dim = embedding_dim
@@ -95,6 +97,7 @@ class TVAESynthesizer(BaseSynthesizer):
         self.batch_size = batch_size
         self.loss_factor = loss_factor
         self.epochs = epochs
+        self.verbose = verbose
 
         if not cuda or not torch.cuda.is_available():
             device = 'cpu'
@@ -120,7 +123,7 @@ class TVAESynthesizer(BaseSynthesizer):
             weight_decay=self.l2scale)
 
         for i in range(self.epochs):
-            for id_, data in enumerate(loader):
+            for data in tqdm(loader, unit="batch", disable=not self.verbose):
                 optimizerAE.zero_grad()
                 real = data[0].to(self._device)
                 mu, std, logvar = encoder(real)
@@ -135,6 +138,9 @@ class TVAESynthesizer(BaseSynthesizer):
                 loss.backward()
                 optimizerAE.step()
                 self.decoder.sigma.data.clamp_(0.01, 1.0)
+
+            if self.verbose:
+                print(f"Epoch {i+1}, Loss: {loss.detach().cpu(): .4f}", flush=True)
 
     def sample(self, samples):
         self.decoder.eval()
