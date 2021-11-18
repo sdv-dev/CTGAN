@@ -1,5 +1,17 @@
 # History
 
+## v0.5.0 - 2021-18-12
+
+This release adds support for Python 3.9 and updates dependencies to ensure compatibility with the
+rest of the SDV ecosystem, and upgrades to the latests [RDT](https://github.com/sdv-dev/RDT/releases/tag/v0.6.1)
+release.
+
+### Issues closed
+
+* Add support for Python 3.9 - Issue [#177](https://github.com/sdv-dev/CTGAN/issues/177) by @pvk-developer
+* Add pip check to CI workflows - Issue [#174](https://github.com/sdv-dev/CTGAN/issues/174) by @pvk-developer
+* Typo in `CTGAN` code - Issue [#158](https://github.com/sdv-dev/CTGAN/issues/158) by @ori-katz100 and @fealho
+
 ## v0.4.3 - 2021-07-12
 
 Dependency upgrades to ensure compatibility with the rest of the SDV ecosystem.
