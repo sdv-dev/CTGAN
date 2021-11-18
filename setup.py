@@ -19,6 +19,7 @@ install_requires = [
     'torch>=1.4,<2',
     'torchvision>=0.5.0,<1',
     'rdt>=0.5.0,<0.6',
+    'tqdm >=4.62.3'
 ]
 
 setup_requires = [
