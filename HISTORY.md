@@ -1,6 +1,6 @@
 # History
 
-## v0.5.0 - 2021-18-12
+## v0.5.0 - 2021-11-18
 
 This release adds support for Python 3.9 and updates dependencies to ensure compatibility with the
 rest of the SDV ecosystem, and upgrades to the latests [RDT](https://github.com/sdv-dev/RDT/releases/tag/v0.6.1)
