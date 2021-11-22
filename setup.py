@@ -46,6 +46,11 @@ development_requires = [
     # style check
     'flake8>=3.7.7,<4',
     'isort>=4.3.4,<5',
+    'dlint>=0.11.0,<0.12',  # code security addon for flake8
+    'flake8-debugger>=4.0.0,<4.1',
+    'flake8-mock>=0.3,<0.4',
+    'flake8-mutable>=1.2.0,<1.3',
+    'flake8-absolute-import>=1.0,<2',
 
     # fix style issues
     'autoflake>=1.1,<2',
