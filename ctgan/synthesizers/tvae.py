@@ -57,7 +57,8 @@ def loss_function(recon_x, x, sigmas, mu, logvar, output_info, factor):
             if span_info.activation_fn != "softmax":
                 ed = st + span_info.dim
                 std = sigmas[st]
-                loss.append(((x[:, st] - torch.tanh(recon_x[:, st])) ** 2 / 2 / (std ** 2)).sum())
+                eq = x[:, st] - torch.tanh(recon_x[:, st])
+                loss.append((eq ** 2 / 2 / (std ** 2)).sum())
                 loss.append(torch.log(std) * x.size()[0])
                 st = ed
 
