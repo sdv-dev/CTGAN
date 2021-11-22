@@ -51,6 +51,7 @@ development_requires = [
     'flake8-mock>=0.3,<0.4',
     'flake8-mutable>=1.2.0,<1.3',
     'flake8-absolute-import>=1.0,<2',
+    'flake8-fixme>=1.1.1,<1.2',
 
     # fix style issues
     'autoflake>=1.1,<2',
