@@ -238,7 +238,7 @@ class CTGANSynthesizer(BaseSynthesizer):
                     st = ed
                     st_c = ed_c
 
-        loss = torch.stack(loss, dim=1)
+        loss = torch.melt(loss, dim=1)
 
         return (loss * m).sum() / data.size()[0]
 

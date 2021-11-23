@@ -68,7 +68,7 @@ def loss_function(recon_x, x, sigmas, mu, logvar, output_info, factor):
                 st = ed
 
     assert st == recon_x.size()[1]
-    KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
+    KLD = -0.5 * torch.sum(1 + logvar - mu**2 - logvar.exp())
     return sum(loss) * factor / x.size()[0], KLD / x.size()[0]
 
 
