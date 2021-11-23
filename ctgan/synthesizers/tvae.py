@@ -105,7 +105,7 @@ class TVAESynthesizer(BaseSynthesizer):
 
         self._device = torch.device(device)
 
-    def fit(self, train_data, discrete_columns=tuple()):
+    def fit(self, train_data, discrete_columns=()):
         self.transformer = DataTransformer()
         self.transformer.fit(train_data, discrete_columns)
         train_data = self.transformer.transform(train_data)

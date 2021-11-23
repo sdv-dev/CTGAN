@@ -62,7 +62,7 @@ class DataTransformer(object):
             output_info=[SpanInfo(num_categories, 'softmax')],
             output_dimensions=num_categories)
 
-    def fit(self, raw_data, discrete_columns=tuple()):
+    def fit(self, raw_data, discrete_columns=()):
         """Fit GMM for continuous columns and One hot encoder for discrete columns.
 
         This step also counts the #columns in matrix data, and span information.

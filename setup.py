@@ -52,6 +52,7 @@ development_requires = [
     'flake8-mutable>=1.2.0,<1.3',
     'flake8-absolute-import>=1.0,<2',
     'flake8-eradicate>=1.1.0,<1.2',
+    'flake8-comprehensions>=3.6.1,<3.7',
 
     # fix style issues
     'autoflake>=1.1,<2',
