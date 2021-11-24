@@ -154,7 +154,7 @@ def test_wrong_discrete_columns_dataframe():
     discrete_columns = ['b', 'c']
 
     ctgan = CTGANSynthesizer(epochs=1)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match='Invalid columns found: {\'c\', \'b\'}'):
         ctgan.fit(data, discrete_columns)
 
 
@@ -165,7 +165,7 @@ def test_wrong_discrete_columns_numpy():
     discrete_columns = [0, 1]
 
     ctgan = CTGANSynthesizer(epochs=1)
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match=r'Invalid columns found: \[1\]'):
         ctgan.fit(data.to_numpy(), discrete_columns)
 
 
@@ -179,10 +179,10 @@ def test_wrong_sampling_conditions():
     ctgan = CTGANSynthesizer(epochs=1)
     ctgan.fit(data, discrete_columns)
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match='The column_name `cardinal` doesn\'t exist in the data.'):
         ctgan.sample(1, 'cardinal', "doesn't matter")
 
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError):  # noqa: RDT currently incorrectly raises a tuple instead of a string
         ctgan.sample(1, 'discrete', "d")
 
 

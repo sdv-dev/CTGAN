@@ -292,7 +292,7 @@ class TestCTGANSynthesizer(TestCase):
         discrete_columns = ['doesnt exist']
 
         ctgan = CTGANSynthesizer(epochs=1)
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match=r'Invalid columns found: {\'doesnt exist\'}'):
             ctgan.fit(data, discrete_columns)
 
     def test_sample(self):
