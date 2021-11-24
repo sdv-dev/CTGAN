@@ -53,6 +53,8 @@ development_requires = [
     'flake8-absolute-import>=1.0,<2',
     'flake8-eradicate>=1.1.0,<1.2',
     'dlint>=0.11.0,<0.12',
+    'flake8-docstrings>=1.5.0,<2',
+    'pydocstyle>=6.1.1,<6.2',
 
     # fix style issues
     'autoflake>=1.1,<2',
