@@ -154,7 +154,7 @@ def test_wrong_discrete_columns_dataframe():
     discrete_columns = ['b', 'c']
 
     ctgan = CTGANSynthesizer(epochs=1)
-    with pytest.raises(ValueError, match='Invalid columns found: {\'c\', \'b\'}'):
+    with pytest.raises(ValueError, match='Invalid columns found: {\'.*\', \'.*\'}'):
         ctgan.fit(data, discrete_columns)
 
 
