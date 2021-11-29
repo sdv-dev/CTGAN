@@ -55,6 +55,7 @@ development_requires = [
     'flake8-expression-complexity>=0.0.9,<0.1',
     'flake8-eradicate>=1.1.0,<1.2',
     'dlint>=0.11.0,<0.12',
+    'flake8-pytest-style>=1.5.0,<2',
 
     # fix style issues
     'autoflake>=1.1,<2',

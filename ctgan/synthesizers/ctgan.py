@@ -211,7 +211,7 @@ class CTGANSynthesizer(BaseSynthesizer):
                     data_t.append(transformed)
                     st = ed
                 else:
-                    assert 0
+                    raise ValueError(f'Unexpected activation function {span_info.activation_fn}.')
 
         return torch.cat(data_t, dim=1)
 
