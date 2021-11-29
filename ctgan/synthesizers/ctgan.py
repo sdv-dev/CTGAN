@@ -42,9 +42,8 @@ class Discriminator(Module):
             create_graph=True, retain_graph=True, only_inputs=True
         )[0]
 
-        gradient_penalty = ((
-            gradients.view(-1, pac * real_data.size(1)).norm(2, dim=1) - 1
-        ) ** 2).mean() * lambda_
+        gradients_view = gradients.view(-1, pac * real_data.size(1)).norm(2, dim=1) - 1
+        gradient_penalty = ((gradients_view) ** 2).mean() * lambda_
 
         return gradient_penalty
 
@@ -212,7 +211,7 @@ class CTGANSynthesizer(BaseSynthesizer):
                     data_t.append(transformed)
                     st = ed
                 else:
-                    assert 0
+                    raise ValueError(f'Unexpected activation function {span_info.activation_fn}.')
 
         return torch.cat(data_t, dim=1)
 
@@ -238,7 +237,7 @@ class CTGANSynthesizer(BaseSynthesizer):
                     st = ed
                     st_c = ed_c
 
-        loss = torch.stack(loss, dim=1)
+        loss = torch.stack(loss, dim=1)  # noqa: PD013
 
         return (loss * m).sum() / data.size()[0]
 
@@ -265,9 +264,9 @@ class CTGANSynthesizer(BaseSynthesizer):
             raise TypeError('``train_data`` should be either pd.DataFrame or np.array.')
 
         if invalid_columns:
-            raise ValueError('Invalid columns found: {}'.format(invalid_columns))
+            raise ValueError(f'Invalid columns found: {invalid_columns}')
 
-    def fit(self, train_data, discrete_columns=tuple(), epochs=None):
+    def fit(self, train_data, discrete_columns=(), epochs=None):
         """Fit the CTGAN Synthesizer models to the training data.
 
         Args:
