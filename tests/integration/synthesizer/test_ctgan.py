@@ -59,7 +59,7 @@ def test_ctgan_numpy():
     discrete_columns = [1]
 
     ctgan = CTGANSynthesizer(epochs=1)
-    ctgan.fit(data.values, discrete_columns)
+    ctgan.fit(data.to_numpy(), discrete_columns)
 
     sampled = ctgan.sample(100)
 
@@ -111,7 +111,7 @@ def test_categorical_nan():
     # since np.nan != np.nan, we need to be careful here
     values = set(sampled['discrete'].unique())
     assert len(values) == 3
-    assert any(pd.isnull(x) for x in values)
+    assert any(pd.isna(x) for x in values)
     assert {"b", "c"}.issubset(values)
 
 

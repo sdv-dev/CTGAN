@@ -80,7 +80,7 @@ class DataTransformer(object):
 
         self._column_transform_info_list = []
         for column_name in raw_data.columns:
-            raw_column_data = raw_data[column_name].values
+            raw_column_data = raw_data[column_name].to_numpy()
             if column_name in discrete_columns:
                 column_transform_info = self._fit_discrete(
                     column_name, raw_column_data)
@@ -129,7 +129,7 @@ class DataTransformer(object):
 
         column_data_list = []
         for column_transform_info in self._column_transform_info_list:
-            column_data = raw_data[[column_transform_info.column_name]].values
+            column_data = raw_data[[column_transform_info.column_name]].to_numpy()
             if column_transform_info.column_type == "continuous":
                 column_data_list += self._transform_continuous(
                     column_transform_info, column_data)
@@ -198,7 +198,7 @@ class DataTransformer(object):
         recovered_data = (pd.DataFrame(recovered_data, columns=column_names)
                           .astype(self._column_raw_dtypes))
         if not self.dataframe:
-            recovered_data = recovered_data.values
+            recovered_data = recovered_data.to_numpy()
 
         return recovered_data
 
