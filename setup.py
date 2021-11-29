@@ -56,6 +56,7 @@ development_requires = [
     'flake8-eradicate>=1.1.0,<1.2',
     'flake8-comprehensions>=3.6.1,<3.7',
     'dlint>=0.11.0,<0.12',
+    'flake8-sfs>=0.0.3,<0.1',
     'flake8-pytest-style>=1.5.0,<2',
 
     # fix style issues
