@@ -284,7 +284,6 @@ class TestCTGANSynthesizer(TestCase):
 
         Note:
             - could create another function for numpy array
-            - TODO: it is currently a integration test, needs to be changed to a proper unit test
         """
         data = pd.DataFrame({
             'discrete': ['a', 'b']
