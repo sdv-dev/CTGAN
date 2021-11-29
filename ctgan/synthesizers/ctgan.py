@@ -42,9 +42,8 @@ class Discriminator(Module):
             create_graph=True, retain_graph=True, only_inputs=True
         )[0]
 
-        gradient_penalty = ((
-            gradients.view(-1, pac * real_data.size(1)).norm(2, dim=1) - 1
-        ) ** 2).mean() * lambda_
+        gradients_view = gradients.view(-1, pac * real_data.size(1)).norm(2, dim=1) - 1
+        gradient_penalty = ((gradients_view) ** 2).mean() * lambda_
 
         return gradient_penalty
 
@@ -212,7 +211,7 @@ class CTGANSynthesizer(BaseSynthesizer):
                     data_t.append(transformed)
                     st = ed
                 else:
-                    assert 0
+                    raise ValueError(f'Unexpected activation function {span_info.activation_fn}.')
 
         return torch.cat(data_t, dim=1)
 
