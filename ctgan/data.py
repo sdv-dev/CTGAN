@@ -7,7 +7,7 @@ import pandas as pd
 
 
 def read_csv(csv_filename, meta_filename=None, header=True, discrete=None):
-
+    """Read a csv file."""
     data = pd.read_csv(csv_filename, header='infer' if header else None)
 
     if meta_filename:
@@ -32,6 +32,7 @@ def read_csv(csv_filename, meta_filename=None, header=True, discrete=None):
 
 
 def read_tsv(data_filename, meta_filename):
+    """Read a tsv file."""
     with open(meta_filename) as f:
         column_info = f.readlines()
 
@@ -79,6 +80,7 @@ def read_tsv(data_filename, meta_filename):
 
 
 def write_tsv(data, meta, output_filename):
+    """Write to a tsv file."""
     with open(output_filename, "w") as f:
         for row in data:
             for idx, col in enumerate(row):
