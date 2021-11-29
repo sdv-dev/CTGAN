@@ -7,9 +7,12 @@ from sklearn.mixture import BayesianGaussianMixture
 
 SpanInfo = namedtuple("SpanInfo", ["dim", "activation_fn"])
 ColumnTransformInfo = namedtuple(
-    "ColumnTransformInfo", ["column_name", "column_type",
-                            "transform", "transform_aux",
-                            "output_info", "output_dimensions"])
+    "ColumnTransformInfo", [
+        "column_name", "column_type",
+        "transform", "transform_aux",
+        "output_info", "output_dimensions"
+    ]
+)
 
 
 class DataTransformer(object):
@@ -108,10 +111,11 @@ class DataTransformer(object):
             component_porb_t = component_probs[i] + 1e-6
             component_porb_t = component_porb_t / component_porb_t.sum()
             selected_component[i] = np.random.choice(
-                np.arange(num_components), p=component_porb_t)
+                np.arange(num_components), p=component_porb_t
+            )
 
-        selected_normalized_value = normalized_values[
-            np.arange(len(raw_column_data)), selected_component].reshape([-1, 1])
+        aranged = np.arange(len(raw_column_data))
+        selected_normalized_value = normalized_values[aranged, selected_component].reshape([-1, 1])
         selected_normalized_value = np.clip(selected_normalized_value, -.99, .99)
 
         selected_component_onehot = np.zeros_like(component_probs)
