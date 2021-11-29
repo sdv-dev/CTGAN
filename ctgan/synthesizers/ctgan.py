@@ -50,7 +50,7 @@ class Discriminator(Module):
 
     def forward(self, input_):
         assert input_.size()[0] % self.pac == 0
-        return self.seq(input.view(-1, self.pacdim))
+        return self.seq(input_.view(-1, self.pacdim))
 
 
 class Residual(Module):
