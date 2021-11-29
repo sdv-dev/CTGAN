@@ -1,3 +1,5 @@
+"""DataTransformer module."""
+
 from collections import namedtuple
 
 import numpy as np

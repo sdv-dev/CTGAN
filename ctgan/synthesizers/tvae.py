@@ -1,3 +1,5 @@
+"""TVAESynthesizer module."""
+
 import numpy as np
 import torch
 from torch.nn import Linear, Module, Parameter, ReLU, Sequential

@@ -1,3 +1,5 @@
+"""Demo module."""
+
 import pandas as pd
 
 DEMO_URL = 'http://ctgan-data.s3.amazonaws.com/census.csv.gz'

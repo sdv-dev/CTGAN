@@ -1,3 +1,5 @@
+"""CTGANSynthesizer module."""
+
 import warnings
 
 import numpy as np

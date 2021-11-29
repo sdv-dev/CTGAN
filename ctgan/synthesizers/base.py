@@ -1,3 +1,5 @@
+"""BaseSynthesizer module"""
+
 import torch
 
 

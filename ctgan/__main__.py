@@ -1,3 +1,5 @@
+"""CLI."""
+
 import argparse
 
 from ctgan.data import read_csv, read_tsv, write_tsv
