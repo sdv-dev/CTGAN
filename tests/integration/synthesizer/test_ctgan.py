@@ -112,7 +112,7 @@ def test_categorical_nan():
     values = set(sampled['discrete'].unique())
     assert len(values) == 3
     assert any(pd.isna(x) for x in values)
-    assert {"b", "c"}.issubset(values)
+    assert {'b', 'c'}.issubset(values)
 
 
 def test_synthesizer_sample():
@@ -139,8 +139,8 @@ def test_save_load():
     ctgan.fit(data, discrete_columns)
 
     with tf.TemporaryDirectory() as temporary_directory:
-        ctgan.save(temporary_directory + "test_tvae.pkl")
-        ctgan = CTGANSynthesizer.load(temporary_directory + "test_tvae.pkl")
+        ctgan.save(temporary_directory + 'test_tvae.pkl')
+        ctgan = CTGANSynthesizer.load(temporary_directory + 'test_tvae.pkl')
 
     sampled = ctgan.sample(1000)
     assert set(sampled.columns) == {'continuous', 'discrete'}
@@ -183,7 +183,7 @@ def test_wrong_sampling_conditions():
         ctgan.sample(1, 'cardinal', "doesn't matter")
 
     with pytest.raises(ValueError):  # noqa: RDT currently incorrectly raises a tuple instead of a string
-        ctgan.sample(1, 'discrete', "d")
+        ctgan.sample(1, 'discrete', 'd')
 
 
 # Below are CTGAN tests that should be implemented in the future
