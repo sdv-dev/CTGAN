@@ -7,11 +7,11 @@ import pandas as pd
 from rdt.transformers import OneHotEncodingTransformer
 from sklearn.mixture import BayesianGaussianMixture
 
-SpanInfo = namedtuple("SpanInfo", ["dim", "activation_fn"])
+SpanInfo = namedtuple('SpanInfo', ['dim', 'activation_fn'])
 ColumnTransformInfo = namedtuple(
-    "ColumnTransformInfo", ["column_name", "column_type",
-                            "transform", "transform_aux",
-                            "output_info", "output_dimensions"])
+    'ColumnTransformInfo', ['column_name', 'column_type',
+                            'transform', 'transform_aux',
+                            'output_info', 'output_dimensions'])
 
 
 class DataTransformer(object):
@@ -47,7 +47,7 @@ class DataTransformer(object):
         num_components = valid_component_indicator.sum()
 
         return ColumnTransformInfo(
-            column_name=column_name, column_type="continuous", transform=gm,
+            column_name=column_name, column_type='continuous', transform=gm,
             transform_aux=valid_component_indicator,
             output_info=[SpanInfo(1, 'tanh'), SpanInfo(num_components, 'softmax')],
             output_dimensions=1 + num_components)
@@ -59,12 +59,12 @@ class DataTransformer(object):
         num_categories = len(ohe.dummies)
 
         return ColumnTransformInfo(
-            column_name=column_name, column_type="discrete", transform=ohe,
+            column_name=column_name, column_type='discrete', transform=ohe,
             transform_aux=None,
             output_info=[SpanInfo(num_categories, 'softmax')],
             output_dimensions=num_categories)
 
-    def fit(self, raw_data, discrete_columns=tuple()):
+    def fit(self, raw_data, discrete_columns=()):
         """Fit GMM for continuous columns and One hot encoder for discrete columns.
 
         This step also counts the #columns in matrix data, and span information.
@@ -82,7 +82,7 @@ class DataTransformer(object):
 
         self._column_transform_info_list = []
         for column_name in raw_data.columns:
-            raw_column_data = raw_data[column_name].values
+            raw_column_data = raw_data[column_name].to_numpy()
             if column_name in discrete_columns:
                 column_transform_info = self._fit_discrete(
                     column_name, raw_column_data)
@@ -131,12 +131,12 @@ class DataTransformer(object):
 
         column_data_list = []
         for column_transform_info in self._column_transform_info_list:
-            column_data = raw_data[[column_transform_info.column_name]].values
-            if column_transform_info.column_type == "continuous":
+            column_data = raw_data[[column_transform_info.column_name]].to_numpy()
+            if column_transform_info.column_type == 'continuous':
                 column_data_list += self._transform_continuous(
                     column_transform_info, column_data)
             else:
-                assert column_transform_info.column_type == "discrete"
+                assert column_transform_info.column_type == 'discrete'
                 column_data_list += self._transform_discrete(
                     column_transform_info, column_data)
 
@@ -200,7 +200,7 @@ class DataTransformer(object):
         recovered_data = (pd.DataFrame(recovered_data, columns=column_names)
                           .astype(self._column_raw_dtypes))
         if not self.dataframe:
-            recovered_data = recovered_data.values
+            recovered_data = recovered_data.to_numpy()
 
         return recovered_data
 
@@ -211,7 +211,7 @@ class DataTransformer(object):
         for column_transform_info in self._column_transform_info_list:
             if column_transform_info.column_name == column_name:
                 break
-            if column_transform_info.column_type == "discrete":
+            if column_transform_info.column_type == 'discrete':
                 discrete_counter += 1
 
             column_id += 1
@@ -224,7 +224,7 @@ class DataTransformer(object):
             raise ValueError(f"The value `{value}` doesn't exist in the column `{column_name}`.")
 
         return {
-            "discrete_column_id": discrete_counter,
-            "column_id": column_id,
-            "value_id": np.argmax(one_hot)
+            'discrete_column_id': discrete_counter,
+            'column_id': column_id,
+            'value_id': np.argmax(one_hot)
         }

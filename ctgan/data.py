@@ -37,7 +37,7 @@ def read_tsv(data_filename, meta_filename):
         column_info = f.readlines()
 
     column_info_raw = [
-        x.replace("{", " ").replace("}", " ").split()
+        x.replace('{', ' ').replace('}', ' ').split()
         for x in column_info
     ]
 
@@ -55,9 +55,9 @@ def read_tsv(data_filename, meta_filename):
             column_info.append(item[1:])
 
     meta = {
-        "continuous_columns": continuous,
-        "discrete_columns": discrete,
-        "column_info": column_info
+        'continuous_columns': continuous,
+        'discrete_columns': discrete,
+        'column_info': column_info
     }
 
     with open(data_filename) as f:
@@ -81,7 +81,8 @@ def read_tsv(data_filename, meta_filename):
 
 def write_tsv(data, meta, output_filename):
     """Write to a tsv file."""
-    with open(output_filename, "w") as f:
+    with open(output_filename, 'w') as f:
+
         for row in data:
             for idx, col in enumerate(row):
                 if idx in meta['continuous_columns']:

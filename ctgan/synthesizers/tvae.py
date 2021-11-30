@@ -81,10 +81,11 @@ def _loss_function(recon_x, x, sigmas, mu, logvar, output_info, factor):
     loss = []
     for column_info in output_info:
         for span_info in column_info:
-            if span_info.activation_fn != "softmax":
+            if span_info.activation_fn != 'softmax':
                 ed = st + span_info.dim
                 std = sigmas[st]
-                loss.append(((x[:, st] - torch.tanh(recon_x[:, st])) ** 2 / 2 / (std ** 2)).sum())
+                eq = x[:, st] - torch.tanh(recon_x[:, st])
+                loss.append((eq ** 2 / 2 / (std ** 2)).sum())
                 loss.append(torch.log(std) * x.size()[0])
                 st = ed
 
@@ -95,7 +96,7 @@ def _loss_function(recon_x, x, sigmas, mu, logvar, output_info, factor):
                 st = ed
 
     assert st == recon_x.size()[1]
-    KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
+    KLD = -0.5 * torch.sum(1 + logvar - mu**2 - logvar.exp())
     return sum(loss) * factor / x.size()[0], KLD / x.size()[0]
 
 
@@ -132,7 +133,7 @@ class TVAESynthesizer(BaseSynthesizer):
 
         self._device = torch.device(device)
 
-    def fit(self, train_data, discrete_columns=tuple()):
+    def fit(self, train_data, discrete_columns=()):
         """Fit the TVAE Synthesizer models to the training data.
 
         Args:
