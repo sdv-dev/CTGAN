@@ -9,13 +9,13 @@ class DataSampler(object):
 
         def is_discrete_column(column_info):
             return (len(column_info) == 1
-                    and column_info[0].activation_fn == "softmax")
+                    and column_info[0].activation_fn == 'softmax')
 
         n_discrete_columns = sum(
             [1 for column_info in output_info if is_discrete_column(column_info)])
 
         self._discrete_column_matrix_st = np.zeros(
-            n_discrete_columns, dtype="int32")
+            n_discrete_columns, dtype='int32')
 
         # Store the row id for each category in each discrete column.
         # For example _rid_by_cat_cols[a][b] is a list of all rows with the
@@ -146,7 +146,7 @@ class DataSampler(object):
 
     def generate_cond_from_condition_column_info(self, condition_info, batch):
         vec = np.zeros((batch, self._n_categories), dtype='float32')
-        id_ = self._discrete_column_matrix_st[condition_info["discrete_column_id"]
-                                              ] + condition_info["value_id"]
-        vec[:, id_] = 1
+        id = self._discrete_column_matrix_st[condition_info['discrete_column_id']
+        id += condition_info['value_id']
+        vec[:, id] = 1
         return vec
