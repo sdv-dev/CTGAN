@@ -66,7 +66,7 @@ class DataSampler(object):
                 if log_frequency:
                     category_freq = np.log(category_freq + 1)
                 category_prob = category_freq / np.sum(category_freq)
-                self._discrete_column_category_prob[current_id, :span_info.dim] = (category_prob)
+                self._discrete_column_category_prob[current_id, :span_info.dim] = category_prob
                 self._discrete_column_cond_st[current_id] = current_cond_st
                 self._discrete_column_n_category[current_id] = span_info.dim
                 current_cond_st += span_info.dim
@@ -146,7 +146,7 @@ class DataSampler(object):
 
     def generate_cond_from_condition_column_info(self, condition_info, batch):
         vec = np.zeros((batch, self._n_categories), dtype='float32')
-        id = self._discrete_column_matrix_st[condition_info["discrete_column_id"]] \
-            + condition_info["value_id"]
+        id = self._discrete_column_matrix_st[condition_info["discrete_column_id"]]
+        id += condition_info["value_id"]
         vec[:, id] = 1
         return vec

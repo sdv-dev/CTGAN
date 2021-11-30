@@ -111,7 +111,8 @@ class DataTransformer(object):
             component_porb_t = component_probs[i] + 1e-6
             component_porb_t = component_porb_t / component_porb_t.sum()
             selected_component[i] = np.random.choice(
-                np.arange(num_components), p=component_porb_t
+                np.arange(num_components),
+                p=component_porb_t
             )
 
         aranged = np.arange(len(raw_column_data))
