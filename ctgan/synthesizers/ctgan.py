@@ -185,13 +185,13 @@ class CTGANSynthesizer(BaseSynthesizer):
         Returns:
             Sampled tensor of same shape as logits from the Gumbel-Softmax distribution.
         """
-        if version.parse(torch.__version__) < version.parse("1.2.0"):
+        if version.parse(torch.__version__) < version.parse('1.2.0'):
             for i in range(10):
                 transformed = functional.gumbel_softmax(logits, tau=tau, hard=hard,
                                                         eps=eps, dim=dim)
                 if not torch.isnan(transformed).any():
                     return transformed
-            raise ValueError("gumbel_softmax returning NaN.")
+            raise ValueError('gumbel_softmax returning NaN.')
 
         return functional.gumbel_softmax(logits, tau=tau, hard=hard, eps=eps, dim=dim)
 
@@ -211,7 +211,7 @@ class CTGANSynthesizer(BaseSynthesizer):
                     data_t.append(transformed)
                     st = ed
                 else:
-                    assert 0
+                    raise ValueError(f'Unexpected activation function {span_info.activation_fn}.')
 
         return torch.cat(data_t, dim=1)
 
@@ -222,7 +222,7 @@ class CTGANSynthesizer(BaseSynthesizer):
         st_c = 0
         for column_info in self._transformer.output_info_list:
             for span_info in column_info:
-                if len(column_info) != 1 or span_info.activation_fn != "softmax":
+                if len(column_info) != 1 or span_info.activation_fn != 'softmax':
                     # not discrete column
                     st += span_info.dim
                 else:
@@ -237,7 +237,7 @@ class CTGANSynthesizer(BaseSynthesizer):
                     st = ed
                     st_c = ed_c
 
-        loss = torch.stack(loss, dim=1)
+        loss = torch.stack(loss, dim=1)  # noqa: PD013
 
         return (loss * m).sum() / data.size()[0]
 
@@ -264,9 +264,9 @@ class CTGANSynthesizer(BaseSynthesizer):
             raise TypeError('``train_data`` should be either pd.DataFrame or np.array.')
 
         if invalid_columns:
-            raise ValueError('Invalid columns found: {}'.format(invalid_columns))
+            raise ValueError(f'Invalid columns found: {invalid_columns}')
 
-    def fit(self, train_data, discrete_columns=tuple(), epochs=None):
+    def fit(self, train_data, discrete_columns=(), epochs=None):
         """Fit the CTGAN Synthesizer models to the training data.
 
         Args:
@@ -404,8 +404,8 @@ class CTGANSynthesizer(BaseSynthesizer):
                 optimizerG.step()
 
             if self._verbose:
-                print(f"Epoch {i+1}, Loss G: {loss_g.detach().cpu(): .4f},"
-                      f"Loss D: {loss_d.detach().cpu(): .4f}",
+                print(f'Epoch {i+1}, Loss G: {loss_g.detach().cpu(): .4f},'  # noqa: T001
+                      f'Loss D: {loss_d.detach().cpu(): .4f}',
                       flush=True)
 
     def sample(self, n, condition_column=None, condition_value=None):
