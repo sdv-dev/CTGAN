@@ -205,7 +205,7 @@ class DataTransformer(object):
         return recovered_data
 
     def convert_column_name_value_to_id(self, column_name, value):
-        """Convert the `column_name` to an id."""
+        """Get the ids of the given `column_name`."""
         discrete_counter = 0
         column_id = 0
         for column_transform_info in self._column_transform_info_list:
