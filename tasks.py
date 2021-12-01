@@ -1,14 +1,35 @@
+import glob
+import operator
 import os
+import re
+import platform
 import shutil
 import stat
 from pathlib import Path
 
 from invoke import task
 
+COMPARISONS = {
+    '>=': operator.ge,
+    '>': operator.gt,
+    '<': operator.lt,
+    '<=': operator.le
+}
+
 
 @task
-def pytest(c):
-    c.run('python -m pytest --cov=ctgan')
+def check_dependencies(c):
+    c.run('python -m pip check')
+
+
+@task
+def unit(c):
+    c.run('python -m pytest ./tests/unit --cov=ctgan --cov-report=xml')
+
+
+@task
+def integration(c):
+    c.run('python -m pytest ./tests/integration --reruns 3')
 
 
 @task
@@ -26,8 +47,61 @@ def readme(c):
     shutil.rmtree(test_path)
 
 
+def _validate_python_version(line):
+    python_version_match = re.search(r"python_version(<=?|>=?)\'(\d\.?)+\'", line)
+    if python_version_match:
+        python_version = python_version_match.group(0)
+        comparison = re.search(r'(>=?|<=?)', python_version).group(0)
+        version_number = python_version.split(comparison)[-1].replace("'", "")
+        comparison_function = COMPARISONS[comparison]
+        return comparison_function(platform.python_version(), version_number)
+
+    return True
+
+
+@task
+def install_minimum(c):
+    with open('setup.py', 'r') as setup_py:
+        lines = setup_py.read().splitlines()
+
+    versions = []
+    started = False
+    for line in lines:
+        if started:
+            if line == ']':
+                started = False
+                continue
+
+            line = line.strip()
+            if _validate_python_version(line):
+                requirement = re.match(r'[^>]*', line).group(0)
+                requirement = re.sub(r"""['",]""", '', requirement)
+                version = re.search(r'>=?[^(,|#)]*', line).group(0)
+                if version:
+                    version = re.sub(r'>=?', '==', version)
+                    version = re.sub(r"""['",]""", '', version)
+                    requirement += version
+
+                versions.append(requirement)
+
+        elif (line.startswith('install_requires = [') or
+             line.startswith('pomegranate_requires = [')):
+            started = True
+
+    c.run(f'python -m pip install {" ".join(versions)}')
+
+
+@task
+def minimum(c):
+    install_minimum(c)
+    check_dependencies(c)
+    unit(c)
+    integration(c)
+
+
 @task
 def lint(c):
+    check_dependencies(c)
     c.run('flake8 ctgan')
     c.run('pydocstyle ctgan')
     c.run('flake8 tests --ignore=D,SFS2')

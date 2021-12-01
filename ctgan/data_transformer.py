@@ -36,7 +36,7 @@ class DataTransformer(object):
     def _fit_continuous(self, column_name, raw_column_data):
         """Train Bayesian GMM for continuous column."""
         gm = BayesianGaussianMixture(
-            self._max_clusters,
+            n_components=self._max_clusters,
             weight_concentration_prior_type='dirichlet_process',
             weight_concentration_prior=0.001,
             n_init=1
@@ -55,7 +55,9 @@ class DataTransformer(object):
     def _fit_discrete(self, column_name, raw_column_data):
         """Fit one hot encoder for discrete column."""
         ohe = OneHotEncodingTransformer()
-        ohe.fit(raw_column_data)
+        fit_data = pd.DataFrame(raw_column_data, columns=[column_name])
+
+        ohe.fit(fit_data, column_name)
         num_categories = len(ohe.dummies)
 
         return ColumnTransformInfo(
@@ -71,24 +73,23 @@ class DataTransformer(object):
         """
         self.output_info_list = []
         self.output_dimensions = 0
+        self.dataframe = True
 
         if not isinstance(raw_data, pd.DataFrame):
             self.dataframe = False
-            raw_data = pd.DataFrame(raw_data)
-        else:
-            self.dataframe = True
+            # work around for RDT issue #328 Fitting with numerical column names fails
+            discrete_columns = [str(column) for column in discrete_columns]
+            column_names = [str(num) for num in range(raw_data.shape[1])]
+            raw_data = pd.DataFrame(raw_data, columns=column_names)
 
         self._column_raw_dtypes = raw_data.infer_objects().dtypes
-
         self._column_transform_info_list = []
         for column_name in raw_data.columns:
             raw_column_data = raw_data[column_name].to_numpy()
             if column_name in discrete_columns:
-                column_transform_info = self._fit_discrete(
-                    column_name, raw_column_data)
+                column_transform_info = self._fit_discrete(column_name, raw_data[column_name])
             else:
-                column_transform_info = self._fit_continuous(
-                    column_name, raw_column_data)
+                column_transform_info = self._fit_continuous(column_name, raw_column_data)
 
             self.output_info_list.append(column_transform_info.output_info)
             self.output_dimensions += column_transform_info.output_dimensions
@@ -122,23 +123,23 @@ class DataTransformer(object):
 
     def _transform_discrete(self, column_transform_info, raw_column_data):
         ohe = column_transform_info.transform
-        return [ohe.transform(raw_column_data)]
+        data = pd.DataFrame(raw_column_data, columns=[column_transform_info.column_name])
+        return [ohe.transform(data).values]
 
     def transform(self, raw_data):
         """Take raw data and output a matrix data."""
         if not isinstance(raw_data, pd.DataFrame):
-            raw_data = pd.DataFrame(raw_data)
+            column_names = [str(num) for num in range(raw_data.shape[1])]
+            raw_data = pd.DataFrame(raw_data, columns=column_names)
 
         column_data_list = []
         for column_transform_info in self._column_transform_info_list:
             column_data = raw_data[[column_transform_info.column_name]].to_numpy()
             if column_transform_info.column_type == 'continuous':
-                column_data_list += self._transform_continuous(
-                    column_transform_info, column_data)
+                column_data_list += self._transform_continuous(column_transform_info, column_data)
             else:
                 assert column_transform_info.column_type == 'discrete'
-                column_data_list += self._transform_discrete(
-                    column_transform_info, column_data)
+                column_data_list += self._transform_discrete(column_transform_info, column_data)
 
         return np.concatenate(column_data_list, axis=1).astype(float)
 
@@ -169,7 +170,8 @@ class DataTransformer(object):
 
     def _inverse_transform_discrete(self, column_transform_info, column_data):
         ohe = column_transform_info.transform
-        return ohe.reverse_transform(column_data)
+        data = pd.DataFrame(column_data, columns=list(ohe.get_output_types()))
+        return ohe.reverse_transform(data)[column_transform_info.column_name]
 
     def inverse_transform(self, data, sigmas=None):
         """Take matrix data and output raw data.
@@ -219,7 +221,9 @@ class DataTransformer(object):
         else:
             raise ValueError(f"The column_name `{column_name}` doesn't exist in the data.")
 
-        one_hot = column_transform_info.transform.transform(np.array([value]))[0]
+        ohe = column_transform_info.transform
+        data = pd.DataFrame([value], columns=[column_transform_info.column_name])
+        one_hot = ohe.transform(data).values[0]
         if sum(one_hot) == 0:
             raise ValueError(f"The value `{value}` doesn't exist in the column `{column_name}`.")
 
