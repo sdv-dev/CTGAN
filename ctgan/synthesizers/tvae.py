@@ -1,3 +1,5 @@
+"""TVAESynthesizer module."""
+
 import numpy as np
 import torch
 from torch.nn import Linear, Module, Parameter, ReLU, Sequential
@@ -10,6 +12,17 @@ from ctgan.synthesizers.base import BaseSynthesizer
 
 
 class Encoder(Module):
+    """Encoder for the TVAESynthesizer.
+
+    Args:
+        data_dim (int):
+            Dimensions of the data.
+        compress_dims (tuple or list of ints):
+            Size of each hidden layer.
+        embedding_dim (int):
+            Size of the output vector.
+    """
+
     def __init__(self, data_dim, compress_dims, embedding_dim):
         super(Encoder, self).__init__()
         dim = data_dim
@@ -20,11 +33,13 @@ class Encoder(Module):
                 ReLU()
             ]
             dim = item
+
         self.seq = Sequential(*seq)
         self.fc1 = Linear(dim, embedding_dim)
         self.fc2 = Linear(dim, embedding_dim)
 
     def forward(self, input):
+        """Encode the passed `input_`."""
         feature = self.seq(input)
         mu = self.fc1(feature)
         logvar = self.fc2(feature)
@@ -33,6 +48,17 @@ class Encoder(Module):
 
 
 class Decoder(Module):
+    """Decoder for the TVAESynthesizer.
+
+    Args:
+        embedding_dim (int):
+            Size of the input vector.
+        decompress_dims (tuple or list of ints):
+            Size of each hidden layer.
+        data_dim (int):
+            Dimensions of the data.
+    """
+
     def __init__(self, embedding_dim, decompress_dims, data_dim):
         super(Decoder, self).__init__()
         dim = embedding_dim
@@ -46,10 +72,11 @@ class Decoder(Module):
         self.sigma = Parameter(torch.ones(data_dim) * 0.1)
 
     def forward(self, input):
+        """Decode the passed `input_`."""
         return self.seq(input), self.sigma
 
 
-def loss_function(recon_x, x, sigmas, mu, logvar, output_info, factor):
+def _loss_function(recon_x, x, sigmas, mu, logvar, output_info, factor):
     st = 0
     loss = []
     for column_info in output_info:
@@ -107,6 +134,17 @@ class TVAESynthesizer(BaseSynthesizer):
         self._device = torch.device(device)
 
     def fit(self, train_data, discrete_columns=()):
+        """Fit the TVAE Synthesizer models to the training data.
+
+        Args:
+            train_data (numpy.ndarray or pandas.DataFrame):
+                Training Data. It must be a 2-dimensional numpy array or a pandas.DataFrame.
+            discrete_columns (list-like):
+                List of discrete columns to be used to generate the Conditional
+                Vector. If ``train_data`` is a Numpy array, this list should
+                contain the integer indices of the columns. Otherwise, if it is
+                a ``pandas.DataFrame``, this list should contain the column names.
+        """
         self.transformer = DataTransformer()
         self.transformer.fit(train_data, discrete_columns)
         train_data = self.transformer.transform(train_data)
@@ -128,7 +166,7 @@ class TVAESynthesizer(BaseSynthesizer):
                 eps = torch.randn_like(std)
                 emb = eps * std + mu
                 rec, sigmas = self.decoder(emb)
-                loss_1, loss_2 = loss_function(
+                loss_1, loss_2 = _loss_function(
                     rec, real, sigmas, mu, logvar,
                     self.transformer.output_info_list, self.loss_factor
                 )
@@ -138,6 +176,15 @@ class TVAESynthesizer(BaseSynthesizer):
                 self.decoder.sigma.data.clamp_(0.01, 1.0)
 
     def sample(self, samples):
+        """Sample data similar to the training data.
+
+        Args:
+            samples (int):
+                Number of rows to sample.
+
+        Returns:
+            numpy.ndarray or pandas.DataFrame
+        """
         self.decoder.eval()
 
         steps = samples // self.batch_size + 1
@@ -155,5 +202,6 @@ class TVAESynthesizer(BaseSynthesizer):
         return self.transformer.inverse_transform(data, sigmas.detach().cpu().numpy())
 
     def set_device(self, device):
+        """Set the `device` to be used ('GPU' or 'CPU)."""
         self._device = device
         self.decoder.to(self._device)

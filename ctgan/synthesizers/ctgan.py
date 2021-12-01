@@ -1,3 +1,5 @@
+"""CTGANSynthesizer module."""
+
 import warnings
 
 import numpy as np
@@ -13,6 +15,7 @@ from ctgan.synthesizers.base import BaseSynthesizer
 
 
 class Discriminator(Module):
+    """Discriminator for the CTGANSynthesizer."""
 
     def __init__(self, input_dim, discriminator_dim, pac=10):
         super(Discriminator, self).__init__()
@@ -28,6 +31,7 @@ class Discriminator(Module):
         self.seq = Sequential(*seq)
 
     def calc_gradient_penalty(self, real_data, fake_data, device='cpu', pac=10, lambda_=10):
+        """Compute the gradient penalty."""
         alpha = torch.rand(real_data.size(0) // pac, 1, 1, device=device)
         alpha = alpha.repeat(1, pac, real_data.size(1))
         alpha = alpha.view(-1, real_data.size(1))
@@ -48,11 +52,13 @@ class Discriminator(Module):
         return gradient_penalty
 
     def forward(self, input):
+        """Apply the Discriminator to the `input_`."""
         assert input.size()[0] % self.pac == 0
         return self.seq(input.view(-1, self.pacdim))
 
 
 class Residual(Module):
+    """Residual layer for the CTGANSynthesizer."""
 
     def __init__(self, i, o):
         super(Residual, self).__init__()
@@ -61,6 +67,7 @@ class Residual(Module):
         self.relu = ReLU()
 
     def forward(self, input):
+        """Apply the Residual layer to the `input_`."""
         out = self.fc(input)
         out = self.bn(out)
         out = self.relu(out)
@@ -68,6 +75,7 @@ class Residual(Module):
 
 
 class Generator(Module):
+    """Generator for the CTGANSynthesizer."""
 
     def __init__(self, embedding_dim, generator_dim, data_dim):
         super(Generator, self).__init__()
@@ -80,6 +88,7 @@ class Generator(Module):
         self.seq = Sequential(*seq)
 
     def forward(self, input):
+        """Apply the Generator to the `input_`."""
         data = self.seq(input)
         return data
 
@@ -91,6 +100,7 @@ class CTGANSynthesizer(BaseSynthesizer):
     are orchestrated together.
     For more details about the process, please check the [Modeling Tabular data using
     Conditional GAN](https://arxiv.org/abs/1907.00503) paper.
+
     Args:
         embedding_dim (int):
             Size of the random sample passed to the Generator. Defaults to 128.
@@ -172,16 +182,18 @@ class CTGANSynthesizer(BaseSynthesizer):
 
         For more details about the issue:
         https://drive.google.com/file/d/1AA5wPfZ1kquaRtVruCd6BiYZGcDeNxyP/view?usp=sharing
+
         Args:
-            logits:
-                […, num_features] unnormalized log probabilities
+            logits […, num_features]:
+                Unnormalized log probabilities
             tau:
-                non-negative scalar temperature
-            hard:
-                if True, the returned samples will be discretized as one-hot vectors,
+                Non-negative scalar temperature
+            hard (bool):
+                If True, the returned samples will be discretized as one-hot vectors,
                 but will be differentiated as if it is the soft sample in autograd
             dim (int):
-                a dimension along which softmax will be computed. Default: -1.
+                A dimension along which softmax will be computed. Default: -1.
+
         Returns:
             Sampled tensor of same shape as logits from the Gumbel-Softmax distribution.
         """
@@ -413,6 +425,7 @@ class CTGANSynthesizer(BaseSynthesizer):
 
         Choosing a condition_column and condition_value will increase the probability of the
         discrete condition_value happening in the condition_column.
+
         Args:
             n (int):
                 Number of rows to sample.
@@ -421,6 +434,7 @@ class CTGANSynthesizer(BaseSynthesizer):
             condition_value (string):
                 Name of the category in the condition_column which we wish to increase the
                 probability of happening.
+
         Returns:
             numpy.ndarray or pandas.DataFrame
         """
@@ -461,6 +475,7 @@ class CTGANSynthesizer(BaseSynthesizer):
         return self._transformer.inverse_transform(data)
 
     def set_device(self, device):
+        """Set the `device` to be used ('GPU' or 'CPU)."""
         self._device = device
         if self._generator is not None:
             self._generator.to(self._device)

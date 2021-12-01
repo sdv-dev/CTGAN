@@ -1,3 +1,5 @@
+"""CLI."""
+
 import argparse
 
 from ctgan.data import read_csv, read_tsv, write_tsv
@@ -57,6 +59,7 @@ def _parse_args():
 
 
 def main():
+    """CLI."""
     args = _parse_args()
     if args.tsv:
         data, discrete_columns = read_tsv(args.data, args.metadata)
