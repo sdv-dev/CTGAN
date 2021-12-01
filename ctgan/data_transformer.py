@@ -129,7 +129,7 @@ class DataTransformer(object):
     def _transform_discrete(self, column_transform_info, raw_column_data):
         ohe = column_transform_info.transform
         data = pd.DataFrame(raw_column_data, columns=[column_transform_info.column_name])
-        return [ohe.transform(data).values]
+        return [ohe.transform(data).to_numpy()]
 
     def transform(self, raw_data):
         """Take raw data and output a matrix data."""
@@ -228,7 +228,7 @@ class DataTransformer(object):
 
         ohe = column_transform_info.transform
         data = pd.DataFrame([value], columns=[column_transform_info.column_name])
-        one_hot = ohe.transform(data).values[0]
+        one_hot = ohe.transform(data).to_numpy()[0]
         if sum(one_hot) == 0:
             raise ValueError(f"The value `{value}` doesn't exist in the column `{column_name}`.")
 
