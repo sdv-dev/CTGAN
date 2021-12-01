@@ -72,7 +72,7 @@ def test_mixed():
     # using a kstest for continuous + a cstest for categorical.
 
 
-def test_loss_function():
+def test__loss_function():
     data = pd.DataFrame({
         '1': [float(i) for i in range(1000)],
         '2': [float(2 * i) for i in range(1000)]

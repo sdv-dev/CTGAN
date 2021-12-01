@@ -29,7 +29,9 @@ def readme(c):
 @task
 def lint(c):
     c.run('flake8 ctgan')
+    c.run('pydocstyle ctgan')
     c.run('flake8 tests --ignore=D,SFS2')
+    c.run('pydocstyle tests')
     c.run('isort -c --recursive ctgan tests')
 
 
