@@ -70,8 +70,8 @@ class TestDecoder(TestCase):
 
 class TestLossFunction(TestCase):
 
-    def test_loss_function(self):
-        """Test 'loss_function'
+    def test__loss_function(self):
+        """Test '_loss_function'
 
         Check loss values = to specific numbers.
 

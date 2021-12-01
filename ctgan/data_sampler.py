@@ -1,3 +1,5 @@
+"""DataSampler module."""
+
 import numpy as np
 
 
@@ -142,9 +144,11 @@ class DataSampler(object):
         return self._data[idx]
 
     def dim_cond_vec(self):
+        """Return the total number of categories."""
         return self._n_categories
 
     def generate_cond_from_condition_column_info(self, condition_info, batch):
+        """Generate the condition vector."""
         vec = np.zeros((batch, self._n_categories), dtype='float32')
         id_ = self._discrete_column_matrix_st[condition_info['discrete_column_id']]
         id_ += condition_info['value_id']
