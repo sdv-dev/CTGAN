@@ -51,10 +51,10 @@ class Discriminator(Module):
 
         return gradient_penalty
 
-    def forward(self, input):
+    def forward(self, input_):
         """Apply the Discriminator to the `input_`."""
-        assert input.size()[0] % self.pac == 0
-        return self.seq(input.view(-1, self.pacdim))
+        assert input_.size()[0] % self.pac == 0
+        return self.seq(input_.view(-1, self.pacdim))
 
 
 class Residual(Module):
@@ -66,12 +66,12 @@ class Residual(Module):
         self.bn = BatchNorm1d(o)
         self.relu = ReLU()
 
-    def forward(self, input):
+    def forward(self, input_):
         """Apply the Residual layer to the `input_`."""
-        out = self.fc(input)
+        out = self.fc(input_)
         out = self.bn(out)
         out = self.relu(out)
-        return torch.cat([out, input], dim=1)
+        return torch.cat([out, input_], dim=1)
 
 
 class Generator(Module):
@@ -87,9 +87,9 @@ class Generator(Module):
         seq.append(Linear(dim, data_dim))
         self.seq = Sequential(*seq)
 
-    def forward(self, input):
+    def forward(self, input_):
         """Apply the Generator to the `input_`."""
-        data = self.seq(input)
+        data = self.seq(input_)
         return data
 
 

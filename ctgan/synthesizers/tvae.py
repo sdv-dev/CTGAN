@@ -38,9 +38,9 @@ class Encoder(Module):
         self.fc1 = Linear(dim, embedding_dim)
         self.fc2 = Linear(dim, embedding_dim)
 
-    def forward(self, input):
+    def forward(self, input_):
         """Encode the passed `input_`."""
-        feature = self.seq(input)
+        feature = self.seq(input_)
         mu = self.fc1(feature)
         logvar = self.fc2(feature)
         std = torch.exp(0.5 * logvar)
@@ -71,9 +71,9 @@ class Decoder(Module):
         self.seq = Sequential(*seq)
         self.sigma = Parameter(torch.ones(data_dim) * 0.1)
 
-    def forward(self, input):
+    def forward(self, input_):
         """Decode the passed `input_`."""
-        return self.seq(input), self.sigma
+        return self.seq(input_), self.sigma
 
 
 def _loss_function(recon_x, x, sigmas, mu, logvar, output_info, factor):
