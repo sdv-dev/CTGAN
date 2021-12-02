@@ -1,3 +1,5 @@
+"""CLI."""
+
 import argparse
 
 from ctgan.data import read_csv, read_tsv, write_tsv
@@ -45,10 +47,10 @@ def _parse_args():
     parser.add_argument('--load', default=None, type=str,
                         help='A filename to load a trained synthesizer.')
 
-    parser.add_argument("--sample_condition_column", default=None, type=str,
-                        help="Select a discrete column name.")
-    parser.add_argument("--sample_condition_column_value", default=None, type=str,
-                        help="Specify the value of the selected discrete column.")
+    parser.add_argument('--sample_condition_column', default=None, type=str,
+                        help='Select a discrete column name.')
+    parser.add_argument('--sample_condition_column_value', default=None, type=str,
+                        help='Specify the value of the selected discrete column.')
 
     parser.add_argument('data', help='Path to training data')
     parser.add_argument('output', help='Path of the output file')
@@ -57,6 +59,7 @@ def _parse_args():
 
 
 def main():
+    """CLI."""
     args = _parse_args()
     if args.tsv:
         data, discrete_columns = read_tsv(args.data, args.metadata)
@@ -95,5 +98,5 @@ def main():
         sampled.to_csv(args.output, index=False)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

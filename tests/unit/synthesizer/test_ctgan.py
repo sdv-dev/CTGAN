@@ -1,3 +1,5 @@
+"""CTGANSynthesizer unit testing module."""
+
 from unittest import TestCase
 from unittest.mock import Mock
 
@@ -168,7 +170,7 @@ class TestGenerator(TestCase):
 
 
 def _assert_is_between(data, lower, upper):
-    """Asserts all values of the tensor 'data' are within range."""
+    """Assert all values of the tensor 'data' are within range."""
     assert all((data >= lower).numpy().tolist())
     assert all((data <= upper).numpy().tolist())
 
@@ -284,7 +286,6 @@ class TestCTGANSynthesizer(TestCase):
 
         Note:
             - could create another function for numpy array
-            - TODO: it is currently a integration test, needs to be changed to a proper unit test
         """
         data = pd.DataFrame({
             'discrete': ['a', 'b']
@@ -292,7 +293,7 @@ class TestCTGANSynthesizer(TestCase):
         discrete_columns = ['doesnt exist']
 
         ctgan = CTGANSynthesizer(epochs=1)
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match=r'Invalid columns found: {\'doesnt exist\'}'):
             ctgan.fit(data, discrete_columns)
 
     def test_sample(self):
