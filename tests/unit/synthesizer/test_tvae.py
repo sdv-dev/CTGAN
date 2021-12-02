@@ -1,3 +1,5 @@
+"""TVAESynthesizer unit testing module."""
+
 from unittest import TestCase
 
 
@@ -71,7 +73,7 @@ class TestDecoder(TestCase):
 class TestLossFunction(TestCase):
 
     def test__loss_function(self):
-        """Test '_loss_function'
+        """Test `_loss_function`.
 
         Check loss values = to specific numbers.
 

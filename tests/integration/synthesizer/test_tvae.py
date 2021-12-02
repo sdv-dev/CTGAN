@@ -16,6 +16,7 @@ from ctgan.synthesizers.tvae import TVAESynthesizer
 
 
 def test_tvae(tmpdir):
+    """Test the TVAESynthesizer load/save methods."""
     iris = datasets.load_iris()
     data = pd.DataFrame(iris.data, columns=iris.feature_names)
     data['class'] = pd.Series(iris.target).map(iris.target_names.__getitem__)
@@ -36,6 +37,7 @@ def test_tvae(tmpdir):
 
 
 def test_drop_last_false():
+    """Test the TVAESynthesizer predicts the correct values."""
     data = pd.DataFrame({
         '1': ['a', 'b', 'c'] * 150,
         '2': ['a', 'b', 'c'] * 150
@@ -73,6 +75,7 @@ def test_mixed():
 
 
 def test__loss_function():
+    """Test the TVAESynthesizer produces average values similar to the training data."""
     data = pd.DataFrame({
         '1': [float(i) for i in range(1000)],
         '2': [float(2 * i) for i in range(1000)]

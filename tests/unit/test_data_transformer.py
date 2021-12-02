@@ -1,3 +1,5 @@
+"""Data transformer unit testing module."""
+
 from unittest import TestCase
 from unittest.mock import Mock, patch
 
@@ -280,8 +282,7 @@ class TestDataTransformer(TestCase):
         """
 
     def test_inverse_transform(self):
-        """Test 'inverse_transform' on a np.ndarray representing one continuous and one
-        discrete columns.
+        """Test 'inverse_transform' on a np.ndarray with continuous and discrete columns.
 
         It should use the appropriate '_fit' type for each column and should return
         the corresponding columns. Since we are using the same example as the 'test_transform',
@@ -354,6 +355,7 @@ class TestDataTransformer(TestCase):
         assert result['value_id'] == 1  # this is the 2nd dimension in the one hot encoding
 
     def test_convert_column_name_value_to_id_multiple(self):
+        """Test 'convert_column_name_value_to_id'."""
         ohe = Mock()
         ohe.transform.return_value = pd.DataFrame([
             [0, 1, 0]  # one hot encoding, second dimension

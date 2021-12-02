@@ -1,3 +1,5 @@
+"""CTGANSynthesizer unit testing module."""
+
 from unittest import TestCase
 from unittest.mock import Mock
 
@@ -168,7 +170,7 @@ class TestGenerator(TestCase):
 
 
 def _assert_is_between(data, lower, upper):
-    """Asserts all values of the tensor 'data' are within range."""
+    """Assert all values of the tensor 'data' are within range."""
     assert all((data >= lower).numpy().tolist())
     assert all((data <= upper).numpy().tolist())
 

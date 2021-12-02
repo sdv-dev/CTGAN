@@ -19,6 +19,7 @@ from ctgan.synthesizers.ctgan import CTGANSynthesizer
 
 
 def test_ctgan_no_categoricals():
+    """Test the CTGANSynthesizer with no categorical values."""
     data = pd.DataFrame({
         'continuous': np.random.random(1000)
     })
@@ -34,6 +35,7 @@ def test_ctgan_no_categoricals():
 
 
 def test_ctgan_dataframe():
+    """Test the CTGANSynthesizer when passed a dataframe."""
     data = pd.DataFrame({
         'continuous': np.random.random(100),
         'discrete': np.random.choice(['a', 'b', 'c'], 100)
@@ -52,6 +54,7 @@ def test_ctgan_dataframe():
 
 
 def test_ctgan_numpy():
+    """Test the CTGANSynthesizer when passed a numpy array."""
     data = pd.DataFrame({
         'continuous': np.random.random(100),
         'discrete': np.random.choice(['a', 'b', 'c'], 100)
@@ -69,6 +72,7 @@ def test_ctgan_numpy():
 
 
 def test_log_frequency():
+    """Test the CTGANSynthesizer with no `log_frequency` set to False."""
     data = pd.DataFrame({
         'continuous': np.random.random(1000),
         'discrete': np.repeat(['a', 'b', 'c'], [950, 25, 25])
@@ -92,6 +96,7 @@ def test_log_frequency():
 
 
 def test_categorical_nan():
+    """Test the CTGANSynthesizer with no categorical values."""
     data = pd.DataFrame({
         'continuous': np.random.random(30),
         # This must be a list (not a np.array) or NaN will be cast to a string.
@@ -116,6 +121,7 @@ def test_categorical_nan():
 
 
 def test_synthesizer_sample():
+    """Test the CTGANSynthesizer samples the correct datatype."""
     data = pd.DataFrame({
         'discrete': np.random.choice(['a', 'b', 'c'], 100)
     })
@@ -129,6 +135,7 @@ def test_synthesizer_sample():
 
 
 def test_save_load():
+    """Test the CTGANSynthesizer load/save methods."""
     data = pd.DataFrame({
         'continuous': np.random.random(100),
         'discrete': np.random.choice(['a', 'b', 'c'], 100)
@@ -148,6 +155,7 @@ def test_save_load():
 
 
 def test_wrong_discrete_columns_dataframe():
+    """Test the CTGANSynthesizer correctly crashes when passed non-existing discrete columns."""
     data = pd.DataFrame({
         'discrete': ['a', 'b']
     })
@@ -159,6 +167,7 @@ def test_wrong_discrete_columns_dataframe():
 
 
 def test_wrong_discrete_columns_numpy():
+    """Test the CTGANSynthesizer correctly crashes when passed non-existing discrete columns."""
     data = pd.DataFrame({
         'discrete': ['a', 'b']
     })
@@ -170,6 +179,7 @@ def test_wrong_discrete_columns_numpy():
 
 
 def test_wrong_sampling_conditions():
+    """Test the CTGANSynthesizer correctly crashes when passed incorrect sampling conditions."""
     data = pd.DataFrame({
         'continuous': np.random.random(100),
         'discrete': np.random.choice(['a', 'b', 'c'], 100)
