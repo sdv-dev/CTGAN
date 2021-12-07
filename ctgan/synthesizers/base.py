@@ -7,6 +7,12 @@ class BaseSynthesizer:
     This should contain the save/load methods.
     """
 
+    def __init__(self):
+        self._best_model = None
+
+    def get_best(self):
+        return self._best_model
+
     def save(self, path):
         device_backup = self._device
         self.set_device(torch.device("cpu"))

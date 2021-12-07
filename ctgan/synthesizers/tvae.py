@@ -105,7 +105,7 @@ class TVAESynthesizer(BaseSynthesizer):
 
         self._device = torch.device(device)
 
-    def fit(self, train_data, discrete_columns=tuple()):
+    def fit(self, train_data, discrete_columns=tuple(), save_best=False):
         self.transformer = DataTransformer()
         self.transformer.fit(train_data, discrete_columns)
         train_data = self.transformer.transform(train_data)
@@ -119,7 +119,9 @@ class TVAESynthesizer(BaseSynthesizer):
             list(encoder.parameters()) + list(self.decoder.parameters()),
             weight_decay=self.l2scale)
 
+        best_loss = float("inf")
         for i in range(self.epochs):
+            epoch_loss = 0
             for id_, data in enumerate(loader):
                 optimizerAE.zero_grad()
                 real = data[0].to(self._device)
@@ -132,9 +134,15 @@ class TVAESynthesizer(BaseSynthesizer):
                     self.transformer.output_info_list, self.loss_factor
                 )
                 loss = loss_1 + loss_2
+
                 loss.backward()
                 optimizerAE.step()
                 self.decoder.sigma.data.clamp_(0.01, 1.0)
+
+                epoch_loss += loss.detach().clone().item()
+            if save_best and epoch_loss < best_loss:
+                best_loss = epoch_loss
+                self._best_model = self
 
     def sample(self, samples):
         self.decoder.eval()

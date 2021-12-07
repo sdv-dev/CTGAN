@@ -147,6 +147,40 @@ def test_save_load():
     assert set(sampled['discrete'].unique()) == {'a', 'b', 'c'}
 
 
+def test_get_best():
+    data = pd.DataFrame({
+        'continuous': np.random.random(100),
+        'discrete': np.random.choice(['a', 'b', 'c'], 100)
+    })
+    discrete_columns = ['discrete']
+
+    ctgan = CTGANSynthesizer(epochs=1)
+    ctgan.fit(data, discrete_columns, save_best=True)
+
+    sampled = ctgan.get_best().sample(1000)
+    assert set(sampled.columns) == {'continuous', 'discrete'}
+    assert set(sampled['discrete'].unique()) == {'a', 'b', 'c'}
+
+
+def test_save_load_best():
+    data = pd.DataFrame({
+        'continuous': np.random.random(100),
+        'discrete': np.random.choice(['a', 'b', 'c'], 100)
+    })
+    discrete_columns = ['discrete']
+
+    ctgan = CTGANSynthesizer(epochs=1)
+    ctgan.fit(data, discrete_columns, save_best=True)
+
+    with tf.TemporaryDirectory() as temporary_directory:
+        ctgan.get_best().save(temporary_directory + "test_best.pkl")
+        ctgan = CTGANSynthesizer.load(temporary_directory + "test_best.pkl")
+
+    sampled = ctgan.sample(1000)
+    assert set(sampled.columns) == {'continuous', 'discrete'}
+    assert set(sampled['discrete'].unique()) == {'a', 'b', 'c'}
+
+
 def test_wrong_discrete_columns_dataframe():
     data = pd.DataFrame({
         'discrete': ['a', 'b']
