@@ -12,7 +12,7 @@
 [![Coverage Status](https://codecov.io/gh/sdv-dev/CTGAN/branch/master/graph/badge.svg)](https://codecov.io/gh/sdv-dev/CTGAN)
 
 
-<img align="center" width=30% src="docs/images/ctgan.png">
+<img align="center" width=30% src="https://user-images.githubusercontent.com/41479552/143879961-8167e5c4-ec67-4053-871d-86c0b06a7af8.png">
 
 * Website: https://sdv.dev
 * Documentation: https://sdv.dev/SDV
