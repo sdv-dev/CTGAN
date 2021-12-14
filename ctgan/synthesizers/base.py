@@ -1,6 +1,9 @@
 """BaseSynthesizer module."""
 
+
 import torch
+
+from ctgan.callbacks.callback_information import CallbackInformation
 
 
 class BaseSynthesizer:
@@ -10,10 +13,7 @@ class BaseSynthesizer:
     """
 
     def __init__(self):
-        self._best_model = None
-
-    def get_best(self):
-        return self._best_model
+        self.callback_info: CallbackInformation = None
 
     def save(self, path):
         """Save the model in the passed `path`."""

@@ -9,9 +9,7 @@ but correctness of the data values and the internal behavior of the
 model are not checked.
 """
 
-import tempfile as tf
 
-import numpy as np
 import pandas as pd
 from sklearn import datasets
 
