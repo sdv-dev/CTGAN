@@ -1,6 +1,7 @@
 """CTGANSynthesizer module."""
 
 import warnings
+from ctgan.callbacks.callback import Callback
 
 import numpy as np
 import pandas as pd
@@ -278,7 +279,7 @@ class CTGANSynthesizer(BaseSynthesizer):
         if invalid_columns:
             raise ValueError(f'Invalid columns found: {invalid_columns}')
 
-    def fit(self, train_data, discrete_columns=(), epochs=None, save_best=False):
+    def fit(self, train_data, discrete_columns=(), epochs=None, callback: Callback=None):
         """Fit the CTGAN Synthesizer models to the training data.
 
         Args:
@@ -289,8 +290,6 @@ class CTGANSynthesizer(BaseSynthesizer):
                 Vector. If ``train_data`` is a Numpy array, this list should
                 contain the integer indices of the columns. Otherwise, if it is
                 a ``pandas.DataFrame``, this list should contain the column names.
-            save_best (bool):
-                If True, the model with the lowest loss will be saved to the object.
         """
         self._validate_discrete_columns(train_data, discrete_columns)
 
@@ -339,10 +338,8 @@ class CTGANSynthesizer(BaseSynthesizer):
 
         mean = torch.zeros(self._batch_size, self._embedding_dim, device=self._device)
         std = mean + 1
-        best_loss = float("inf")
         steps_per_epoch = max(len(train_data) // self._batch_size, 1)
         for i in range(epochs):
-            epoch_loss = 0
             for id_ in range(steps_per_epoch):
                 for n in range(self._discriminator_steps):
                     fakez = torch.normal(mean=mean, std=std)
@@ -387,8 +384,6 @@ class CTGANSynthesizer(BaseSynthesizer):
                     loss_d.backward()
                     optimizerD.step()
 
-                    epoch_loss += abs(loss_d.detach().clone().item())
-
                 fakez = torch.normal(mean=mean, std=std)
                 condvec = self._data_sampler.sample_condvec(self._batch_size)
 
@@ -419,11 +414,15 @@ class CTGANSynthesizer(BaseSynthesizer):
                 loss_g.backward()
                 optimizerG.step()
 
-                epoch_loss += abs(loss_g.detach().clone().item())
-
-            if save_best and epoch_loss < best_loss:
-                best_loss = epoch_loss
-                self._best_model = self
+            if callback:
+                self.callback_info = callback.callback(
+                    model=self,
+                    generator_loss=loss_g,
+                    discriminator_loss=loss_d,
+                    epoch=i
+                )
+                if self.callback_info.early_stop:
+                    break
             if self._verbose:
                 print(f'Epoch {i+1}, Loss G: {loss_g.detach().cpu(): .4f},'  # noqa: T001
                       f'Loss D: {loss_d.detach().cpu(): .4f}',
