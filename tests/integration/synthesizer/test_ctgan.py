@@ -16,6 +16,9 @@ import pandas as pd
 import pytest
 
 from ctgan.synthesizers.ctgan import CTGANSynthesizer
+from dataclasses import dataclass
+from ctgan.callbacks.callback import Callback
+from ctgan.callbacks.callback_information import CallbackInformation
 
 
 def test_ctgan_no_categoricals():
@@ -154,38 +157,35 @@ def test_save_load():
     assert set(sampled['discrete'].unique()) == {'a', 'b', 'c'}
 
 
-def test_get_best():
+@dataclass
+class MyCallbackInfo(CallbackInformation):
+    epoch_count: int = 0
+
+
+class Cb(Callback):
+    def __init__(self):
+        self.calls = 0
+
+    def callback(self, epoch, **kwargs):
+        self.calls += 1
+        return MyCallbackInfo(
+            early_stop=self.calls > 1,
+            epoch_count=epoch
+        )
+
+
+def test_early_stop():
     data = pd.DataFrame({
         'continuous': np.random.random(100),
         'discrete': np.random.choice(['a', 'b', 'c'], 100)
     })
     discrete_columns = ['discrete']
 
-    ctgan = CTGANSynthesizer(epochs=1)
-    ctgan.fit(data, discrete_columns, save_best=True)
+    ctgan = CTGANSynthesizer(epochs=10)
+    ctgan.fit(data, discrete_columns, callback=Cb())
 
-    sampled = ctgan.get_best().sample(1000)
-    assert set(sampled.columns) == {'continuous', 'discrete'}
-    assert set(sampled['discrete'].unique()) == {'a', 'b', 'c'}
-
-
-def test_save_load_best():
-    data = pd.DataFrame({
-        'continuous': np.random.random(100),
-        'discrete': np.random.choice(['a', 'b', 'c'], 100)
-    })
-    discrete_columns = ['discrete']
-
-    ctgan = CTGANSynthesizer(epochs=1)
-    ctgan.fit(data, discrete_columns, save_best=True)
-
-    with tf.TemporaryDirectory() as temporary_directory:
-        ctgan.get_best().save(temporary_directory + "test_best.pkl")
-        ctgan = CTGANSynthesizer.load(temporary_directory + "test_best.pkl")
-
-    sampled = ctgan.sample(1000)
-    assert set(sampled.columns) == {'continuous', 'discrete'}
-    assert set(sampled['discrete'].unique()) == {'a', 'b', 'c'}
+    assert ctgan.callback_info.epoch_count == 1
+    assert ctgan.callback_info.early_stop
 
 
 def test_wrong_discrete_columns_dataframe():
