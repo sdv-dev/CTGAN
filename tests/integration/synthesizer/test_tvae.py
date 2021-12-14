@@ -96,37 +96,3 @@ def test__loss_function():
     avg_error = error / num_samples
 
     assert avg_error < 400
-
-
-def test_get_best():
-    data = pd.DataFrame({
-        'continuous': np.random.random(100),
-        'discrete': np.random.choice(['a', 'b', 'c'], 100)
-    })
-    discrete_columns = ['discrete']
-
-    tvae = TVAESynthesizer(epochs=1)
-    tvae.fit(data, discrete_columns, save_best=True)
-
-    sampled = tvae.get_best().sample(1000)
-    assert set(sampled.columns) == {'continuous', 'discrete'}
-    assert set(sampled['discrete'].unique()) == {'a', 'b', 'c'}
-
-
-def test_save_load_best():
-    data = pd.DataFrame({
-        'continuous': np.random.random(100),
-        'discrete': np.random.choice(['a', 'b', 'c'], 100)
-    })
-    discrete_columns = ['discrete']
-
-    tvae = TVAESynthesizer(epochs=1)
-    tvae.fit(data, discrete_columns, save_best=True)
-
-    with tf.TemporaryDirectory() as temporary_directory:
-        tvae.get_best().save(temporary_directory + "test_best.pkl")
-        tvae = TVAESynthesizer.load(temporary_directory + "test_best.pkl")
-
-    sampled = tvae.sample(1000)
-    assert set(sampled.columns) == {'continuous', 'discrete'}
-    assert set(sampled['discrete'].unique()) == {'a', 'b', 'c'}
