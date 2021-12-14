@@ -1,7 +1,6 @@
 """CTGANSynthesizer module."""
 
 import warnings
-from ctgan.callbacks.callback import Callback
 
 import numpy as np
 import pandas as pd
@@ -10,6 +9,7 @@ from packaging import version
 from torch import optim
 from torch.nn import BatchNorm1d, Dropout, LeakyReLU, Linear, Module, ReLU, Sequential, functional
 
+from ctgan.callbacks.callback import Callback
 from ctgan.data_sampler import DataSampler
 from ctgan.data_transformer import DataTransformer
 from ctgan.synthesizers.base import BaseSynthesizer
@@ -279,7 +279,7 @@ class CTGANSynthesizer(BaseSynthesizer):
         if invalid_columns:
             raise ValueError(f'Invalid columns found: {invalid_columns}')
 
-    def fit(self, train_data, discrete_columns=(), epochs=None, callback: Callback=None):
+    def fit(self, train_data, discrete_columns=(), epochs=None, callback: Callback = None):
         """Fit the CTGAN Synthesizer models to the training data.
 
         Args:

@@ -10,15 +10,15 @@ model are not checked.
 """
 
 import tempfile as tf
+from dataclasses import dataclass
 
 import numpy as np
 import pandas as pd
 import pytest
 
-from ctgan.synthesizers.ctgan import CTGANSynthesizer
-from dataclasses import dataclass
 from ctgan.callbacks.callback import Callback
 from ctgan.callbacks.callback_information import CallbackInformation
+from ctgan.synthesizers.ctgan import CTGANSynthesizer
 
 
 def test_ctgan_no_categoricals():

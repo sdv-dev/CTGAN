@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+
 from ctgan.callbacks.callback_information import CallbackInformation
 
 
