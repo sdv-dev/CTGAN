@@ -11,7 +11,7 @@ from ctgan.data_transformer import ColumnTransformInfo, DataTransformer, SpanInf
 
 class TestDataTransformer(TestCase):
 
-    @patch('ctgan.data_transformer.BayesianGaussianMixture')
+    @patch('ctgan.data_transformer.BayesGMMTransformer')
     def test___fit_continuous_(self, MockBGM):
         """Test '_fit_continuous_' on a simple continuous column.
 
@@ -37,10 +37,8 @@ class TestDataTransformer(TestCase):
             - fit should be called with the data
         """
         bgm_instance = MockBGM.return_value
-        bgm_instance.weights_ = np.array([10.0, 5.0, 0.0])  # 2 non-zero components
-
-        max_clusters = 10
-        transformer = DataTransformer(max_clusters, weight_threshold=0.005)
+        bgm_instance._valid_component_indicator = [True, False, True]
+        transformer = DataTransformer()
         info = transformer._fit_continuous('column', np.random.normal((100, 1)))
 
         assert info.column_name == 'column'
