@@ -4,14 +4,12 @@ from collections import namedtuple
 
 import numpy as np
 import pandas as pd
-from rdt.transformers import OneHotEncodingTransformer, BayesGMMTransformer
+from rdt.transformers import BayesGMMTransformer, OneHotEncodingTransformer
 
 SpanInfo = namedtuple('SpanInfo', ['dim', 'activation_fn'])
 ColumnTransformInfo = namedtuple(
     'ColumnTransformInfo', [
-        'column_name', 'column_type',
-        'transform', 'transform_aux',
-        'output_info', 'output_dimensions'
+        'column_name', 'column_type', 'transform', 'output_info', 'output_dimensions'
     ]
 )
 
@@ -35,29 +33,25 @@ class DataTransformer(object):
         self._max_clusters = max_clusters
         self._weight_threshold = weight_threshold
 
-    def _fit_continuous(self, column_name, raw_column_data):
+    def _fit_continuous(self, data):
         """Train Bayesian GMM for continuous columns."""
         gm = BayesGMMTransformer()
-        gm.fit(pd.DataFrame(raw_column_data, columns=[column_name]), [column_name])
+        gm.fit(data, list(data.columns))
         num_components = sum(gm._valid_component_indicator)
 
         return ColumnTransformInfo(
-            column_name=column_name, column_type='continuous', transform=gm,
-            transform_aux='TO_DELETE',
+            column_name=data.columns[0], column_type='continuous', transform=gm,
             output_info=[SpanInfo(1, 'tanh'), SpanInfo(num_components, 'softmax')],
             output_dimensions=1 + num_components)
 
-    def _fit_discrete(self, column_name, raw_column_data):
+    def _fit_discrete(self, data):
         """Fit one hot encoder for discrete column."""
         ohe = OneHotEncodingTransformer()
-        fit_data = pd.DataFrame(raw_column_data, columns=[column_name])
-
-        ohe.fit(fit_data, column_name)
+        ohe.fit(data, list(data.columns))
         num_categories = len(ohe.dummies)
 
         return ColumnTransformInfo(
-            column_name=column_name, column_type='discrete', transform=ohe,
-            transform_aux=None,
+            column_name=data.columns[0], column_type='discrete', transform=ohe,
             output_info=[SpanInfo(num_categories, 'softmax')],
             output_dimensions=num_categories)
 
@@ -80,30 +74,30 @@ class DataTransformer(object):
         self._column_raw_dtypes = raw_data.infer_objects().dtypes
         self._column_transform_info_list = []
         for column_name in raw_data.columns:
-            raw_column_data = raw_data[column_name].to_numpy()
             if column_name in discrete_columns:
-                column_transform_info = self._fit_discrete(column_name, raw_data[column_name])
+                column_transform_info = self._fit_discrete(raw_data[[column_name]])
             else:
-                column_transform_info = self._fit_continuous(column_name, raw_column_data)
+                column_transform_info = self._fit_continuous(raw_data[[column_name]])
 
             self.output_info_list.append(column_transform_info.output_info)
             self.output_dimensions += column_transform_info.output_dimensions
             self._column_transform_info_list.append(column_transform_info)
 
-    def _transform_continuous(self, column_transform_info, raw_column_data):
-        data = pd.DataFrame({
-            column_transform_info.column_name: raw_column_data.flatten()
-        })
-        res = column_transform_info.transform.transform(data, [column_transform_info.column_name])
-        x = np.zeros((len(res), column_transform_info.output_dimensions))
-        x[:,0] = res["%s.normalized" % column_transform_info.column_name].values
-        x[:,res["%s.component" % column_transform_info.column_name].values.astype(int)+1] = 1.0
-        return [x[:,i:i+1] for i in range(x.shape[1])]
+    def _transform_continuous(self, column_transform_info, data):
+        column_name = data.columns[0]
+        data[column_name] = data[column_name].to_numpy().flatten()
+        gm = column_transform_info.transform
+        transformed = gm.transform(data, [column_name])
+        output = np.zeros((len(transformed), column_transform_info.output_dimensions))
+        output[:, 0] = transformed[f'{column_name}.normalized'].to_numpy()
+        index = transformed[f'{column_name}.component'].to_numpy().astype(int)
+        output[:, index + 1] = 1.0
 
-    def _transform_discrete(self, column_transform_info, raw_column_data):
+        return output
+
+    def _transform_discrete(self, column_transform_info, data):
         ohe = column_transform_info.transform
-        data = pd.DataFrame(raw_column_data, columns=[column_transform_info.column_name])
-        return [ohe.transform(data).to_numpy()]
+        return ohe.transform(data).to_numpy()
 
     def transform(self, raw_data):
         """Take raw data and output a matrix data."""
@@ -113,25 +107,23 @@ class DataTransformer(object):
 
         column_data_list = []
         for column_transform_info in self._column_transform_info_list:
-            column_data = raw_data[[column_transform_info.column_name]].to_numpy()
+            column_name = column_transform_info.column_name
+            data = raw_data[[column_name]]
             if column_transform_info.column_type == 'continuous':
-                column_data_list += self._transform_continuous(column_transform_info, column_data)
+                column_data_list.append(self._transform_continuous(column_transform_info, data))
             else:
-                assert column_transform_info.column_type == 'discrete'
-                column_data_list += self._transform_discrete(column_transform_info, column_data)
+                column_data_list.append(self._transform_discrete(column_transform_info, data))
 
         return np.concatenate(column_data_list, axis=1).astype(float)
 
     def _inverse_transform_continuous(self, column_transform_info, column_data, sigmas, st):
-        print(column_data.shape)
-        data = np.zeros((column_data.shape[0], 2))
-        data[:,0] = column_data[:,0]
-        data[:,1] = np.argmax(column_data[:,1:], axis=1)
-        data = pd.DataFrame(data, columns=[
-            "%s.normalized" % column_transform_info.column_name,
-            "%s.component" % column_transform_info.column_name,
-        ])
-        return column_transform_info.transform.reverse_transform(data, [column_transform_info.column_name])
+        gm = column_transform_info.transform
+        data = pd.DataFrame(column_data[:, :2], columns=list(gm.get_output_types()))
+        data.iloc[:, 1] = np.argmax(column_data[:, 1:], axis=1)
+        if sigmas is not None:
+            data.iloc[:, 0] = np.random.normal(data.iloc[:, 0], sigmas[st])
+
+        return gm.reverse_transform(data, [column_transform_info.column_name])
 
     def _inverse_transform_discrete(self, column_transform_info, column_data):
         ohe = column_transform_info.transform
@@ -150,12 +142,10 @@ class DataTransformer(object):
         for column_transform_info in self._column_transform_info_list:
             dim = column_transform_info.output_dimensions
             column_data = data[:, st:st + dim]
-
             if column_transform_info.column_type == 'continuous':
                 recovered_column_data = self._inverse_transform_continuous(
                     column_transform_info, column_data, sigmas, st)
             else:
-                assert column_transform_info.column_type == 'discrete'
                 recovered_column_data = self._inverse_transform_discrete(
                     column_transform_info, column_data)
 

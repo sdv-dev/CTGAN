@@ -39,7 +39,8 @@ class TestDataTransformer(TestCase):
         bgm_instance = MockBGM.return_value
         bgm_instance._valid_component_indicator = [True, False, True]
         transformer = DataTransformer()
-        info = transformer._fit_continuous('column', np.random.normal((100, 1)))
+        data = pd.DataFrame(np.random.normal((100, 1)), columns=['column'])
+        info = transformer._fit_continuous(data)
 
         assert info.column_name == 'column'
         assert info.transform == bgm_instance
@@ -76,7 +77,8 @@ class TestDataTransformer(TestCase):
         ohe_instance = MockOHE.return_value
         ohe_instance.dummies = ['a', 'b']
         transformer = DataTransformer()
-        info = transformer._fit_discrete('column', np.array(['a', 'b'] * 100))
+        data = pd.DataFrame(np.array(['a', 'b'] * 100), columns=['column'])
+        info = transformer._fit_discrete(data)
 
         assert info.column_name == 'column'
         assert info.transform == ohe_instance
@@ -122,7 +124,6 @@ class TestDataTransformer(TestCase):
         transformer._fit_continuous = Mock()
         transformer._fit_continuous.return_value = ColumnTransformInfo(
             column_name='x', column_type='continuous', transform=None,
-            transform_aux=None,
             output_info=[SpanInfo(1, 'tanh'), SpanInfo(3, 'softmax')],
             output_dimensions=1 + 3
         )
@@ -130,7 +131,6 @@ class TestDataTransformer(TestCase):
         transformer._fit_discrete = Mock()
         transformer._fit_discrete.return_value = ColumnTransformInfo(
             column_name='y', column_type='discrete', transform=None,
-            transform_aux=None,
             output_info=[SpanInfo(2, 'softmax')],
             output_dimensions=2
         )
@@ -208,13 +208,11 @@ class TestDataTransformer(TestCase):
         transformer._column_transform_info_list = [
             ColumnTransformInfo(
                 column_name='x', column_type='continuous', transform=None,
-                transform_aux=None,
                 output_info=[SpanInfo(1, 'tanh'), SpanInfo(3, 'softmax')],
                 output_dimensions=1 + 3
             ),
             ColumnTransformInfo(
                 column_name='y', column_type='discrete', transform=None,
-                transform_aux=None,
                 output_info=[SpanInfo(2, 'softmax')],
                 output_dimensions=2
             )
@@ -227,17 +225,16 @@ class TestDataTransformer(TestCase):
             [1, 0, 0],
             [1, 0, 0],
         ])
-        return_value = (selected_normalized_value, selected_component_onehot)
+        return_value = np.concatenate(
+            (selected_normalized_value, selected_component_onehot), axis=1)
         transformer._transform_continuous.return_value = return_value
 
         transformer._transform_discrete = Mock()
-        transformer._transform_discrete.return_value = [
-            np.array([
-                [0, 1],
-                [0, 1],
-                [1, 0],
-            ])
-        ]
+        transformer._transform_discrete.return_value = np.array([
+            [0, 1],
+            [0, 1],
+            [1, 0],
+        ])
 
         result = transformer.transform(data)
         transformer._transform_continuous.assert_called_once()
@@ -335,13 +332,11 @@ class TestDataTransformer(TestCase):
         transformer._column_transform_info_list = [
             ColumnTransformInfo(
                 column_name='x', column_type='continuous', transform=None,
-                transform_aux=None,
                 output_info=[SpanInfo(1, 'tanh'), SpanInfo(3, 'softmax')],
                 output_dimensions=1 + 3
             ),
             ColumnTransformInfo(
                 column_name='y', column_type='discrete', transform=ohe,
-                transform_aux=None,
                 output_info=[SpanInfo(2, 'softmax')],
                 output_dimensions=2
             )
@@ -362,19 +357,16 @@ class TestDataTransformer(TestCase):
         transformer._column_transform_info_list = [
             ColumnTransformInfo(
                 column_name='x', column_type='continuous', transform=None,
-                transform_aux=None,
                 output_info=[SpanInfo(1, 'tanh'), SpanInfo(3, 'softmax')],
                 output_dimensions=1 + 3
             ),
             ColumnTransformInfo(
                 column_name='y', column_type='discrete', transform=ohe,
-                transform_aux=None,
                 output_info=[SpanInfo(2, 'softmax')],
                 output_dimensions=2
             ),
             ColumnTransformInfo(
                 column_name='z', column_type='discrete', transform=ohe,
-                transform_aux=None,
                 output_info=[SpanInfo(2, 'softmax')],
                 output_dimensions=2
             )
