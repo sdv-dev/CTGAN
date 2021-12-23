@@ -8,6 +8,7 @@ import torch
 from packaging import version
 from torch import optim
 from torch.nn import BatchNorm1d, Dropout, LeakyReLU, Linear, Module, ReLU, Sequential, functional
+from tqdm import tqdm
 
 from ctgan.data_sampler import DataSampler
 from ctgan.data_transformer import DataTransformer
@@ -340,9 +341,8 @@ class CTGANSynthesizer(BaseSynthesizer):
 
         steps_per_epoch = max(len(train_data) // self._batch_size, 1)
         for i in range(epochs):
-            for id_ in range(steps_per_epoch):
-
-                for n in range(self._discriminator_steps):
+            for _ in tqdm(range(steps_per_epoch), unit="batch", disable=not self._verbose):
+                for _ in range(self._discriminator_steps):
                     fakez = torch.normal(mean=mean, std=std)
 
                     condvec = self._data_sampler.sample_condvec(self._batch_size)
