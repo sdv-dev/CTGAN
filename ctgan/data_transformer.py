@@ -34,10 +34,19 @@ class DataTransformer(object):
         self._weight_threshold = weight_threshold
 
     def _fit_continuous(self, data):
-        """Train Bayesian GMM for continuous columns."""
+        """Train Bayesian GMM for continuous columns.
+
+        Args:
+            data (pd.DataFrame):
+                A dataframe containing a column.
+
+        Returns:
+            namedtuple:
+                A ``ColumnTransformInfo`` object.
+        """
         gm = BayesGMMTransformer()
         gm.fit(data, list(data.columns))
-        num_components = sum(gm._valid_component_indicator)
+        num_components = sum(gm.valid_component_indicator)
 
         return ColumnTransformInfo(
             column_name=data.columns[0], column_type='continuous', transform=gm,
@@ -45,7 +54,16 @@ class DataTransformer(object):
             output_dimensions=1 + num_components)
 
     def _fit_discrete(self, data):
-        """Fit one hot encoder for discrete column."""
+        """Fit one hot encoder for discrete column.
+
+        Args:
+            data (pd.DataFrame):
+                A dataframe containing a column.
+
+        Returns:
+            namedtuple:
+                A ``ColumnTransformInfo`` object.
+        """
         ohe = OneHotEncodingTransformer()
         ohe.fit(data, list(data.columns))
         num_categories = len(ohe.dummies)
@@ -56,12 +74,15 @@ class DataTransformer(object):
             output_dimensions=num_categories)
 
     def fit(self, raw_data, discrete_columns=()):
-        """Fit GMM for continuous columns and One hot encoder for discrete columns.
+        """Fit a the data.
 
-        This step also counts the #columns in matrix data, and span information.
+        Fits a ``BayesGMMTransformer`` for continuous columns and a
+        ``OneHotEncodingTransformer`` for discrete columns.
+
+        This step also counts the #columns in matrix data and span information.
         """
-        self.output_info_list = []
-        self.output_dimensions = 0
+        self.output_info_list = []  # delete
+        self.output_dimensions = 0  # delete
         self.dataframe = True
 
         if not isinstance(raw_data, pd.DataFrame):
