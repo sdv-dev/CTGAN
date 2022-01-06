@@ -74,15 +74,15 @@ class DataTransformer(object):
             output_dimensions=num_categories)
 
     def fit(self, raw_data, discrete_columns=()):
-        """Fit a the data.
+        """Fit the data.
 
         Fits a ``BayesGMMTransformer`` for continuous columns and a
         ``OneHotEncodingTransformer`` for discrete columns.
 
         This step also counts the #columns in matrix data and span information.
         """
-        self.output_info_list = []  # delete
-        self.output_dimensions = 0  # delete
+        self.output_info_list = []
+        self.output_dimensions = 0
         self.dataframe = True
 
         if not isinstance(raw_data, pd.DataFrame):
@@ -112,7 +112,7 @@ class DataTransformer(object):
         output = np.zeros((len(transformed), column_transform_info.output_dimensions))
         output[:, 0] = transformed[f'{column_name}.normalized'].to_numpy()
         index = transformed[f'{column_name}.component'].to_numpy().astype(int)
-        output[:, index + 1] = 1.0
+        output[np.arange(index.size), index + 1] = 1.0
 
         return output
 

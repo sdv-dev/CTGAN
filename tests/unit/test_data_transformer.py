@@ -171,7 +171,7 @@ class TestDataTransformer(TestCase):
         bgm_instance.transform = Mock()
         bgm_instance.transform.return_value = pd.DataFrame({
             'x.normalized': [0.1, 0.2, 0.3],
-            'x.component': [0.0, 0.0, 0.0]  # double check that this works with other values.
+            'x.component': [0.0, 1.0, 1.0]
         })
 
         transformer = DataTransformer()
@@ -188,8 +188,8 @@ class TestDataTransformer(TestCase):
         # Assert
         expected = np.array([
             [0.1, 1, 0, 0],
-            [0.2, 1, 0, 0],
-            [0.3, 1, 0, 0],
+            [0.2, 0, 1, 0],
+            [0.3, 0, 1, 0],
         ])
         np.testing.assert_array_equal(result, expected)
 
@@ -237,8 +237,8 @@ class TestDataTransformer(TestCase):
         selected_normalized_value = np.array([[0.1], [0.3], [0.5]])
         selected_component_onehot = np.array([
             [1, 0, 0],
-            [1, 0, 0],
-            [1, 0, 0],
+            [0, 1, 0],
+            [0, 1, 0],
         ])
         return_value = np.concatenate(
             (selected_normalized_value, selected_component_onehot), axis=1)
@@ -260,36 +260,86 @@ class TestDataTransformer(TestCase):
 
         expected = np.array([
             [0.1, 1, 0, 0, 0, 1],
-            [0.3, 1, 0, 0, 0, 1],
-            [0.5, 1, 0, 0, 1, 0],
+            [0.3, 0, 1, 0, 0, 1],
+            [0.5, 0, 1, 0, 1, 0],
         ])
         assert result.shape == (3, 6)
         assert (result[:, 0] == expected[:, 0]).all(), 'continuous-cdf'
         assert (result[:, 1:4] == expected[:, 1:4]).all(), 'continuous-softmax'
         assert (result[:, 4:6] == expected[:, 4:6]).all(), 'discrete'
 
-    def test__inverse_transform_continuous(self):
+    @patch('ctgan.data_transformer.BayesGMMTransformer')
+    def test__inverse_transform_continuous(self, MockBGM):
         """Test ``_inverse_transform_continuous``.
 
         Setup:
-            - Mock ``column_transform_info``.
+            - Create ``DataTransformer``.
+            - Mock the ``BayesGMMTransformer`` where:
+                - ``get_output_types`` returns the appropriate dictionary.
+                - ``reverse_transform`` returns some dataframe.
 
         Input:
-            - column_data = np.ndarray
-              - the first column contains the normalized value
-              - the remaining columns correspond to the one-hot
+            - A ``ColumnTransformInfo`` object.
+            - A np.ndarray where:
+              - The first column contains the normalized value
+              - The remaining columns correspond to the one-hot
             - sigmas = np.ndarray of floats
             - st = index of the sigmas ndarray
 
         Output:
-            - numpy array containing a single column of continuous values.
+            - Dataframe where the first column are floats and the second is a lable encoding.
 
         Side Effects:
-            - None.
+            - The ``reverse_transform`` method should be called with a dataframe
+            where the first column are floats and the second is a lable encoding.
         """
+        # Setup
+        bgm_instance = MockBGM.return_value
+        bgm_instance.get_output_types = Mock()
+        bgm_instance.get_output_types.return_value = {
+            'x.normalized': 'numerical',
+            'x.component': 'numerical'
+        }
+        bgm_instance.reverse_transform = Mock()
+        bgm_instance.reverse_transform.return_value = pd.DataFrame({
+            'x.normalized': [0.1, 0.2, 0.3],
+            'x.component': [0.0, 1.0, 1.0]
+        })
+
+        transformer = DataTransformer()
+        column_data = np.array([
+            [0.1, 1, 0, 0],
+            [0.3, 0, 1, 0],
+            [0.5, 0, 1, 0],
+        ])
+        column_transform_info = ColumnTransformInfo(
+            column_name='x', column_type='continuous', transform=bgm_instance,
+            output_info=[SpanInfo(1, 'tanh'), SpanInfo(3, 'softmax')],
+            output_dimensions=1 + 3
+        )
+
+        # Run
+        result = transformer._inverse_transform_continuous(
+            column_transform_info, column_data, None, None)
+
+        # Assert
+        expected = pd.DataFrame({
+            'x.normalized': [0.1, 0.2, 0.3],
+            'x.component': [0.0, 1.0, 1.0]
+        })
+        np.testing.assert_array_equal(result, expected)
+
+        expected_data = pd.DataFrame({
+            'x.normalized': [0.1, 0.3, 0.5],
+            'x.component': [0, 1, 1]
+        })
+        pd.testing.assert_frame_equal(
+            bgm_instance.reverse_transform.call_args[0][0],
+            expected_data
+        )
 
     def test_inverse_transform(self):
-        """Test `inverse_transform`` on a np.ndarray with continuous and discrete columns.
+        """Test ``inverse_transform`` on a np.ndarray with continuous and discrete columns.
 
         It should use the appropriate '_fit' type for each column and should return
         the corresponding columns. Since we are using the same example as the 'test_transform',
