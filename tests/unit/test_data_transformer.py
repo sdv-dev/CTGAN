@@ -13,7 +13,7 @@ class TestDataTransformer(TestCase):
 
     @patch('ctgan.data_transformer.BayesGMMTransformer')
     def test___fit_continuous(self, MockBGM):
-        """Test ``_fit_continuous_`` on a simple continuous column.
+        """Test ``_fit_continuous`` on a simple continuous column.
 
         A ``BayesGMMTransformer`` will be created and fit with some ``data``.
 
@@ -168,7 +168,6 @@ class TestDataTransformer(TestCase):
         """
         # Setup
         bgm_instance = MockBGM.return_value
-        bgm_instance.transform = Mock()
         bgm_instance.transform.return_value = pd.DataFrame({
             'x.normalized': [0.1, 0.2, 0.3],
             'x.component': [0.0, 1.0, 1.0]
@@ -295,12 +294,11 @@ class TestDataTransformer(TestCase):
         """
         # Setup
         bgm_instance = MockBGM.return_value
-        bgm_instance.get_output_types = Mock()
         bgm_instance.get_output_types.return_value = {
             'x.normalized': 'numerical',
             'x.component': 'numerical'
         }
-        bgm_instance.reverse_transform = Mock()
+
         bgm_instance.reverse_transform.return_value = pd.DataFrame({
             'x.normalized': [0.1, 0.2, 0.3],
             'x.component': [0.0, 1.0, 1.0]
@@ -312,6 +310,7 @@ class TestDataTransformer(TestCase):
             [0.3, 0, 1, 0],
             [0.5, 0, 1, 0],
         ])
+
         column_transform_info = ColumnTransformInfo(
             column_name='x', column_type='continuous', transform=bgm_instance,
             output_info=[SpanInfo(1, 'tanh'), SpanInfo(3, 'softmax')],
@@ -327,12 +326,14 @@ class TestDataTransformer(TestCase):
             'x.normalized': [0.1, 0.2, 0.3],
             'x.component': [0.0, 1.0, 1.0]
         })
+
         np.testing.assert_array_equal(result, expected)
 
         expected_data = pd.DataFrame({
             'x.normalized': [0.1, 0.3, 0.5],
             'x.component': [0, 1, 1]
         })
+
         pd.testing.assert_frame_equal(
             bgm_instance.reverse_transform.call_args[0][0],
             expected_data

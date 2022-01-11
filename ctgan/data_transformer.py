@@ -44,12 +44,13 @@ class DataTransformer(object):
             namedtuple:
                 A ``ColumnTransformInfo`` object.
         """
+        column_name = data.columns[0]
         gm = BayesGMMTransformer()
-        gm.fit(data, list(data.columns))
+        gm.fit(data, [column_name])
         num_components = sum(gm.valid_component_indicator)
 
         return ColumnTransformInfo(
-            column_name=data.columns[0], column_type='continuous', transform=gm,
+            column_name=column_name, column_type='continuous', transform=gm,
             output_info=[SpanInfo(1, 'tanh'), SpanInfo(num_components, 'softmax')],
             output_dimensions=1 + num_components)
 
@@ -64,17 +65,18 @@ class DataTransformer(object):
             namedtuple:
                 A ``ColumnTransformInfo`` object.
         """
+        column_name = data.columns[0]
         ohe = OneHotEncodingTransformer()
-        ohe.fit(data, list(data.columns))
+        ohe.fit(data, [column_name])
         num_categories = len(ohe.dummies)
 
         return ColumnTransformInfo(
-            column_name=data.columns[0], column_type='discrete', transform=ohe,
+            column_name=column_name, column_type='discrete', transform=ohe,
             output_info=[SpanInfo(num_categories, 'softmax')],
             output_dimensions=num_categories)
 
     def fit(self, raw_data, discrete_columns=()):
-        """Fit the data.
+        """Fit the ``DataTransformer``.
 
         Fits a ``BayesGMMTransformer`` for continuous columns and a
         ``OneHotEncodingTransformer`` for discrete columns.
@@ -142,7 +144,8 @@ class DataTransformer(object):
         data = pd.DataFrame(column_data[:, :2], columns=list(gm.get_output_types()))
         data.iloc[:, 1] = np.argmax(column_data[:, 1:], axis=1)
         if sigmas is not None:
-            data.iloc[:, 0] = np.random.normal(data.iloc[:, 0], sigmas[st])
+            selected_normalized_value = np.random.normal(data.iloc[:, 0], sigmas[st])
+            data.iloc[:, 0] = selected_normalized_value
 
         return gm.reverse_transform(data, [column_transform_info.column_name])
 
