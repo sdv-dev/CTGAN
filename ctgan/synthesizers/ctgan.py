@@ -9,6 +9,7 @@ from packaging import version
 from torch import optim
 from torch.nn import BatchNorm1d, Dropout, LeakyReLU, Linear, Module, ReLU, Sequential, functional
 
+from ctgan.callbacks.callback import Callback
 from ctgan.data_sampler import DataSampler
 from ctgan.data_transformer import DataTransformer
 from ctgan.synthesizers.base import BaseSynthesizer
@@ -278,7 +279,7 @@ class CTGANSynthesizer(BaseSynthesizer):
         if invalid_columns:
             raise ValueError(f'Invalid columns found: {invalid_columns}')
 
-    def fit(self, train_data, discrete_columns=(), epochs=None):
+    def fit(self, train_data, discrete_columns=(), epochs=None, callback: Callback = None):
         """Fit the CTGAN Synthesizer models to the training data.
 
         Args:
@@ -337,11 +338,9 @@ class CTGANSynthesizer(BaseSynthesizer):
 
         mean = torch.zeros(self._batch_size, self._embedding_dim, device=self._device)
         std = mean + 1
-
         steps_per_epoch = max(len(train_data) // self._batch_size, 1)
         for i in range(epochs):
             for id_ in range(steps_per_epoch):
-
                 for n in range(self._discriminator_steps):
                     fakez = torch.normal(mean=mean, std=std)
 
@@ -415,6 +414,15 @@ class CTGANSynthesizer(BaseSynthesizer):
                 loss_g.backward()
                 optimizerG.step()
 
+            if callback:
+                self.callback_info = callback.callback(
+                    model=self,
+                    generator_loss=loss_g,
+                    discriminator_loss=loss_d,
+                    epoch=i
+                )
+                if self.callback_info.early_stop:
+                    break
             if self._verbose:
                 print(f'Epoch {i+1}, Loss G: {loss_g.detach().cpu(): .4f},'  # noqa: T001
                       f'Loss D: {loss_d.detach().cpu(): .4f}',

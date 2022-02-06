@@ -1,6 +1,9 @@
 """BaseSynthesizer module."""
 
+
 import torch
+
+from ctgan.callbacks.callback_information import CallbackInformation
 
 
 class BaseSynthesizer:
@@ -8,6 +11,9 @@ class BaseSynthesizer:
 
     This should contain the save/load methods.
     """
+
+    def __init__(self):
+        self.callback_info: CallbackInformation = None
 
     def save(self, path):
         """Save the model in the passed `path`."""

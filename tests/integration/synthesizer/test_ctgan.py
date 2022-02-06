@@ -10,11 +10,14 @@ model are not checked.
 """
 
 import tempfile as tf
+from dataclasses import dataclass
 
 import numpy as np
 import pandas as pd
 import pytest
 
+from ctgan.callbacks.callback import Callback
+from ctgan.callbacks.callback_information import CallbackInformation
 from ctgan.synthesizers.ctgan import CTGANSynthesizer
 
 
@@ -152,6 +155,37 @@ def test_save_load():
     sampled = ctgan.sample(1000)
     assert set(sampled.columns) == {'continuous', 'discrete'}
     assert set(sampled['discrete'].unique()) == {'a', 'b', 'c'}
+
+
+@dataclass
+class MyCallbackInfo(CallbackInformation):
+    epoch_count: int = 0
+
+
+class Cb(Callback):
+    def __init__(self):
+        self.calls = 0
+
+    def callback(self, epoch, **kwargs):
+        self.calls += 1
+        return MyCallbackInfo(
+            early_stop=self.calls > 1,
+            epoch_count=epoch
+        )
+
+
+def test_early_stop():
+    data = pd.DataFrame({
+        'continuous': np.random.random(100),
+        'discrete': np.random.choice(['a', 'b', 'c'], 100)
+    })
+    discrete_columns = ['discrete']
+
+    ctgan = CTGANSynthesizer(epochs=10)
+    ctgan.fit(data, discrete_columns, callback=Cb())
+
+    assert ctgan.callback_info.epoch_count == 1
+    assert ctgan.callback_info.early_stop
 
 
 def test_wrong_discrete_columns_dataframe():
