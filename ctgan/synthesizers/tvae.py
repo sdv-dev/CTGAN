@@ -8,7 +8,7 @@ from torch.optim import Adam
 from torch.utils.data import DataLoader, TensorDataset
 
 from ctgan.data_transformer import DataTransformer
-from ctgan.synthesizers.base import BaseSynthesizer
+from ctgan.synthesizers.base import BaseSynthesizer, random_state
 
 
 class Encoder(Module):
@@ -175,6 +175,7 @@ class TVAESynthesizer(BaseSynthesizer):
                 optimizerAE.step()
                 self.decoder.sigma.data.clamp_(0.01, 1.0)
 
+    @random_state
     def sample(self, samples):
         """Sample data similar to the training data.
 
