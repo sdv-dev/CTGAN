@@ -23,6 +23,8 @@ def set_random_state(random_state, set_model_random_state):
     else:
         desired_state = random_state
 
+    np.random.set_state(desired_state.get_state())
+
     try:
         yield
     finally:
@@ -53,6 +55,7 @@ class BaseSynthesizer:
 
     This should contain the save/load methods.
     """
+
     random_state = None
 
     def save(self, path):
