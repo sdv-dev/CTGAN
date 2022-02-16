@@ -52,7 +52,7 @@ def random_state(function):
     """
 
     def wrapper(self, *args, **kwargs):
-        if self.random_state is None:
+        if self._random_state is None:
             return function(self, *args, **kwargs)
         else:
             with set_random_state(
