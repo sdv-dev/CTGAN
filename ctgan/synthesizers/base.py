@@ -44,7 +44,6 @@ def random_state(function):
         function (Callable):
             The function to wrap around.
     """
-
     def wrapper(self, *args, **kwargs):
         if self.random_states is None:
             return function(self, *args, **kwargs)
@@ -99,6 +98,6 @@ class BaseSynthesizer:
         ):
             self.random_states = random_state
         else:
-            raise ValueError(
-                '`random_state` {random_state} expected to be an int or a tuple of '
+            raise TypeError(
+                f'`random_state` {random_state} expected to be an int or a tuple of '
                 '(`np.random.RandomState`, `torch.Generator`)')

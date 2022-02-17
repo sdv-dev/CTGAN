@@ -133,6 +133,7 @@ class TVAESynthesizer(BaseSynthesizer):
 
         self._device = torch.device(device)
 
+    @random_state
     def fit(self, train_data, discrete_columns=()):
         """Fit the TVAE Synthesizer models to the training data.
 

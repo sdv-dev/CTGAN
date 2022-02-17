@@ -111,9 +111,9 @@ def test_fixed_random_seed():
     discrete_columns = ['discrete']
 
     tvae = TVAESynthesizer(epochs=1)
-    tvae.fit(data, discrete_columns)
 
     # Run
+    tvae.fit(data, discrete_columns)
     sampled_random = tvae.sample(10)
 
     tvae.set_random_state(0)

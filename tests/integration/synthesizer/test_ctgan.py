@@ -211,9 +211,9 @@ def test_fixed_random_seed():
     discrete_columns = ['discrete']
 
     ctgan = CTGANSynthesizer(epochs=1)
-    ctgan.fit(data, discrete_columns)
 
     # Run
+    ctgan.fit(data, discrete_columns)
     sampled_random = ctgan.sample(10)
 
     ctgan.set_random_state(0)
