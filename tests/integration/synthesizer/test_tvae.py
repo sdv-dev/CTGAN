@@ -115,10 +115,17 @@ def test_fixed_random_seed():
 
     # Run
     sampled_random = tvae.sample(10)
-    tvae.set_random_seed(0)
-    sampled_0 = tvae.sample(10)
-    sampled_1 = tvae.sample(10)
+
+    tvae.set_random_state(0)
+    sampled_0_0 = tvae.sample(10)
+    sampled_0_1 = tvae.sample(10)
+
+    tvae.set_random_state(0)
+    sampled_1_0 = tvae.sample(10)
+    sampled_1_1 = tvae.sample(10)
 
     # Assert
-    assert not np.array_equal(sampled_random, sampled_0)
-    np.testing.assert_array_equal(sampled_0, sampled_1)
+    assert not np.array_equal(sampled_random, sampled_0_0)
+    assert not np.array_equal(sampled_random, sampled_0_1)
+    np.testing.assert_array_equal(sampled_0_0, sampled_1_0)
+    np.testing.assert_array_equal(sampled_0_1, sampled_1_1)

@@ -7,24 +7,34 @@ import torch
 
 
 @contextlib.contextmanager
-def random_seed(seed):
-    """Context manager for managing the random seed.
+def set_random_states(random_state, set_model_random_state):
+    """Context manager for managing the random state.
 
     Args:
-        seed (int):
-            The random seed.
+        random_state (int or tuple):
+            The random seed or a tuple of (numpy.random.RandomState, torch.Generator).
+        set_model_random_state (function):
+            Function to set the random state on the model.
     """
-    state = np.random.get_state()
-    torch_state = torch.get_rng_state()
+    original_np_state = np.random.get_state()
+    original_torch_state = torch.get_rng_state()
 
-    np.random.seed(seed)
-    torch.manual_seed(seed)
+    random_np_state, random_torch_state = random_state
+
+    np.random.set_state(random_np_state.get_state())
+    torch.set_rng_state(random_torch_state.get_state())
 
     try:
         yield
     finally:
-        np.random.set_state(state)
-        torch.set_rng_state(torch_state)
+        current_np_state = np.random.RandomState()
+        current_np_state.set_state(np.random.get_state())
+        current_torch_state = torch.Generator()
+        current_torch_state.set_state(torch.get_rng_state())
+        set_model_random_state((current_np_state, current_torch_state))
+
+        np.random.set_state(original_np_state)
+        torch.set_rng_state(original_torch_state)
 
 
 def random_state(function):
@@ -36,11 +46,11 @@ def random_state(function):
     """
 
     def wrapper(self, *args, **kwargs):
-        if self._random_seed is None:
+        if self.random_states is None:
             return function(self, *args, **kwargs)
 
         else:
-            with random_seed(self._random_seed):
+            with set_random_states(self.random_states, self.set_random_state):
                 return function(self, *args, **kwargs)
 
     return wrapper
@@ -52,7 +62,7 @@ class BaseSynthesizer:
     This should contain the save/load methods.
     """
 
-    _random_seed = None
+    random_states = None
 
     def save(self, path):
         """Save the model in the passed `path`."""
@@ -69,11 +79,26 @@ class BaseSynthesizer:
         model.set_device(device)
         return model
 
-    def set_random_seed(self, random_seed):
-        """Set the random seed.
+    def set_random_state(self, random_state):
+        """Set the random state.
 
         Args:
-            random_seed (int):
-                Seed for the random generator.
+            random_state (tuple or int):
+                Either a tuple containing the (numpy.random.RandomState, torch.Generator)
+                or an int representing the random seed to use for both random states.
         """
-        self._random_seed = random_seed
+        if isinstance(random_state, int):
+            self.random_states = (
+                np.random.RandomState(seed=random_state),
+                torch.Generator().manual_seed(random_state),
+            )
+        elif (
+            isinstance(random_state, tuple) and
+            isinstance(random_state[0], np.random.RandomState) and
+            isinstance(random_state[1], torch.Generator)
+        ):
+            self.random_states = random_state
+        else:
+            raise ValueError(
+                '`random_state` {random_state} expected to be an int or a tuple of '
+                '(`np.random.RandomState`, `torch.Generator`)')

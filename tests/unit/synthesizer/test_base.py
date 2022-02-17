@@ -1,27 +1,37 @@
 
 """BaseSynthesizer unit testing module."""
 
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock, call, patch
+
+import numpy as np
+import torch
 
 from ctgan.synthesizers.base import BaseSynthesizer, random_state
 
 
 @patch('ctgan.synthesizers.base.torch')
 @patch('ctgan.synthesizers.base.np.random')
-def test_valid_random_seed(random_mock, torch_mock):
-    """Test the ``random_seed`` attribute with a valid random seed.
+def test_valid_random_state(random_mock, torch_mock):
+    """Test the ``random_state`` attribute with a valid random state.
 
     Expect that the decorated function uses the random_state attribute.
     """
     # Setup
     my_function = MagicMock()
     instance = MagicMock()
-    instance._random_seed = 42
+
+    random_state_mock = MagicMock()
+    random_state_mock.get_state.return_value = 'desired numpy state'
+    torch_generator_mock = MagicMock()
+    torch_generator_mock.get_state.return_value = 'desired torch state'
+    instance.random_states = (random_state_mock, torch_generator_mock)
 
     args = {'some', 'args'}
     kwargs = {'keyword': 'value'}
 
+    random_mock.RandomState.return_value = random_state_mock
     random_mock.get_state.return_value = 'random state'
+    torch_mock.Generator.return_value = torch_generator_mock
     torch_mock.get_rng_state.return_value = 'torch random state'
 
     # Run
@@ -32,17 +42,19 @@ def test_valid_random_seed(random_mock, torch_mock):
     my_function.assert_called_once_with(instance, *args, **kwargs)
 
     instance.assert_not_called
-    random_mock.get_state.assert_called_once_with()
-    torch_mock.get_rng_state.assert_called_once_with()
-    random_mock.seed.assert_called_once_with(42)
-    random_mock.set_state.assert_called_once_with('random state')
-    torch_mock.set_rng_state.assert_called_once_with('torch random state')
+    assert random_mock.get_state.call_count == 2
+    assert torch_mock.get_rng_state.call_count == 2
+    random_mock.RandomState.assert_has_calls(
+        [call().get_state(), call(), call().set_state('random state')])
+    random_mock.set_state.assert_has_calls([call('desired numpy state'), call('random state')])
+    torch_mock.set_rng_state.assert_has_calls(
+        [call('desired torch state'), call('torch random state')])
 
 
 @patch('ctgan.synthesizers.base.torch')
 @patch('ctgan.synthesizers.base.np.random')
 def test_no_random_seed(random_mock, torch_mock):
-    """Test the ``random_seed`` attribute with no random seed.
+    """Test the ``random_state`` attribute with no random state.
 
     Expect that the decorated function calls the original function
     when there is no random state.
@@ -50,7 +62,7 @@ def test_no_random_seed(random_mock, torch_mock):
     # Setup
     my_function = MagicMock()
     instance = MagicMock()
-    instance._random_seed = None
+    instance.random_states = None
 
     args = {'some', 'args'}
     kwargs = {'keyword': 'value'}
@@ -64,21 +76,24 @@ def test_no_random_seed(random_mock, torch_mock):
 
     instance.assert_not_called
     random_mock.get_state.assert_not_called()
-    random_mock.seed.assert_not_called()
+    random_mock.RandomState.assert_not_called()
     random_mock.set_state.assert_not_called()
     torch_mock.get_rng_state.assert_not_called()
+    torch_mock.Generator.assert_not_called()
     torch_mock.set_rng_state.assert_not_called()
 
 
 class TestBaseSynthesizer:
 
-    def test_set_random_seed(self):
-        """Test ``set_random_seed`` works as expected."""
+    def test_set_random_state(self):
+        """Test ``set_random_state`` works as expected."""
         # Setup
         instance = BaseSynthesizer()
 
         # Run
-        instance.set_random_seed(3)
+        instance.set_random_state(3)
 
         # Assert
-        assert instance._random_seed == 3
+        assert isinstance(instance.random_states, tuple)
+        assert isinstance(instance.random_states[0], np.random.RandomState)
+        assert isinstance(instance.random_states[1], torch.Generator)

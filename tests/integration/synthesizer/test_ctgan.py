@@ -215,13 +215,20 @@ def test_fixed_random_seed():
 
     # Run
     sampled_random = ctgan.sample(10)
-    ctgan.set_random_seed(0)
-    sampled_0 = ctgan.sample(10)
-    sampled_1 = ctgan.sample(10)
+
+    ctgan.set_random_state(0)
+    sampled_0_0 = ctgan.sample(10)
+    sampled_0_1 = ctgan.sample(10)
+
+    ctgan.set_random_state(0)
+    sampled_1_0 = ctgan.sample(10)
+    sampled_1_1 = ctgan.sample(10)
 
     # Assert
-    assert not np.array_equal(sampled_random, sampled_0)
-    np.testing.assert_array_equal(sampled_0, sampled_1)
+    assert not np.array_equal(sampled_random, sampled_0_0)
+    assert not np.array_equal(sampled_random, sampled_0_1)
+    np.testing.assert_array_equal(sampled_0_0, sampled_1_0)
+    np.testing.assert_array_equal(sampled_0_1, sampled_1_1)
 
 
 # Below are CTGAN tests that should be implemented in the future
