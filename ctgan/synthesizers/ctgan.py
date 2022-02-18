@@ -11,7 +11,7 @@ from torch.nn import BatchNorm1d, Dropout, LeakyReLU, Linear, Module, ReLU, Sequ
 
 from ctgan.data_sampler import DataSampler
 from ctgan.data_transformer import DataTransformer
-from ctgan.synthesizers.base import BaseSynthesizer
+from ctgan.synthesizers.base import BaseSynthesizer, random_state
 
 
 class Discriminator(Module):
@@ -278,6 +278,7 @@ class CTGANSynthesizer(BaseSynthesizer):
         if invalid_columns:
             raise ValueError(f'Invalid columns found: {invalid_columns}')
 
+    @random_state
     def fit(self, train_data, discrete_columns=(), epochs=None):
         """Fit the CTGAN Synthesizer models to the training data.
 
@@ -420,6 +421,7 @@ class CTGANSynthesizer(BaseSynthesizer):
                       f'Loss D: {loss_d.detach().cpu(): .4f}',
                       flush=True)
 
+    @random_state
     def sample(self, n, condition_column=None, condition_value=None):
         """Sample data similar to the training data.
 

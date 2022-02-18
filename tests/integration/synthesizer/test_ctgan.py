@@ -196,6 +196,41 @@ def test_wrong_sampling_conditions():
         ctgan.sample(1, 'discrete', 'd')
 
 
+def test_fixed_random_seed():
+    """Test the CTGANSynthesizer with a fixed seed.
+
+    Expect that when the random seed is reset with the same seed, the same sequence
+    of data will be produced. Expect that the data generated with the seed is
+    different than randomly sampled data.
+    """
+    # Setup
+    data = pd.DataFrame({
+        'continuous': np.random.random(100),
+        'discrete': np.random.choice(['a', 'b', 'c'], 100)
+    })
+    discrete_columns = ['discrete']
+
+    ctgan = CTGANSynthesizer(epochs=1)
+
+    # Run
+    ctgan.fit(data, discrete_columns)
+    sampled_random = ctgan.sample(10)
+
+    ctgan.set_random_state(0)
+    sampled_0_0 = ctgan.sample(10)
+    sampled_0_1 = ctgan.sample(10)
+
+    ctgan.set_random_state(0)
+    sampled_1_0 = ctgan.sample(10)
+    sampled_1_1 = ctgan.sample(10)
+
+    # Assert
+    assert not np.array_equal(sampled_random, sampled_0_0)
+    assert not np.array_equal(sampled_random, sampled_0_1)
+    np.testing.assert_array_equal(sampled_0_0, sampled_1_0)
+    np.testing.assert_array_equal(sampled_0_1, sampled_1_1)
+
+
 # Below are CTGAN tests that should be implemented in the future
 def test_continuous():
     """Test training the CTGAN synthesizer on a continuous dataset."""

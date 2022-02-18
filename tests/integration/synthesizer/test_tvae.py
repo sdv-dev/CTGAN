@@ -9,6 +9,7 @@ but correctness of the data values and the internal behavior of the
 model are not checked.
 """
 
+import numpy as np
 import pandas as pd
 from sklearn import datasets
 
@@ -93,3 +94,38 @@ def test__loss_function():
     avg_error = error / num_samples
 
     assert avg_error < 400
+
+
+def test_fixed_random_seed():
+    """Test the TVAESynthesizer with a fixed seed.
+
+    Expect that when the random seed is reset with the same seed, the same sequence
+    of data will be produced. Expect that the data generated with the seed is
+    different than randomly sampled data.
+    """
+    # Setup
+    data = pd.DataFrame({
+        'continuous': np.random.random(100),
+        'discrete': np.random.choice(['a', 'b', 'c'], 100)
+    })
+    discrete_columns = ['discrete']
+
+    tvae = TVAESynthesizer(epochs=1)
+
+    # Run
+    tvae.fit(data, discrete_columns)
+    sampled_random = tvae.sample(10)
+
+    tvae.set_random_state(0)
+    sampled_0_0 = tvae.sample(10)
+    sampled_0_1 = tvae.sample(10)
+
+    tvae.set_random_state(0)
+    sampled_1_0 = tvae.sample(10)
+    sampled_1_1 = tvae.sample(10)
+
+    # Assert
+    assert not np.array_equal(sampled_random, sampled_0_0)
+    assert not np.array_equal(sampled_random, sampled_0_1)
+    np.testing.assert_array_equal(sampled_0_0, sampled_1_0)
+    np.testing.assert_array_equal(sampled_0_1, sampled_1_1)
