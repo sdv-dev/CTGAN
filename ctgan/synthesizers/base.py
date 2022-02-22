@@ -82,11 +82,13 @@ class BaseSynthesizer:
         """Set the random state.
 
         Args:
-            random_state (tuple or int):
+            random_state (int, tuple, or None):
                 Either a tuple containing the (numpy.random.RandomState, torch.Generator)
                 or an int representing the random seed to use for both random states.
         """
-        if isinstance(random_state, int):
+        if random_state is None:
+            self.random_state = random_state
+        elif isinstance(random_state, int):
             self.random_states = (
                 np.random.RandomState(seed=random_state),
                 torch.Generator().manual_seed(random_state),
