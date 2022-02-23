@@ -97,3 +97,14 @@ class TestBaseSynthesizer:
         assert isinstance(instance.random_states, tuple)
         assert isinstance(instance.random_states[0], np.random.RandomState)
         assert isinstance(instance.random_states[1], torch.Generator)
+
+    def test_set_random_state_with_none(self):
+        """Test ``set_random_state`` with None."""
+        # Setup
+        instance = BaseSynthesizer()
+
+        # Run
+        instance.set_random_state(None)
+
+        # Assert
+        assert instance.random_states is None
