@@ -103,8 +103,9 @@ class TestBaseSynthesizer:
         # Setup
         instance = BaseSynthesizer()
 
-        # Run
-        instance.set_random_state(None)
+        # Run and assert
+        instance.set_random_state(3)
+        assert instance.random_states is not None
 
-        # Assert
+        instance.set_random_state(None)
         assert instance.random_states is None
