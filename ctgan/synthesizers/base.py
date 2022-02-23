@@ -87,7 +87,7 @@ class BaseSynthesizer:
                 or an int representing the random seed to use for both random states.
         """
         if random_state is None:
-            self.random_state = random_state
+            self.random_states = random_state
         elif isinstance(random_state, int):
             self.random_states = (
                 np.random.RandomState(seed=random_state),
