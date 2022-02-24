@@ -154,7 +154,7 @@ class TVAESynthesizer(BaseSynthesizer):
 
         data_dim = self.transformer.output_dimensions
         encoder = Encoder(data_dim, self.compress_dims, self.embedding_dim).to(self._device)
-        self.decoder = Decoder(self.embedding_dim, self.compress_dims, data_dim).to(self._device)
+        self.decoder = Decoder(self.embedding_dim, self.decompress_dims, data_dim).to(self._device)
         optimizerAE = Adam(
             list(encoder.parameters()) + list(self.decoder.parameters()),
             weight_decay=self.l2scale)
