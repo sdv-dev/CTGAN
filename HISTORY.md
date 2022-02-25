@@ -1,5 +1,15 @@
 # History
 
+## v0.5.1 - 2022-02-25
+
+This release fixes a bug with the decoder instantiation, and also allows users to set a random state for the model
+fitting and sampling.
+
+### Issues closed
+
+* Update self.decoder with correct variable name - Issue [#203](https://github.com/sdv-dev/CTGAN/issues/203) by @tejuafonja
+* Add random state - Issue [#204](https://github.com/sdv-dev/CTGAN/issues/204) by @katxiao
+
 ## v0.5.0 - 2021-11-18
 
 This release adds support for Python 3.9 and updates dependencies to ensure compatibility with the
