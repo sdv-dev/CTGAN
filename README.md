@@ -1,8 +1,7 @@
-<p align="left">
-  <a href="https://dai.lids.mit.edu">
-    <img width=15% src="https://dai.lids.mit.edu/wp-content/uploads/2018/06/Logo_DAI_highres.png" alt="DAI-Lab" />
-  </a>
-  <i>An Open Source Project from the <a href="https://dai.lids.mit.edu">Data to AI Lab, at MIT</a></i>
+<div align="center">
+<br/>
+<p align="center">
+    <i>This repository is part of <a href="https://sdv.dev">The Synthetic Data Vault Project</a>, a project from <a href="https://datacebo.com">DataCebo</a>.</i>
 </p>
 
 [![Development Status](https://img.shields.io/badge/Development%20Status-2%20--%20Pre--Alpha-yellow)](https://pypi.org/search/?c=Development+Status+%3A%3A+2+-+Pre-Alpha)
@@ -11,18 +10,44 @@
 [![Downloads](https://pepy.tech/badge/ctgan)](https://pepy.tech/project/ctgan)
 [![Coverage Status](https://codecov.io/gh/sdv-dev/CTGAN/branch/master/graph/badge.svg)](https://codecov.io/gh/sdv-dev/CTGAN)
 
+<div align="left">
+<br/>
+<p align="center">
+<a href="https://github.com/sdv-dev/CTGAN">
+<img align="center" width=40% src="https://github.com/sdv-dev/SDV/blob/master/docs/images/CTGAN-DataCebo.png"></img>
+</a>
+</p>
+</div>
 
-<img align="center" width=30% src="docs/images/ctgan.png">
+</div>
 
-* Website: https://sdv.dev
-* Documentation: https://sdv.dev/SDV
-* Repository: https://github.com/sdv-dev/CTGAN
-* License: [MIT](https://github.com/sdv-dev/CTGAN/blob/master/LICENSE)
-* Development Status: [Pre-Alpha](https://pypi.org/search/?c=Development+Status+%3A%3A+2+-+Pre-Alpha)
-
-## Overview
+# Overview
 
 CTGAN is a collection of Deep Learning based Synthetic Data Generators for single table data, which are able to learn from real data and generate synthetic clones with high fidelity.
+
+| Important Links                               |                                                                      |
+| --------------------------------------------- | -------------------------------------------------------------------- |
+| :computer: **[Website]**                      | Check out the SDV Website for more information about the project.    |
+| :orange_book: **[SDV Blog]**                  | Regular publshing of useful content about Synthetic Data Generation. |
+| :book: **[Documentation]**                    | Quickstarts, User and Development Guides, and API Reference.         |
+| :octocat: **[Repository]**                    | The link to the Github Repository of this library.                   |
+| :scroll: **[License]**                        | The entire ecosystem is published under the MIT License.             |
+| :keyboard: **[Development Status]**           | This software is in its Pre-Alpha stage.                             |
+| [![][Slack Logo] **Community**][Community]    | Join our Slack Workspace for announcements and discussions.          |
+| [![][MyBinder Logo] **Tutorials**][Tutorials] | Run the SDV Tutorials in a Binder environment.                       |
+
+[Website]: https://sdv.dev
+[SDV Blog]: https://sdv.dev/blog
+[Documentation]: https://sdv.dev/SDV
+[Repository]: https://github.com/sdv-dev/CTGAN
+[License]: https://github.com/sdv-dev/CTGAN/blob/master/LICENSE
+[Development Status]: https://pypi.org/search/?c=Development+Status+%3A%3A+2+-+Pre-Alpha
+[Slack Logo]: https://github.com/sdv-dev/SDV/blob/master/docs/images/slack.png
+[Community]: https://join.slack.com/t/sdv-space/shared_invite/zt-gdsfcb5w-0QQpFMVoyB2Yd6SRiMplcw
+[MyBinder Logo]: https://github.com/sdv-dev/SDV/blob/master/docs/images/mybinder.png
+[Tutorials]: https://mybinder.org/v2/gh/sdv-dev/SDV/master?filepath=tutorials
+
+## Implemented Models
 
 Currently, this library implements the **CTGAN** and **TVAE** models proposed in the [Modeling Tabular data using Conditional GAN](https://arxiv.org/abs/1907.00503) paper. For more information about these models, please check out the respective user guides:
 * [CTGAN User Guide](https://sdv.dev/SDV/user_guides/single_table/ctgan.html).
@@ -30,30 +55,25 @@ Currently, this library implements the **CTGAN** and **TVAE** models proposed in
 
 # Install
 
-## Requirements
+**CTGAN** is part of the **SDV** project and is automatically installed alongside it. For
+details about this process please visit the [SDV Installation Guide](
+https://sdv.dev/SDV/getting_started/install.html)
 
-**CTGAN** has been developed and tested on [Python 3.6, 3.7 and 3.8](https://www.python.org/downloads/)
+Optionally, **CTGAN** can also be installed as a standalone library using the following commands:
 
-## Install from PyPI
-
-The recommended way to installing **CTGAN** is using [pip](https://pip.pypa.io/en/stable/):
+**Using `pip`:**
 
 ```bash
 pip install ctgan
 ```
 
-This will pull and install the latest stable release from [PyPI](https://pypi.org/).
-
-## Install with conda
-
-**CTGAN** can also be installed using [conda](https://docs.conda.io/en/latest/):
+**Using `conda`:**
 
 ```bash
-conda install -c sdv-dev -c pytorch -c conda-forge ctgan
+conda install -c pytorch -c conda-forge ctgan
 ```
 
-This will pull and install the latest stable release from [Anaconda](https://anaconda.org/).
-
+For more installation options please visit the [CTGAN installation Guide](INSTALL.md)
 
 # Usage Example
 
@@ -135,15 +155,28 @@ A package to easily deploy **CTGAN** onto a remote server. This package is devel
 
 More details can be found in the corresponding repository: https://github.com/oregonpillow/ctgan-server-cli
 
+---
 
-# The Synthetic Data Vault
 
-<p>
-  <a href="https://sdv.dev">
-    <img width=30% src="https://github.com/sdv-dev/SDV/blob/master/docs/images/SDV-Logo-Color-Tagline.png?raw=true">
-  </a>
-  <p><i>This repository is part of <a href="https://sdv.dev">The Synthetic Data Vault Project</a></i></p>
-</p>
+<div align="center">
+<a href="https://datacebo.com"><img align="center" width=40% src="https://github.com/sdv-dev/SDV/blob/master/docs/images/DataCebo.png"></img></a>
+</div>
+<br/>
+<br/>
 
-* Website: https://sdv.dev
-* Documentation: https://sdv.dev/SDV
+[The Synthetic Data Vault Project](https://sdv.dev) was first created at MIT's [Data to AI Lab](
+https://dai.lids.mit.edu/) in 2016. After 4 years of research and traction with enterprise, we
+created [DataCebo](https://datacebo.com) in 2020 with the goal of growing the project.
+Today, DataCebo is the proud developer of SDV, the largest ecosystem for
+synthetic data generation & evaluation. It is home to multiple libraries that support synthetic
+data, including:
+
+* 🔄 Data discovery & transformation. Reverse the transforms to reproduce realistic data.
+* 🧠 Multiple machine learning models -- ranging from Copulas to Deep Learning -- to create tabular,
+  multi table and time series data.
+* 📊 Measuring quality and privacy of synthetic data, and comparing different synthetic data
+  generation models.
+
+[Get started using the SDV package](https://sdv.dev/SDV/getting_started/install.html) -- a fully
+integrated solution and your one-stop shop for synthetic data. Or, use the standalone libraries
+for specific needs.

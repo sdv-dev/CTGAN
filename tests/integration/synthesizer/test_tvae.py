@@ -9,6 +9,7 @@ but correctness of the data values and the internal behavior of the
 model are not checked.
 """
 
+import numpy as np
 import pandas as pd
 from sklearn import datasets
 
@@ -16,6 +17,7 @@ from ctgan.synthesizers.tvae import TVAESynthesizer
 
 
 def test_tvae(tmpdir):
+    """Test the TVAESynthesizer load/save methods."""
     iris = datasets.load_iris()
     data = pd.DataFrame(iris.data, columns=iris.feature_names)
     data['class'] = pd.Series(iris.target).map(iris.target_names.__getitem__)
@@ -36,6 +38,7 @@ def test_tvae(tmpdir):
 
 
 def test_drop_last_false():
+    """Test the TVAESynthesizer predicts the correct values."""
     data = pd.DataFrame({
         '1': ['a', 'b', 'c'] * 150,
         '2': ['a', 'b', 'c'] * 150
@@ -72,7 +75,8 @@ def test_mixed():
     # using a kstest for continuous + a cstest for categorical.
 
 
-def test_loss_function():
+def test__loss_function():
+    """Test the TVAESynthesizer produces average values similar to the training data."""
     data = pd.DataFrame({
         '1': [float(i) for i in range(1000)],
         '2': [float(2 * i) for i in range(1000)]
@@ -90,3 +94,38 @@ def test_loss_function():
     avg_error = error / num_samples
 
     assert avg_error < 400
+
+
+def test_fixed_random_seed():
+    """Test the TVAESynthesizer with a fixed seed.
+
+    Expect that when the random seed is reset with the same seed, the same sequence
+    of data will be produced. Expect that the data generated with the seed is
+    different than randomly sampled data.
+    """
+    # Setup
+    data = pd.DataFrame({
+        'continuous': np.random.random(100),
+        'discrete': np.random.choice(['a', 'b', 'c'], 100)
+    })
+    discrete_columns = ['discrete']
+
+    tvae = TVAESynthesizer(epochs=1)
+
+    # Run
+    tvae.fit(data, discrete_columns)
+    sampled_random = tvae.sample(10)
+
+    tvae.set_random_state(0)
+    sampled_0_0 = tvae.sample(10)
+    sampled_0_1 = tvae.sample(10)
+
+    tvae.set_random_state(0)
+    sampled_1_0 = tvae.sample(10)
+    sampled_1_1 = tvae.sample(10)
+
+    # Assert
+    assert not np.array_equal(sampled_random, sampled_0_0)
+    assert not np.array_equal(sampled_random, sampled_0_1)
+    np.testing.assert_array_equal(sampled_0_0, sampled_1_0)
+    np.testing.assert_array_equal(sampled_0_1, sampled_1_1)

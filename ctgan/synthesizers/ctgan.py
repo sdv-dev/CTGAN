@@ -1,3 +1,5 @@
+"""CTGANSynthesizer module."""
+
 import warnings
 
 import numpy as np
@@ -9,10 +11,11 @@ from torch.nn import BatchNorm1d, Dropout, LeakyReLU, Linear, Module, ReLU, Sequ
 
 from ctgan.data_sampler import DataSampler
 from ctgan.data_transformer import DataTransformer
-from ctgan.synthesizers.base import BaseSynthesizer
+from ctgan.synthesizers.base import BaseSynthesizer, random_state
 
 
 class Discriminator(Module):
+    """Discriminator for the CTGANSynthesizer."""
 
     def __init__(self, input_dim, discriminator_dim, pac=10):
         super(Discriminator, self).__init__()
@@ -28,6 +31,7 @@ class Discriminator(Module):
         self.seq = Sequential(*seq)
 
     def calc_gradient_penalty(self, real_data, fake_data, device='cpu', pac=10, lambda_=10):
+        """Compute the gradient penalty."""
         alpha = torch.rand(real_data.size(0) // pac, 1, 1, device=device)
         alpha = alpha.repeat(1, pac, real_data.size(1))
         alpha = alpha.view(-1, real_data.size(1))
@@ -42,18 +46,19 @@ class Discriminator(Module):
             create_graph=True, retain_graph=True, only_inputs=True
         )[0]
 
-        gradient_penalty = ((
-            gradients.view(-1, pac * real_data.size(1)).norm(2, dim=1) - 1
-        ) ** 2).mean() * lambda_
+        gradients_view = gradients.view(-1, pac * real_data.size(1)).norm(2, dim=1) - 1
+        gradient_penalty = ((gradients_view) ** 2).mean() * lambda_
 
         return gradient_penalty
 
-    def forward(self, input):
-        assert input.size()[0] % self.pac == 0
-        return self.seq(input.view(-1, self.pacdim))
+    def forward(self, input_):
+        """Apply the Discriminator to the `input_`."""
+        assert input_.size()[0] % self.pac == 0
+        return self.seq(input_.view(-1, self.pacdim))
 
 
 class Residual(Module):
+    """Residual layer for the CTGANSynthesizer."""
 
     def __init__(self, i, o):
         super(Residual, self).__init__()
@@ -61,14 +66,16 @@ class Residual(Module):
         self.bn = BatchNorm1d(o)
         self.relu = ReLU()
 
-    def forward(self, input):
-        out = self.fc(input)
+    def forward(self, input_):
+        """Apply the Residual layer to the `input_`."""
+        out = self.fc(input_)
         out = self.bn(out)
         out = self.relu(out)
-        return torch.cat([out, input], dim=1)
+        return torch.cat([out, input_], dim=1)
 
 
 class Generator(Module):
+    """Generator for the CTGANSynthesizer."""
 
     def __init__(self, embedding_dim, generator_dim, data_dim):
         super(Generator, self).__init__()
@@ -80,8 +87,9 @@ class Generator(Module):
         seq.append(Linear(dim, data_dim))
         self.seq = Sequential(*seq)
 
-    def forward(self, input):
-        data = self.seq(input)
+    def forward(self, input_):
+        """Apply the Generator to the `input_`."""
+        data = self.seq(input_)
         return data
 
 
@@ -92,6 +100,7 @@ class CTGANSynthesizer(BaseSynthesizer):
     are orchestrated together.
     For more details about the process, please check the [Modeling Tabular data using
     Conditional GAN](https://arxiv.org/abs/1907.00503) paper.
+
     Args:
         embedding_dim (int):
             Size of the random sample passed to the Generator. Defaults to 128.
@@ -173,26 +182,28 @@ class CTGANSynthesizer(BaseSynthesizer):
 
         For more details about the issue:
         https://drive.google.com/file/d/1AA5wPfZ1kquaRtVruCd6BiYZGcDeNxyP/view?usp=sharing
+
         Args:
-            logits:
-                […, num_features] unnormalized log probabilities
+            logits […, num_features]:
+                Unnormalized log probabilities
             tau:
-                non-negative scalar temperature
-            hard:
-                if True, the returned samples will be discretized as one-hot vectors,
+                Non-negative scalar temperature
+            hard (bool):
+                If True, the returned samples will be discretized as one-hot vectors,
                 but will be differentiated as if it is the soft sample in autograd
             dim (int):
-                a dimension along which softmax will be computed. Default: -1.
+                A dimension along which softmax will be computed. Default: -1.
+
         Returns:
             Sampled tensor of same shape as logits from the Gumbel-Softmax distribution.
         """
-        if version.parse(torch.__version__) < version.parse("1.2.0"):
+        if version.parse(torch.__version__) < version.parse('1.2.0'):
             for i in range(10):
                 transformed = functional.gumbel_softmax(logits, tau=tau, hard=hard,
                                                         eps=eps, dim=dim)
                 if not torch.isnan(transformed).any():
                     return transformed
-            raise ValueError("gumbel_softmax returning NaN.")
+            raise ValueError('gumbel_softmax returning NaN.')
 
         return functional.gumbel_softmax(logits, tau=tau, hard=hard, eps=eps, dim=dim)
 
@@ -212,7 +223,7 @@ class CTGANSynthesizer(BaseSynthesizer):
                     data_t.append(transformed)
                     st = ed
                 else:
-                    assert 0
+                    raise ValueError(f'Unexpected activation function {span_info.activation_fn}.')
 
         return torch.cat(data_t, dim=1)
 
@@ -223,7 +234,7 @@ class CTGANSynthesizer(BaseSynthesizer):
         st_c = 0
         for column_info in self._transformer.output_info_list:
             for span_info in column_info:
-                if len(column_info) != 1 or span_info.activation_fn != "softmax":
+                if len(column_info) != 1 or span_info.activation_fn != 'softmax':
                     # not discrete column
                     st += span_info.dim
                 else:
@@ -238,7 +249,7 @@ class CTGANSynthesizer(BaseSynthesizer):
                     st = ed
                     st_c = ed_c
 
-        loss = torch.stack(loss, dim=1)
+        loss = torch.stack(loss, dim=1)  # noqa: PD013
 
         return (loss * m).sum() / data.size()[0]
 
@@ -265,9 +276,10 @@ class CTGANSynthesizer(BaseSynthesizer):
             raise TypeError('``train_data`` should be either pd.DataFrame or np.array.')
 
         if invalid_columns:
-            raise ValueError('Invalid columns found: {}'.format(invalid_columns))
+            raise ValueError(f'Invalid columns found: {invalid_columns}')
 
-    def fit(self, train_data, discrete_columns=tuple(), epochs=None):
+    @random_state
+    def fit(self, train_data, discrete_columns=(), epochs=None):
         """Fit the CTGAN Synthesizer models to the training data.
 
         Args:
@@ -405,15 +417,17 @@ class CTGANSynthesizer(BaseSynthesizer):
                 optimizerG.step()
 
             if self._verbose:
-                print(f"Epoch {i+1}, Loss G: {loss_g.detach().cpu(): .4f}, "
-                      f"Loss D: {loss_d.detach().cpu(): .4f}",
+                print(f'Epoch {i+1}, Loss G: {loss_g.detach().cpu(): .4f},'  # noqa: T001
+                      f'Loss D: {loss_d.detach().cpu(): .4f}',
                       flush=True)
 
+    @random_state
     def sample(self, n, condition_column=None, condition_value=None):
         """Sample data similar to the training data.
 
         Choosing a condition_column and condition_value will increase the probability of the
         discrete condition_value happening in the condition_column.
+
         Args:
             n (int):
                 Number of rows to sample.
@@ -422,6 +436,7 @@ class CTGANSynthesizer(BaseSynthesizer):
             condition_value (string):
                 Name of the category in the condition_column which we wish to increase the
                 probability of happening.
+
         Returns:
             numpy.ndarray or pandas.DataFrame
         """
@@ -462,6 +477,7 @@ class CTGANSynthesizer(BaseSynthesizer):
         return self._transformer.inverse_transform(data)
 
     def set_device(self, device):
+        """Set the `device` to be used ('GPU' or 'CPU)."""
         self._device = device
         if self._generator is not None:
             self._generator.to(self._device)

@@ -1,3 +1,5 @@
+"""Synthesizers module."""
+
 from ctgan.synthesizers.ctgan import CTGANSynthesizer
 from ctgan.synthesizers.tvae import TVAESynthesizer
 
