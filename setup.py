@@ -114,6 +114,6 @@ setup(
     test_suite='tests',
     tests_require=tests_require,
     url='https://github.com/sdv-dev/CTGAN',
-    version='0.5.1.dev3',
+    version='0.5.1.dev4',
     zip_safe=False,
 )
