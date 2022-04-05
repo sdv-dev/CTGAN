@@ -279,7 +279,7 @@ class CTGANSynthesizer(BaseSynthesizer):
             raise ValueError(f'Invalid columns found: {invalid_columns}')
 
     @random_state
-    def fit(self, train_data, discrete_columns=(), epochs=None):
+    def fit(self, train_data, discrete_columns=(), epochs=None, transformer_load=False, transformer=None):
         """Fit the CTGAN Synthesizer models to the training data.
 
         Args:
@@ -301,9 +301,12 @@ class CTGANSynthesizer(BaseSynthesizer):
                  'in a future version. Please pass `epochs` to the constructor instead'),
                 DeprecationWarning
             )
-
-        self._transformer = DataTransformer()
-        self._transformer.fit(train_data, discrete_columns)
+        
+        if not transformer_load:
+            self._transformer = DataTransformer()
+            self._transformer.fit(train_data, discrete_columns)
+        else:
+            self._transformer = transformer
 
         train_data = self._transformer.transform(train_data)
 
