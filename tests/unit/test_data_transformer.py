@@ -52,7 +52,7 @@ class TestDataTransformer(TestCase):
         assert info.output_info[0].activation_fn == 'tanh'
         assert info.output_info[1].dim == 2
         assert info.output_info[1].activation_fn == 'softmax'
-    
+
     @patch('ctgan.data_transformer.BayesGMMTransformer')
     def test__fit_continuous_max_clusters(MockBGM):
         """Test ``_fit_continuous`` with data that has less than 10 rows.
@@ -62,7 +62,7 @@ class TestDataTransformer(TestCase):
 
         Input:
         - Data with less than 10 rows.
-        
+
         Side Effects:
         - A ``BayesGMMTransformer`` is created with the max number of clusters set to the
           length of the data.
@@ -70,7 +70,7 @@ class TestDataTransformer(TestCase):
         # Setup
         data = pd.DataFrame(np.random.normal((7, 1)), columns=['column'])
         transformer = DataTransformer()
-    
+
         # Run
         transformer._fit_continuous(data)
 
