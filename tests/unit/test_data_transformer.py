@@ -54,7 +54,7 @@ class TestDataTransformer(TestCase):
         assert info.output_info[1].activation_fn == 'softmax'
 
     @patch('ctgan.data_transformer.BayesGMMTransformer')
-    def test__fit_continuous_max_clusters(MockBGM):
+    def test__fit_continuous_max_clusters(self, MockBGM):
         """Test ``_fit_continuous`` with data that has less than 10 rows.
 
         Expect that a ``BayesGMMTransformer`` is created with the max number of clusters
