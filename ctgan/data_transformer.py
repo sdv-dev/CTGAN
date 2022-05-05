@@ -108,9 +108,9 @@ class DataTransformer(object):
 
     def _transform_continuous(self, column_transform_info, data):
         column_name = data.columns[0]
-        data[column_name] = data[column_name].to_numpy().flatten()
+        flatten_data = pd.DataFrame({column_name: data[column_name].to_numpy().flatten()})
         gm = column_transform_info.transform
-        transformed = gm.transform(data, [column_name])
+        transformed = gm.transform(flatten_data, [column_name])
 
         #  Converts the transformed data to the appropriate output format.
         #  The first column (ending in '.normalized') stays the same,
