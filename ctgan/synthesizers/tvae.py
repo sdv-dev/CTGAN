@@ -110,6 +110,7 @@ class TVAESynthesizer(BaseSynthesizer):
         decompress_dims=(128, 128),
         l2scale=1e-5,
         batch_size=500,
+        verbose=False,
         epochs=300,
         loss_factor=2,
         cuda=True
@@ -122,6 +123,7 @@ class TVAESynthesizer(BaseSynthesizer):
         self.l2scale = l2scale
         self.batch_size = batch_size
         self.loss_factor = loss_factor
+        self.verbose = verbose
         self.epochs = epochs
 
         if not cuda or not torch.cuda.is_available():
@@ -175,6 +177,10 @@ class TVAESynthesizer(BaseSynthesizer):
                 loss.backward()
                 optimizerAE.step()
                 self.decoder.sigma.data.clamp_(0.01, 1.0)
+
+            if self.verbose:
+                print(f'Epoch {i + 1}, Loss: {loss.detach().cpu(): .4f},',  # noqa: T001
+                      flush=True)
 
     @random_state
     def sample(self, samples):
