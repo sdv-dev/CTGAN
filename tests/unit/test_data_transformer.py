@@ -53,6 +53,30 @@ class TestDataTransformer(TestCase):
         assert info.output_info[1].dim == 2
         assert info.output_info[1].activation_fn == 'softmax'
 
+    @patch('ctgan.data_transformer.BayesGMMTransformer')
+    def test__fit_continuous_max_clusters(self, MockBGM):
+        """Test ``_fit_continuous`` with data that has less than 10 rows.
+
+        Expect that a ``BayesGMMTransformer`` is created with the max number of clusters
+        set to the length of the data.
+
+        Input:
+        - Data with less than 10 rows.
+
+        Side Effects:
+        - A ``BayesGMMTransformer`` is created with the max number of clusters set to the
+          length of the data.
+        """
+        # Setup
+        data = pd.DataFrame(np.random.normal((7, 1)), columns=['column'])
+        transformer = DataTransformer()
+
+        # Run
+        transformer._fit_continuous(data)
+
+        # Assert
+        MockBGM.assert_called_once_with(max_clusters=len(data))
+
     @patch('ctgan.data_transformer.OneHotEncodingTransformer')
     def test___fit_discrete(self, MockOHE):
         """Test ``_fit_discrete_`` on a simple discrete column.
