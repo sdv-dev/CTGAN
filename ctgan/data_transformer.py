@@ -45,7 +45,7 @@ class DataTransformer(object):
                 A ``ColumnTransformInfo`` object.
         """
         column_name = data.columns[0]
-        gm = BayesGMMTransformer()
+        gm = BayesGMMTransformer(max_clusters=min(len(data), 10))
         gm.fit(data, [column_name])
         num_components = sum(gm.valid_component_indicator)
 
