@@ -17,8 +17,8 @@ install_requires = [
     "numpy>=1.20.0,<2;python_version>='3.7'",
     'pandas>=1.1.3,<2',
     'scikit-learn>=0.24,<2',
-    'pytorch=1.10.1.' #'torch>=1.8.0,<2',
-    'torchvision>=0.9.0,<1',
+    #'pytorch=1.10.1.' #'torch>=1.8.0,<2',
+    #'torchvision>=0.9.0,<1',
     'rdt>=0.6.2,<0.7',
 ]
 
