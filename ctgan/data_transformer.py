@@ -2,7 +2,7 @@ from collections import namedtuple
 
 import numpy as np
 import pandas as pd
-from rdt.transformers import OneHotEncodingTransformer
+from rdt.transformers import OneHotEncoder
 from sklearn.mixture import BayesianGaussianMixture
 
 SpanInfo = namedtuple("SpanInfo", ["dim", "activation_fn"])
@@ -52,7 +52,7 @@ class DataTransformer(object):
 
     def _fit_discrete(self, column_name, raw_column_data):
         """Fit one hot encoder for discrete column."""
-        ohe = OneHotEncodingTransformer()
+        ohe = OneHotEncoder()
         fit_data = pd.DataFrame(raw_column_data, columns=[column_name])
 
         ohe.fit(fit_data, column_name)
@@ -168,7 +168,7 @@ class DataTransformer(object):
 
     def _inverse_transform_discrete(self, column_transform_info, column_data):
         ohe = column_transform_info.transform
-        data = pd.DataFrame(column_data, columns=list(ohe.get_output_types()))
+        data = pd.DataFrame(column_data, columns=list(ohe.get_output_sdtypes()))
         return ohe.reverse_transform(data)[column_transform_info.column_name]
 
     def inverse_transform(self, data, sigmas=None):

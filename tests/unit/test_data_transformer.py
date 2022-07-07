@@ -49,16 +49,16 @@ class TestDataTransformer(TestCase):
         assert info.output_info[1].dim == 2
         assert info.output_info[1].activation_fn == "softmax"
 
-    @patch('ctgan.data_transformer.OneHotEncodingTransformer')
+    @patch('ctgan.data_transformer.OneHotEncoder')
     def test___fit_discrete_(self, MockOHE):
         """Test '_fit_discrete_' on a simple discrete column.
 
-        A 'OneHotEncodingTransformer' will be created and fit with the
+        A 'OneHotEncoder' will be created and fit with the
         'raw_column_data'.
 
         Setup:
             - Create DataTransformer
-            - Mock the OneHotEncodingTransformer
+            - Mock the OneHotEncoder
             - Provide fit method (no-op)
 
         Input:
