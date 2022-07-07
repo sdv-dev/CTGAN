@@ -4,7 +4,7 @@ from collections import namedtuple
 
 import numpy as np
 import pandas as pd
-from rdt.transformers import BayesGMMTransformer, OneHotEncodingTransformer
+from rdt.transformers import ClusterBasedNormalizer, OneHotEncoder
 
 SpanInfo = namedtuple('SpanInfo', ['dim', 'activation_fn'])
 ColumnTransformInfo = namedtuple(
@@ -45,7 +45,7 @@ class DataTransformer(object):
                 A ``ColumnTransformInfo`` object.
         """
         column_name = data.columns[0]
-        gm = BayesGMMTransformer(max_clusters=min(len(data), 10))
+        gm = ClusterBasedNormalizer(model_missing_values=True, max_clusters=min(len(data), 10))
         gm.fit(data, [column_name])
         num_components = sum(gm.valid_component_indicator)
 
@@ -66,7 +66,7 @@ class DataTransformer(object):
                 A ``ColumnTransformInfo`` object.
         """
         column_name = data.columns[0]
-        ohe = OneHotEncodingTransformer()
+        ohe = OneHotEncoder()
         ohe.fit(data, [column_name])
         num_categories = len(ohe.dummies)
 
@@ -78,8 +78,8 @@ class DataTransformer(object):
     def fit(self, raw_data, discrete_columns=()):
         """Fit the ``DataTransformer``.
 
-        Fits a ``BayesGMMTransformer`` for continuous columns and a
-        ``OneHotEncodingTransformer`` for discrete columns.
+        Fits a ``ClusterBasedNormalizer`` for continuous columns and a
+        ``OneHotEncoder`` for discrete columns.
 
         This step also counts the #columns in matrix data and span information.
         """
@@ -145,7 +145,7 @@ class DataTransformer(object):
 
     def _inverse_transform_continuous(self, column_transform_info, column_data, sigmas, st):
         gm = column_transform_info.transform
-        data = pd.DataFrame(column_data[:, :2], columns=list(gm.get_output_types()))
+        data = pd.DataFrame(column_data[:, :2], columns=list(gm.get_output_sdtypes()))
         data.iloc[:, 1] = np.argmax(column_data[:, 1:], axis=1)
         if sigmas is not None:
             selected_normalized_value = np.random.normal(data.iloc[:, 0], sigmas[st])
@@ -155,7 +155,7 @@ class DataTransformer(object):
 
     def _inverse_transform_discrete(self, column_transform_info, column_data):
         ohe = column_transform_info.transform
-        data = pd.DataFrame(column_data, columns=list(ohe.get_output_types()))
+        data = pd.DataFrame(column_data, columns=list(ohe.get_output_sdtypes()))
         return ohe.reverse_transform(data)[column_transform_info.column_name]
 
     def inverse_transform(self, data, sigmas=None):
