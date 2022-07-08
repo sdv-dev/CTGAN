@@ -2,6 +2,7 @@
 
 from collections import namedtuple
 import pickle
+import time
 
 import numpy as np
 import pandas as pd
@@ -15,7 +16,7 @@ ColumnTransformInfo = namedtuple(
 )
 
 
-class DataTransformer(object):
+class DataTransformer_v2(object):
     """Data Transformer.
 
     Model continuous columns with a BayesianGMM and normalized to a scalar [0, 1] and a vector.
@@ -76,7 +77,7 @@ class DataTransformer(object):
             output_info=[SpanInfo(num_categories, 'softmax')],
             output_dimensions=num_categories)
 
-    def fit(self, raw_data, discrete_columns=()):
+    def fit(self, raw_data_path: str, raw_data_info_path: str):
         """Fit the ``DataTransformer``.
 
         Fits a ``BayesGMMTransformer`` for continuous columns and a
@@ -86,22 +87,38 @@ class DataTransformer(object):
         """
         self.output_info_list = []
         self.output_dimensions = 0
-        self.dataframe = True
+        self.dataframe = False
 
-        if not isinstance(raw_data, pd.DataFrame):
-            self.dataframe = False
-            # work around for RDT issue #328 Fitting with numerical column names fails
-            discrete_columns = [str(column) for column in discrete_columns]
-            column_names = [str(num) for num in range(raw_data.shape[1])]
-            raw_data = pd.DataFrame(raw_data, columns=column_names)
+        # work around for RDT issue #328 Fitting with numerical column names fails
 
-        self._column_raw_dtypes = raw_data.infer_objects().dtypes
+        data_info = pd.read_csv(raw_data_info_path)
+        assert np.isin(["features", "dtype"], list(data_info.columns)).all()
+
+        cat_dtype = ["object", "category"]
+        discrete_columns = data_info.features[data_info["dtype"].isin(cat_dtype)].values
+        discrete_columns = [str(column) for column in discrete_columns]
+
+        self._column_raw_dtypes = data_info["dtype"].values
         self._column_transform_info_list = []
-        for column_name in raw_data.columns:
+        for column_name in data_info["features"].values:
+
+            start = time.time()
+            tmp_dtype = df_info.loc[df_info.features == column_name,"dtype"].values[0]
+            tmp_data = pd.concat(pd.read_csv(raw_data_path, 
+                                            chunksize=50000, 
+                                            usecols=[column_name], 
+                                            dtype=tmp_dtype))
+            end = time.time()
+            print((end-start)/60, " mins to load ", column_name)
+
+            start = time.time()
             if column_name in discrete_columns:
-                column_transform_info = self._fit_discrete(raw_data[[column_name]])
+                column_transform_info = self._fit_discrete(tmp_data)
             else:
-                column_transform_info = self._fit_continuous(raw_data[[column_name]])
+                column_transform_info = self._fit_continuous(tmp_data)
+            
+            end = time.time()
+            print((end-start)/60, " mins to train encoder for ", column_name)
 
             self.output_info_list.append(column_transform_info.output_info)
             self.output_dimensions += column_transform_info.output_dimensions
@@ -127,20 +144,30 @@ class DataTransformer(object):
         ohe = column_transform_info.transform
         return ohe.transform(data).to_numpy()
 
-    def transform(self, raw_data):
+    def transform(self, raw_data_path: str, raw_data_info_path: str):
         """Take raw data and output a matrix data."""
-        if not isinstance(raw_data, pd.DataFrame):
-            column_names = [str(num) for num in range(raw_data.shape[1])]
-            raw_data = pd.DataFrame(raw_data, columns=column_names)
+
+        data_info = pd.read_csv(raw_data_info_path)
+        assert np.isin(["features", "dtype"], list(data_info.columns)).all()
 
         column_data_list = []
         for column_transform_info in self._column_transform_info_list:
+            
             column_name = column_transform_info.column_name
-            data = raw_data[[column_name]]
+            tmp_dtype = df_info.loc[df_info.features == column_name,"dtype"].values[0]
+            data = pd.concat(pd.read_csv(raw_data_path, 
+                                            chunksize=50000, 
+                                            usecols=[column_name], 
+                                            dtype=tmp_dtype))
+
             if column_transform_info.column_type == 'continuous':
                 column_data_list.append(self._transform_continuous(column_transform_info, data))
             else:
                 column_data_list.append(self._transform_discrete(column_transform_info, data))
+
+        del data
+        with open(raw_data_path[:-4]+"_list", 'wb') as fp:
+            pickle.dump(column_data_list, fp)
 
         return np.concatenate(column_data_list, axis=1).astype(float)
 
@@ -218,8 +245,9 @@ class DataTransformer(object):
         }
 
 
-#Testing Large data set with 
 if __name__ == '__main__':
+
+    #Testing Large data set with 
 
     TEST_DATA_PATH = "X:\\4xtra\\4xtra_LBS_model\\model_layer\\Users\\lbs_all\\Data\\final_extra.csv"
     import pandas as pd
@@ -233,18 +261,20 @@ if __name__ == '__main__':
                                 dtype=df_info["dtype"].values))
 
     categorical = df_info["features"][df_info.dtype == "object"].values
-    transformer = DataTransformer()
+    transformer = DataTransformer_v2()
 
     start = time.time()
-    transformer.fit(df, categorical)
+    transformer.fit(TEST_DATA_PATH, TEST_DATA_PATH[:-4]+"_info.csv")
     end = time.time()
     dif = end - start
     print(dif//60, "mins")
 
-    with open(TEST_DATA_PATH[:-4]+"_DT", 'wb') as fp:
-        pickle.dump(transformer, fp)
+    # with open(TEST_DATA_PATH[:-4]+"_DTv2.pickle", 'wb') as fp:
+    #     pickle.dump(transformer, fp)
 
 
+    with open(TEST_DATA_PATH[:-4]+"_DTv2.pickle", 'rb') as fp:
+        tmp = pickle.load(fp)
 
 
-
+    tmp._column_transform_info_list

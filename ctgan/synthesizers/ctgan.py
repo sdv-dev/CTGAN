@@ -291,7 +291,7 @@ class CTGANSynthesizer(BaseSynthesizer):
                 contain the integer indices of the columns. Otherwise, if it is
                 a ``pandas.DataFrame``, this list should contain the column names.
         """
-        self._validate_discrete_columns(train_data, discrete_columns)
+        self._validate_discrete_columns(train_data, discrete_columns) # !!! possibly remove if big data
 
         if epochs is None:
             epochs = self._epochs
@@ -308,9 +308,9 @@ class CTGANSynthesizer(BaseSynthesizer):
         else:
             self._transformer = transformer
 
-        train_data = self._transformer.transform(train_data)
+        train_data = self._transformer.transform(train_data) # !!! transform beforehands and pass to fit method
 
-        self._data_sampler = DataSampler(
+        self._data_sampler = DataSampler( # !!! fit DataSampler outside the fit method and pass it
             train_data,
             self._transformer.output_info_list,
             self._log_frequency)
