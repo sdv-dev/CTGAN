@@ -11,14 +11,14 @@ from ctgan.data_transformer import ColumnTransformInfo, DataTransformer, SpanInf
 
 class TestDataTransformer(TestCase):
 
-    @patch('ctgan.data_transformer.BayesGMMTransformer')
-    def test___fit_continuous(self, MockBGM):
+    @patch('ctgan.data_transformer.ClusterBasedNormalizer')
+    def test___fit_continuous(self, MockCBN):
         """Test ``_fit_continuous`` on a simple continuous column.
 
-        A ``BayesGMMTransformer`` will be created and fit with some ``data``.
+        A ``ClusterBasedNormalizer`` will be created and fit with some ``data``.
 
         Setup:
-            - Mock the ``BayesGMMTransformer`` with ``valid_component_indicator`` as
+            - Mock the ``ClusterBasedNormalizer`` with ``valid_component_indicator`` as
               ``[True, False, True]``.
             - Initialize a ``DataTransformer``.
 
@@ -28,7 +28,7 @@ class TestDataTransformer(TestCase):
         Output:
             - A ``ColumnTransformInfo`` object where:
               - ``column_name`` matches the column of the data.
-              - ``transform`` is the ``BayesGMMTransformer`` instance.
+              - ``transform`` is the ``ClusterBasedNormalizer`` instance.
               - ``output_dimensions`` is 3 (matches size of ``valid_component_indicator``).
               - ``output_info`` assigns the correct activation functions.
 
@@ -36,8 +36,8 @@ class TestDataTransformer(TestCase):
             - ``fit`` should be called with the data.
         """
         # Setup
-        bgm_instance = MockBGM.return_value
-        bgm_instance.valid_component_indicator = [True, False, True]
+        cbn_instance = MockCBN.return_value
+        cbn_instance.valid_component_indicator = [True, False, True]
         transformer = DataTransformer()
         data = pd.DataFrame(np.random.normal((100, 1)), columns=['column'])
 
@@ -46,25 +46,25 @@ class TestDataTransformer(TestCase):
 
         # Assert
         assert info.column_name == 'column'
-        assert info.transform == bgm_instance
+        assert info.transform == cbn_instance
         assert info.output_dimensions == 3
         assert info.output_info[0].dim == 1
         assert info.output_info[0].activation_fn == 'tanh'
         assert info.output_info[1].dim == 2
         assert info.output_info[1].activation_fn == 'softmax'
 
-    @patch('ctgan.data_transformer.BayesGMMTransformer')
-    def test__fit_continuous_max_clusters(self, MockBGM):
+    @patch('ctgan.data_transformer.ClusterBasedNormalizer')
+    def test__fit_continuous_max_clusters(self, MockCBN):
         """Test ``_fit_continuous`` with data that has less than 10 rows.
 
-        Expect that a ``BayesGMMTransformer`` is created with the max number of clusters
+        Expect that a ``ClusterBasedNormalizer`` is created with the max number of clusters
         set to the length of the data.
 
         Input:
         - Data with less than 10 rows.
 
         Side Effects:
-        - A ``BayesGMMTransformer`` is created with the max number of clusters set to the
+        - A ``ClusterBasedNormalizer`` is created with the max number of clusters set to the
           length of the data.
         """
         # Setup
@@ -75,16 +75,16 @@ class TestDataTransformer(TestCase):
         transformer._fit_continuous(data)
 
         # Assert
-        MockBGM.assert_called_once_with(max_clusters=len(data))
+        MockCBN.assert_called_once_with(model_missing_values=True, max_clusters=len(data))
 
-    @patch('ctgan.data_transformer.OneHotEncodingTransformer')
+    @patch('ctgan.data_transformer.OneHotEncoder')
     def test___fit_discrete(self, MockOHE):
         """Test ``_fit_discrete_`` on a simple discrete column.
 
-        A ``OneHotEncodingTransformer`` will be created and fit with the ``data``.
+        A ``OneHotEncoder`` will be created and fit with the ``data``.
 
         Setup:
-            - Mock the ``OneHotEncodingTransformer``.
+            - Mock the ``OneHotEncoder``.
             - Create ``DataTransformer``.
 
         Input:
@@ -93,7 +93,7 @@ class TestDataTransformer(TestCase):
         Output:
             - A ``ColumnTransformInfo`` object where:
               - ``column_name`` matches the column of the data.
-              - ``transform`` is the ``OneHotEncodingTransformer`` instance.
+              - ``transform`` is the ``OneHotEncoder`` instance.
               - ``output_dimensions`` is 2.
               - ``output_info`` assigns the correct activation function.
 
@@ -172,12 +172,12 @@ class TestDataTransformer(TestCase):
         transformer._fit_continuous.assert_called_once()
         assert transformer.output_dimensions == 6
 
-    @patch('ctgan.data_transformer.BayesGMMTransformer')
-    def test__transform_continuous(self, MockBGM):
+    @patch('ctgan.data_transformer.ClusterBasedNormalizer')
+    def test__transform_continuous(self, MockCBN):
         """Test ``_transform_continuous``.
 
         Setup:
-            - Mock the ``BayesGMMTransformer`` with the transform method returning
+            - Mock the ``ClusterBasedNormalizer`` with the transform method returning
             some dataframe.
             - Create ``DataTransformer``.
 
@@ -191,8 +191,8 @@ class TestDataTransformer(TestCase):
             representation of the component part of the mocked transform.
         """
         # Setup
-        bgm_instance = MockBGM.return_value
-        bgm_instance.transform.return_value = pd.DataFrame({
+        cbn_instance = MockCBN.return_value
+        cbn_instance.transform.return_value = pd.DataFrame({
             'x.normalized': [0.1, 0.2, 0.3],
             'x.component': [0.0, 1.0, 1.0]
         })
@@ -200,7 +200,7 @@ class TestDataTransformer(TestCase):
         transformer = DataTransformer()
         data = pd.DataFrame({'x': np.array([0.1, 0.3, 0.5])})
         column_transform_info = ColumnTransformInfo(
-            column_name='x', column_type='continuous', transform=bgm_instance,
+            column_name='x', column_type='continuous', transform=cbn_instance,
             output_info=[SpanInfo(1, 'tanh'), SpanInfo(3, 'softmax')],
             output_dimensions=1 + 3
         )
@@ -291,14 +291,14 @@ class TestDataTransformer(TestCase):
         assert (result[:, 1:4] == expected[:, 1:4]).all(), 'continuous-softmax'
         assert (result[:, 4:6] == expected[:, 4:6]).all(), 'discrete'
 
-    @patch('ctgan.data_transformer.BayesGMMTransformer')
-    def test__inverse_transform_continuous(self, MockBGM):
+    @patch('ctgan.data_transformer.ClusterBasedNormalizer')
+    def test__inverse_transform_continuous(self, MockCBN):
         """Test ``_inverse_transform_continuous``.
 
         Setup:
             - Create ``DataTransformer``.
-            - Mock the ``BayesGMMTransformer`` where:
-                - ``get_output_types`` returns the appropriate dictionary.
+            - Mock the ``ClusterBasedNormalizer`` where:
+                - ``get_output_sdtypes`` returns the appropriate dictionary.
                 - ``reverse_transform`` returns some dataframe.
 
         Input:
@@ -317,13 +317,13 @@ class TestDataTransformer(TestCase):
             where the first column are floats and the second is a lable encoding.
         """
         # Setup
-        bgm_instance = MockBGM.return_value
-        bgm_instance.get_output_types.return_value = {
+        cbn_instance = MockCBN.return_value
+        cbn_instance.get_output_sdtypes.return_value = {
             'x.normalized': 'numerical',
             'x.component': 'numerical'
         }
 
-        bgm_instance.reverse_transform.return_value = pd.DataFrame({
+        cbn_instance.reverse_transform.return_value = pd.DataFrame({
             'x.normalized': [0.1, 0.2, 0.3],
             'x.component': [0.0, 1.0, 1.0]
         })
@@ -336,7 +336,7 @@ class TestDataTransformer(TestCase):
         ])
 
         column_transform_info = ColumnTransformInfo(
-            column_name='x', column_type='continuous', transform=bgm_instance,
+            column_name='x', column_type='continuous', transform=cbn_instance,
             output_info=[SpanInfo(1, 'tanh'), SpanInfo(3, 'softmax')],
             output_dimensions=1 + 3
         )
@@ -359,7 +359,7 @@ class TestDataTransformer(TestCase):
         })
 
         pd.testing.assert_frame_equal(
-            bgm_instance.reverse_transform.call_args[0][0],
+            cbn_instance.reverse_transform.call_args[0][0],
             expected_data
         )
 
