@@ -161,7 +161,7 @@ class CTGANSynthesizer(BaseSynthesizer):
         self._log_frequency = log_frequency
         self._verbose = verbose
         self._epochs = epochs
-        self.pac = pac
+        self._pac = pac
 
         if not cuda or not torch.cuda.is_available():
             device = 'cpu'
@@ -323,7 +323,7 @@ class CTGANSynthesizer(BaseSynthesizer):
         discriminator = Discriminator(
             data_dim + self._data_sampler.dim_cond_vec(),
             self._discriminator_dim,
-            pac=self.pac
+            pac=self._pac
         ).to(self._device)
 
         optimizerG = optim.Adam(
@@ -378,7 +378,7 @@ class CTGANSynthesizer(BaseSynthesizer):
                     y_real = discriminator(real_cat)
 
                     pen = discriminator.calc_gradient_penalty(
-                        real_cat, fake_cat, self._device, self.pac)
+                        real_cat, fake_cat, self._device, self._pac)
                     loss_d = -(torch.mean(y_real) - torch.mean(y_fake))
 
                     optimizerD.zero_grad()
