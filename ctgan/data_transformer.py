@@ -46,7 +46,7 @@ class DataTransformer(object):
         """
         column_name = data.columns[0]
         gm = ClusterBasedNormalizer(model_missing_values=True, max_clusters=min(len(data), 10))
-        gm.fit(data, [column_name])
+        gm.fit(data, column_name)
         num_components = sum(gm.valid_component_indicator)
 
         return ColumnTransformInfo(
@@ -67,7 +67,7 @@ class DataTransformer(object):
         """
         column_name = data.columns[0]
         ohe = OneHotEncoder()
-        ohe.fit(data, [column_name])
+        ohe.fit(data, column_name)
         num_categories = len(ohe.dummies)
 
         return ColumnTransformInfo(
@@ -110,7 +110,7 @@ class DataTransformer(object):
         column_name = data.columns[0]
         data[column_name] = data[column_name].to_numpy().flatten()
         gm = column_transform_info.transform
-        transformed = gm.transform(data, [column_name])
+        transformed = gm.transform(data)
 
         #  Converts the transformed data to the appropriate output format.
         #  The first column (ending in '.normalized') stays the same,
@@ -151,7 +151,7 @@ class DataTransformer(object):
             selected_normalized_value = np.random.normal(data.iloc[:, 0], sigmas[st])
             data.iloc[:, 0] = selected_normalized_value
 
-        return gm.reverse_transform(data, [column_transform_info.column_name])
+        return gm.reverse_transform(data)
 
     def _inverse_transform_discrete(self, column_transform_info, column_data):
         ohe = column_transform_info.transform
