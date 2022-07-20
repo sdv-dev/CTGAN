@@ -469,8 +469,10 @@ class CTGANSynthesizer(BaseSynthesizer):
                 c1 = torch.from_numpy(c1).to(self._device)
                 fakez = torch.cat([fakez, c1], dim=1)
 
-            fake = self._generator(fakez)
-            fakeact = self._apply_activate(fake)
+            with torch.no_grad():
+                fake = self._generator(fakez)
+                fakeact = self._apply_activate(fake)
+
             data.append(fakeact.detach().cpu().numpy())
 
         data = np.concatenate(data, axis=0)
