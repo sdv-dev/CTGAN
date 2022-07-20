@@ -440,6 +440,8 @@ class CTGANSynthesizer(BaseSynthesizer):
         Returns:
             numpy.ndarray or pandas.DataFrame
         """
+        self._generator.eval()
+
         if condition_column is not None and condition_value is not None:
             condition_info = self._transformer.convert_column_name_value_to_id(
                 condition_column, condition_value)
