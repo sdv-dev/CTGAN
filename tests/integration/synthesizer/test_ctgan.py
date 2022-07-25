@@ -134,6 +134,33 @@ def test_synthesizer_sample():
     assert isinstance(samples, pd.DataFrame)
 
 
+def test_synthesizer_sampling():
+    """Test the CTGANSynthesizer sampling."""
+    data = pd.DataFrame({
+        'continuous': np.random.random(1000),
+        'discrete': np.repeat(['a', 'b', 'c'], [950, 25, 25])
+    })
+
+    discrete_columns = ['discrete']
+
+    ctgan = CTGANSynthesizer(epochs=100)
+    ctgan.fit(data, discrete_columns)
+
+    samples = ctgan.sample(1000)
+    assert samples['discrete'].value_counts()['a'] > 800
+    assert samples['discrete'].value_counts()['b'] < 100
+    assert samples['discrete'].value_counts()['c'] < 100
+
+    samples = ctgan.sample(1000, condition_column='discrete', condition_value='a')
+    assert samples['discrete'].value_counts()['a'] > 750
+
+    samples = ctgan.sample(1000, condition_column='discrete', condition_value='b')
+    assert samples['discrete'].value_counts()['b'] > 750
+
+    samples = ctgan.sample(1000, condition_column='discrete', condition_value='c')
+    assert samples['discrete'].value_counts()['c'] > 750
+
+
 def test_save_load():
     """Test the CTGANSynthesizer load/save methods."""
     data = pd.DataFrame({
