@@ -71,6 +71,8 @@ class DataSampler(object):
                 self._discrete_column_category_prob[current_id, :span_info.dim] = category_prob
                 self._discrete_column_cond_st[current_id] = current_cond_st
                 self._discrete_column_n_category[current_id] = span_info.dim
+                self._discrete_column_matrix_st[current_id] = st
+
                 current_cond_st += span_info.dim
                 current_id += 1
                 st = ed
