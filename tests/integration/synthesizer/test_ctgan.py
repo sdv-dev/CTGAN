@@ -80,19 +80,19 @@ def test_log_frequency():
 
     discrete_columns = ['discrete']
 
-    ctgan = CTGANSynthesizer(epochs=100)
+    ctgan = CTGANSynthesizer(epochs=1)
     ctgan.fit(data, discrete_columns)
 
-    sampled = ctgan.sample(10000)
-    counts = sampled['discrete'].value_counts()
-    assert counts['a'] < 6500
+    assert ctgan._data_sampler._discrete_column_category_prob[0][0] < 0.95
+    assert ctgan._data_sampler._discrete_column_category_prob[0][1] > 0.025
+    assert ctgan._data_sampler._discrete_column_category_prob[0][2] > 0.025
 
-    ctgan = CTGANSynthesizer(log_frequency=False, epochs=100)
+    ctgan = CTGANSynthesizer(log_frequency=False, epochs=1)
     ctgan.fit(data, discrete_columns)
 
-    sampled = ctgan.sample(10000)
-    counts = sampled['discrete'].value_counts()
-    assert counts['a'] > 9000
+    assert ctgan._data_sampler._discrete_column_category_prob[0][0] == 0.95
+    assert ctgan._data_sampler._discrete_column_category_prob[0][1] == 0.025
+    assert ctgan._data_sampler._discrete_column_category_prob[0][2] == 0.025
 
 
 def test_categorical_nan():
