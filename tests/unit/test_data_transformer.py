@@ -278,9 +278,6 @@ class TestDataTransformer(TestCase):
         result = transformer.transform(data)
 
         # Assert
-        transformer._transform_continuous.assert_called_once()
-        transformer._transform_discrete.assert_called_once()
-
         expected = np.array([
             [0.1, 1, 0, 0, 0, 1],
             [0.3, 0, 1, 0, 0, 1],
