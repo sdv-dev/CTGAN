@@ -232,9 +232,6 @@ class TestDataTransformer(TestCase):
 
         Output:
             - np.array containing the transformed columns.
-
-        Side Effects:
-            - ``_transform_discrete`` and ``_transform_continuous`` should each be called once.
         """
         # Setup
         data = pd.DataFrame({
@@ -287,6 +284,70 @@ class TestDataTransformer(TestCase):
         assert (result[:, 0] == expected[:, 0]).all(), 'continuous-cdf'
         assert (result[:, 1:4] == expected[:, 1:4]).all(), 'continuous-softmax'
         assert (result[:, 4:6] == expected[:, 4:6]).all(), 'discrete'
+
+    def test_parallel_sync_transform_same_output(self):
+        """Test ``_parallel_transform`` and ``_synchronous_transform`` on a dataframe with one continuous and one discrete column.
+
+        The output of ``_parallel_transform`` should be the same as the output of ``_synchronous_transform``.
+
+        Setup:
+            - Initialize a ``DataTransformer`` with a ``column_transform_info`` detailing
+            a continuous and a discrete columns.
+            - Mock the ``_transform_discrete`` and ``_transform_continuous`` methods.
+
+        Input:
+            - A table with one continuous and one discrete columns.
+
+        Output:
+            - A list containing the transformed columns.
+        """
+        # Setup
+        data = pd.DataFrame({
+            'x': np.array([0.1, 0.3, 0.5]),
+            'y': np.array(['yes', 'yes', 'no'])
+        })
+
+        transformer = DataTransformer()
+        transformer._column_transform_info_list = [
+            ColumnTransformInfo(
+                column_name='x', column_type='continuous', transform=None,
+                output_info=[SpanInfo(1, 'tanh'), SpanInfo(3, 'softmax')],
+                output_dimensions=1 + 3
+            ),
+            ColumnTransformInfo(
+                column_name='y', column_type='discrete', transform=None,
+                output_info=[SpanInfo(2, 'softmax')],
+                output_dimensions=2
+            )
+        ]
+
+        transformer._transform_continuous = Mock()
+        selected_normalized_value = np.array([[0.1], [0.3], [0.5]])
+        selected_component_onehot = np.array([
+            [1, 0, 0],
+            [0, 1, 0],
+            [0, 1, 0],
+        ])
+        return_value = np.concatenate(
+            (selected_normalized_value, selected_component_onehot), axis=1)
+        transformer._transform_continuous.return_value = return_value
+
+        transformer._transform_discrete = Mock()
+        transformer._transform_discrete.return_value = np.array([
+            [0, 1],
+            [0, 1],
+            [1, 0],
+        ])
+
+        # Run
+        parallel_result = transformer._parallel_transform(data, transformer._column_transform_info_list)
+        sync_result = transformer._synchronous_transform(data, transformer._column_transform_info_list)
+        parallel_result_np = np.concatenate(parallel_result, axis=1).astype(float)
+        sync_result_np = np.concatenate(sync_result, axis=1).astype(float)
+
+        # Assert
+        assert len(parallel_result) == len(sync_result)
+        np.testing.assert_array_equal(parallel_result_np, sync_result_np)
 
     @patch('ctgan.data_transformer.ClusterBasedNormalizer')
     def test__inverse_transform_continuous(self, MockCBN):
