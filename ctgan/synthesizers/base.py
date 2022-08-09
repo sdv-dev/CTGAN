@@ -44,6 +44,7 @@ def random_state(function):
         function (Callable):
             The function to wrap around.
     """
+
     def wrapper(self, *args, **kwargs):
         if self.random_states is None:
             return function(self, *args, **kwargs)
