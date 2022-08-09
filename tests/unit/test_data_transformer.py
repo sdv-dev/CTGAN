@@ -286,9 +286,10 @@ class TestDataTransformer(TestCase):
         assert (result[:, 4:6] == expected[:, 4:6]).all(), 'discrete'
 
     def test_parallel_sync_transform_same_output(self):
-        """Test ``_parallel_transform`` and ``_synchronous_transform`` on a dataframe with one continuous and one discrete column.
+        """Test ``_parallel_transform`` and ``_synchronous_transform`` on a dataframe.
 
-        The output of ``_parallel_transform`` should be the same as the output of ``_synchronous_transform``.
+        The output of ``_parallel_transform`` should be the same as the output of
+        ``_synchronous_transform``.
 
         Setup:
             - Initialize a ``DataTransformer`` with a ``column_transform_info`` detailing
@@ -340,8 +341,14 @@ class TestDataTransformer(TestCase):
         ])
 
         # Run
-        parallel_result = transformer._parallel_transform(data, transformer._column_transform_info_list)
-        sync_result = transformer._synchronous_transform(data, transformer._column_transform_info_list)
+        parallel_result = transformer._parallel_transform(
+            data,
+            transformer._column_transform_info_list
+        )
+        sync_result = transformer._synchronous_transform(
+            data,
+            transformer._column_transform_info_list
+        )
         parallel_result_np = np.concatenate(parallel_result, axis=1).astype(float)
         sync_result_np = np.concatenate(sync_result, axis=1).astype(float)
 
