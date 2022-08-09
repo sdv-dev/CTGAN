@@ -1,7 +1,6 @@
 """DataTransformer module."""
 
 from collections import namedtuple
-from multiprocessing import cpu_count
 
 import numpy as np
 import pandas as pd
@@ -160,7 +159,7 @@ class DataTransformer(object):
                 process = delayed(self._transform_discrete)(column_transform_info, data)
             processes.append(process)
 
-        return Parallel(n_jobs=cpu_count())(processes)
+        return Parallel(n_jobs=-1)(processes)
 
     def transform(self, raw_data):
         """Take raw data and output a matrix data."""
