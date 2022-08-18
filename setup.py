@@ -19,7 +19,7 @@ install_requires = [
     'scikit-learn>=0.24,<2',
     'torch>=1.8.0,<2',
     'torchvision>=0.9.0,<1',
-    'rdt>=1.1.0,<2.0',
+    'rdt>=1.2.0,<2.0',
 ]
 
 setup_requires = [
