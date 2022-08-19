@@ -71,6 +71,8 @@ class DataSampler(object):
                 self._discrete_column_category_prob[current_id, :span_info.dim] = category_prob
                 self._discrete_column_cond_st[current_id] = current_cond_st
                 self._discrete_column_n_category[current_id] = span_info.dim
+                self._discrete_column_matrix_st[current_id] = st
+
                 current_cond_st += span_info.dim
                 current_id += 1
                 st = ed
@@ -150,7 +152,7 @@ class DataSampler(object):
     def generate_cond_from_condition_column_info(self, condition_info, batch):
         """Generate the condition vector."""
         vec = np.zeros((batch, self._n_categories), dtype='float32')
-        id_ = self._discrete_column_matrix_st[condition_info['discrete_column_id']]
+        id_ = self._discrete_column_cond_st[condition_info['discrete_column_id']]
         id_ += condition_info['value_id']
         vec[:, id_] = 1
         return vec

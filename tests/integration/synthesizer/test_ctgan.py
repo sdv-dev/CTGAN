@@ -80,19 +80,19 @@ def test_log_frequency():
 
     discrete_columns = ['discrete']
 
-    ctgan = CTGANSynthesizer(epochs=100)
+    ctgan = CTGANSynthesizer(epochs=1)
     ctgan.fit(data, discrete_columns)
 
-    sampled = ctgan.sample(10000)
-    counts = sampled['discrete'].value_counts()
-    assert counts['a'] < 6500
+    assert ctgan._data_sampler._discrete_column_category_prob[0][0] < 0.95
+    assert ctgan._data_sampler._discrete_column_category_prob[0][1] > 0.025
+    assert ctgan._data_sampler._discrete_column_category_prob[0][2] > 0.025
 
-    ctgan = CTGANSynthesizer(log_frequency=False, epochs=100)
+    ctgan = CTGANSynthesizer(log_frequency=False, epochs=1)
     ctgan.fit(data, discrete_columns)
 
-    sampled = ctgan.sample(10000)
-    counts = sampled['discrete'].value_counts()
-    assert counts['a'] > 9000
+    assert ctgan._data_sampler._discrete_column_category_prob[0][0] == 0.95
+    assert ctgan._data_sampler._discrete_column_category_prob[0][1] == 0.025
+    assert ctgan._data_sampler._discrete_column_category_prob[0][2] == 0.025
 
 
 def test_categorical_nan():
@@ -132,6 +132,33 @@ def test_synthesizer_sample():
 
     samples = ctgan.sample(1000, 'discrete', 'a')
     assert isinstance(samples, pd.DataFrame)
+
+
+def test_synthesizer_sampling():
+    """Test the CTGANSynthesizer sampling."""
+    data = pd.DataFrame({
+        'continuous': np.random.random(1000),
+        'discrete': np.repeat(['a', 'b', 'c'], [950, 25, 25])
+    })
+
+    discrete_columns = ['discrete']
+
+    ctgan = CTGANSynthesizer(epochs=100)
+    ctgan.fit(data, discrete_columns)
+
+    samples = ctgan.sample(1000)
+    assert samples['discrete'].value_counts()['a'] > 800
+    assert samples['discrete'].value_counts()['b'] < 100
+    assert samples['discrete'].value_counts()['c'] < 100
+
+    samples = ctgan.sample(1000, condition_column='discrete', condition_value='a')
+    assert samples['discrete'].value_counts()['a'] > 750
+
+    samples = ctgan.sample(1000, condition_column='discrete', condition_value='b')
+    assert samples['discrete'].value_counts()['b'] > 750
+
+    samples = ctgan.sample(1000, condition_column='discrete', condition_value='c')
+    assert samples['discrete'].value_counts()['c'] > 750
 
 
 def test_save_load():
