@@ -4,7 +4,8 @@ from collections import namedtuple
 
 import numpy as np
 import pandas as pd
-from rdt.transformers import BayesGMMTransformer, OneHotEncodingTransformer
+from joblib import Parallel, delayed
+from rdt.transformers import ClusterBasedNormalizer, OneHotEncoder
 
 SpanInfo = namedtuple('SpanInfo', ['dim', 'activation_fn'])
 ColumnTransformInfo = namedtuple(
@@ -45,8 +46,8 @@ class DataTransformer(object):
                 A ``ColumnTransformInfo`` object.
         """
         column_name = data.columns[0]
-        gm = BayesGMMTransformer()
-        gm.fit(data, [column_name])
+        gm = ClusterBasedNormalizer(model_missing_values=True, max_clusters=min(len(data), 10))
+        gm.fit(data, column_name)
         num_components = sum(gm.valid_component_indicator)
 
         return ColumnTransformInfo(
@@ -66,8 +67,8 @@ class DataTransformer(object):
                 A ``ColumnTransformInfo`` object.
         """
         column_name = data.columns[0]
-        ohe = OneHotEncodingTransformer()
-        ohe.fit(data, [column_name])
+        ohe = OneHotEncoder()
+        ohe.fit(data, column_name)
         num_categories = len(ohe.dummies)
 
         return ColumnTransformInfo(
@@ -78,8 +79,8 @@ class DataTransformer(object):
     def fit(self, raw_data, discrete_columns=()):
         """Fit the ``DataTransformer``.
 
-        Fits a ``BayesGMMTransformer`` for continuous columns and a
-        ``OneHotEncodingTransformer`` for discrete columns.
+        Fits a ``ClusterBasedNormalizer`` for continuous columns and a
+        ``OneHotEncoder`` for discrete columns.
 
         This step also counts the #columns in matrix data and span information.
         """
@@ -110,7 +111,7 @@ class DataTransformer(object):
         column_name = data.columns[0]
         data[column_name] = data[column_name].to_numpy().flatten()
         gm = column_transform_info.transform
-        transformed = gm.transform(data, [column_name])
+        transformed = gm.transform(data)
 
         #  Converts the transformed data to the appropriate output format.
         #  The first column (ending in '.normalized') stays the same,
@@ -126,14 +127,13 @@ class DataTransformer(object):
         ohe = column_transform_info.transform
         return ohe.transform(data).to_numpy()
 
-    def transform(self, raw_data):
-        """Take raw data and output a matrix data."""
-        if not isinstance(raw_data, pd.DataFrame):
-            column_names = [str(num) for num in range(raw_data.shape[1])]
-            raw_data = pd.DataFrame(raw_data, columns=column_names)
+    def _synchronous_transform(self, raw_data, column_transform_info_list):
+        """Take a Pandas DataFrame and transform columns synchronous.
 
+        Outputs a list with Numpy arrays.
+        """
         column_data_list = []
-        for column_transform_info in self._column_transform_info_list:
+        for column_transform_info in column_transform_info_list:
             column_name = column_transform_info.column_name
             data = raw_data[[column_name]]
             if column_transform_info.column_type == 'continuous':
@@ -141,21 +141,60 @@ class DataTransformer(object):
             else:
                 column_data_list.append(self._transform_discrete(column_transform_info, data))
 
+        return column_data_list
+
+    def _parallel_transform(self, raw_data, column_transform_info_list):
+        """Take a Pandas DataFrame and transform columns in parallel.
+
+        Outputs a list with Numpy arrays.
+        """
+        processes = []
+        for column_transform_info in column_transform_info_list:
+            column_name = column_transform_info.column_name
+            data = raw_data[[column_name]]
+            process = None
+            if column_transform_info.column_type == 'continuous':
+                process = delayed(self._transform_continuous)(column_transform_info, data)
+            else:
+                process = delayed(self._transform_discrete)(column_transform_info, data)
+            processes.append(process)
+
+        return Parallel(n_jobs=-1)(processes)
+
+    def transform(self, raw_data):
+        """Take raw data and output a matrix data."""
+        if not isinstance(raw_data, pd.DataFrame):
+            column_names = [str(num) for num in range(raw_data.shape[1])]
+            raw_data = pd.DataFrame(raw_data, columns=column_names)
+
+        # Only use parallelization with larger data sizes.
+        # Otherwise, the transformation will be slower.
+        if raw_data.shape[0] < 500:
+            column_data_list = self._synchronous_transform(
+                raw_data,
+                self._column_transform_info_list
+            )
+        else:
+            column_data_list = self._parallel_transform(
+                raw_data,
+                self._column_transform_info_list
+            )
+
         return np.concatenate(column_data_list, axis=1).astype(float)
 
     def _inverse_transform_continuous(self, column_transform_info, column_data, sigmas, st):
         gm = column_transform_info.transform
-        data = pd.DataFrame(column_data[:, :2], columns=list(gm.get_output_types()))
+        data = pd.DataFrame(column_data[:, :2], columns=list(gm.get_output_sdtypes()))
         data.iloc[:, 1] = np.argmax(column_data[:, 1:], axis=1)
         if sigmas is not None:
             selected_normalized_value = np.random.normal(data.iloc[:, 0], sigmas[st])
             data.iloc[:, 0] = selected_normalized_value
 
-        return gm.reverse_transform(data, [column_transform_info.column_name])
+        return gm.reverse_transform(data)
 
     def _inverse_transform_discrete(self, column_transform_info, column_data):
         ohe = column_transform_info.transform
-        data = pd.DataFrame(column_data, columns=list(ohe.get_output_types()))
+        data = pd.DataFrame(column_data, columns=list(ohe.get_output_sdtypes()))
         return ohe.reverse_transform(data)[column_transform_info.column_name]
 
     def inverse_transform(self, data, sigmas=None):

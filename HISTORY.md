@@ -1,5 +1,18 @@
 # History
 
+## v0.5.2 - 2022-08-18
+
+This release updates CTGAN to use the latest version of RDT. It also includes performance and robustness updates to the data transformer.
+
+### Issues closed
+* Bump rdt version - Issue [#242](https://github.com/sdv-dev/CTGAN/issues/242) by @katxiao
+* Single thread data transform is slow for huge table - Issue [#151](https://github.com/sdv-dev/CTGAN/issues/151) by @mfhbree
+* Fix RDT api - Issue [#232](https://github.com/sdv-dev/CTGAN/issues/232) by @pvk-developer
+* Update macos to use latest version. - Issue [#237](https://github.com/sdv-dev/CTGAN/issues/237) by @pvk-developer
+* Update the RDT version to 1.0 - Issue [#224](https://github.com/sdv-dev/CTGAN/issues/224) by @pvk-developer
+* Update slack invite link. - Issue [#222](https://github.com/sdv-dev/CTGAN/issues/222) by @pvk-developer
+* robustness fix, when data have less rows than the default number of cl… - Issue [#211](https://github.com/sdv-dev/CTGAN/issues/211) by @Deathn0t
+
 ## v0.5.1 - 2022-02-25
 
 This release fixes a bug with the decoder instantiation, and also allows users to set a random state for the model
