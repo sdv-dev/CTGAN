@@ -96,12 +96,41 @@ def _loss_function(recon_x, x, sigmas, mu, logvar, output_info, factor):
                 st = ed
 
     assert st == recon_x.size()[1]
-    KLD = -0.5 * torch.sum(1 + logvar - mu**2 - logvar.exp())
+    KLD = -0.5 * torch.sum(1 + logvar - mu ** 2 - logvar.exp())
     return sum(loss) * factor / x.size()[0], KLD / x.size()[0]
 
 
 class TVAESynthesizer(BaseSynthesizer):
-    """TVAESynthesizer."""
+    """ Tabular VAE Synthesizer.
+
+    This is the core class of the TVAE class, where the different components
+    are orchestrated together.
+
+    For more details about the process, please check the [Modeling Tabular data using
+    Conditional GAN](https://arxiv.org/abs/1907.00503) paper.
+
+    Args:
+        embedding_dim (int):
+            Size of the random sample passed to the Generator. Defaults to 128.
+        compress_dims (tuple or list of ints):
+            Size of each hidden layer in the encoder. Defaults to (128, 128).
+        decompress_dims (tuple or list of ints):
+            Size of each hidden layer in the decoder. Defaults to (128, 128).
+        l2scale (float):
+            Regularization term. Defaults to 1e-5.
+        batch_size (int):
+            Number of data samples to process in each step.
+        loss_factor (int):
+            Multiplier for the reconstruction error. Defaults to 2.
+        verbose (boolean):
+            Whether to have print statements for progress results. Defaults to ``False``.
+        epochs (int):
+            Number of training epochs. Defaults to 300.
+        cuda (bool):
+            Whether to attempt to use cuda for GPU computation.
+            If this is False or CUDA is not available, CPU will be used.
+            Defaults to ``True``.
+    """
 
     def __init__(
         self,
