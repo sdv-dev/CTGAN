@@ -13,21 +13,21 @@ import numpy as np
 import pandas as pd
 from sklearn import datasets
 
-from ctgan.synthesizers.tvae import TVAESynthesizer
+from ctgan.synthesizers.tvae import TVAE
 
 
 def test_tvae(tmpdir):
-    """Test the TVAESynthesizer load/save methods."""
+    """Test the TVAE load/save methods."""
     iris = datasets.load_iris()
     data = pd.DataFrame(iris.data, columns=iris.feature_names)
     data['class'] = pd.Series(iris.target).map(iris.target_names.__getitem__)
 
-    tvae = TVAESynthesizer(epochs=10)
+    tvae = TVAE(epochs=10)
     tvae.fit(data, ['class'])
 
     path = str(tmpdir / 'test_tvae.pkl')
     tvae.save(path)
-    tvae = TVAESynthesizer.load(path)
+    tvae = TVAE.load(path)
 
     sampled = tvae.sample(100)
 
@@ -38,13 +38,13 @@ def test_tvae(tmpdir):
 
 
 def test_drop_last_false():
-    """Test the TVAESynthesizer predicts the correct values."""
+    """Test the TVAE predicts the correct values."""
     data = pd.DataFrame({
         '1': ['a', 'b', 'c'] * 150,
         '2': ['a', 'b', 'c'] * 150
     })
 
-    tvae = TVAESynthesizer(epochs=300)
+    tvae = TVAE(epochs=300)
     tvae.fit(data, ['1', '2'])
 
     sampled = tvae.sample(100)
@@ -76,13 +76,13 @@ def test_mixed():
 
 
 def test__loss_function():
-    """Test the TVAESynthesizer produces average values similar to the training data."""
+    """Test the TVAE produces average values similar to the training data."""
     data = pd.DataFrame({
         '1': [float(i) for i in range(1000)],
         '2': [float(2 * i) for i in range(1000)]
     })
 
-    tvae = TVAESynthesizer(epochs=300)
+    tvae = TVAE(epochs=300)
     tvae.fit(data)
 
     num_samples = 1000
@@ -97,7 +97,7 @@ def test__loss_function():
 
 
 def test_fixed_random_seed():
-    """Test the TVAESynthesizer with a fixed seed.
+    """Test the TVAE with a fixed seed.
 
     Expect that when the random seed is reset with the same seed, the same sequence
     of data will be produced. Expect that the data generated with the seed is
@@ -110,7 +110,7 @@ def test_fixed_random_seed():
     })
     discrete_columns = ['discrete']
 
-    tvae = TVAESynthesizer(epochs=1)
+    tvae = TVAE(epochs=1)
 
     # Run
     tvae.fit(data, discrete_columns)

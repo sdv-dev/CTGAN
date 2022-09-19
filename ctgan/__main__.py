@@ -3,7 +3,7 @@
 import argparse
 
 from ctgan.data import read_csv, read_tsv, write_tsv
-from ctgan.synthesizers.ctgan import CTGANSynthesizer
+from ctgan.synthesizers.ctgan import CTGAN
 
 
 def _parse_args():
@@ -67,11 +67,11 @@ def main():
         data, discrete_columns = read_csv(args.data, args.metadata, args.header, args.discrete)
 
     if args.load:
-        model = CTGANSynthesizer.load(args.load)
+        model = CTGAN.load(args.load)
     else:
         generator_dim = [int(x) for x in args.generator_dim.split(',')]
         discriminator_dim = [int(x) for x in args.discriminator_dim.split(',')]
-        model = CTGANSynthesizer(
+        model = CTGAN(
             embedding_dim=args.embedding_dim, generator_dim=generator_dim,
             discriminator_dim=discriminator_dim, generator_lr=args.generator_lr,
             generator_decay=args.generator_decay, discriminator_lr=args.discriminator_lr,

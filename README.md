@@ -84,11 +84,11 @@ To get started with CTGAN, you should prepare your data as either a `numpy.ndarr
 * **Continuous Columns**: can contain any numerical value.
 * **Discrete Columns**: contain a finite number values, whether these are string values or not.
 
-In this example we load the [Adult Census Dataset](https://archive.ics.uci.edu/ml/datasets/adult) which is a built-in demo dataset. We then model it using the **CTGANSynthesizer** and generate a synthetic copy of it.
+In this example we load the [Adult Census Dataset](https://archive.ics.uci.edu/ml/datasets/adult) which is a built-in demo dataset. We then model it using the **CTGAN** and generate a synthetic copy of it.
 
 
 ```python3
-from ctgan import CTGANSynthesizer
+from ctgan import CTGAN
 from ctgan import load_demo
 
 data = load_demo()
@@ -106,7 +106,7 @@ discrete_columns = [
     'income'
 ]
 
-ctgan = CTGANSynthesizer(epochs=10)
+ctgan = CTGAN(epochs=10)
 ctgan.fit(data, discrete_columns)
 
 # Synthetic copy
