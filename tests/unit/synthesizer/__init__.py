@@ -1,1 +1,1 @@
-"""CTGANSynthesizer testing module."""
+"""CTGAN testing module."""

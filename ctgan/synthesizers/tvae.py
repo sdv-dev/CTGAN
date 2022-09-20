@@ -1,4 +1,4 @@
-"""TVAESynthesizer module."""
+"""TVAE module."""
 
 import numpy as np
 import torch
@@ -12,7 +12,7 @@ from ctgan.synthesizers.base import BaseSynthesizer, random_state
 
 
 class Encoder(Module):
-    """Encoder for the TVAESynthesizer.
+    """Encoder for the TVAE.
 
     Args:
         data_dim (int):
@@ -48,7 +48,7 @@ class Encoder(Module):
 
 
 class Decoder(Module):
-    """Decoder for the TVAESynthesizer.
+    """Decoder for the TVAE.
 
     Args:
         embedding_dim (int):
@@ -100,8 +100,8 @@ def _loss_function(recon_x, x, sigmas, mu, logvar, output_info, factor):
     return sum(loss) * factor / x.size()[0], KLD / x.size()[0]
 
 
-class TVAESynthesizer(BaseSynthesizer):
-    """TVAESynthesizer."""
+class TVAE(BaseSynthesizer):
+    """TVAE."""
 
     def __init__(
         self,

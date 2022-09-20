@@ -1,4 +1,4 @@
-"""CTGANSynthesizer unit testing module."""
+"""CTGAN unit testing module."""
 
 from unittest import TestCase
 from unittest.mock import Mock
@@ -8,7 +8,7 @@ import pytest
 import torch
 
 from ctgan.data_transformer import SpanInfo
-from ctgan.synthesizers.ctgan import CTGANSynthesizer, Discriminator, Generator, Residual
+from ctgan.synthesizers.ctgan import CTGAN, Discriminator, Generator, Residual
 
 
 class TestDiscriminator(TestCase):
@@ -175,7 +175,7 @@ def _assert_is_between(data, lower, upper):
     assert all((data <= upper).numpy().tolist())
 
 
-class TestCTGANSynthesizer(TestCase):
+class TestCTGAN(TestCase):
 
     def test__apply_activate_(self):
         """Test `_apply_activate` for tables with both continuous and categoricals.
@@ -192,7 +192,7 @@ class TestCTGANSynthesizer(TestCase):
         Output:
             - tensor = tensor of shape (N, data_dims)
         """
-        model = CTGANSynthesizer()
+        model = CTGAN()
         model._transformer = Mock()
         model._transformer.output_info_list = [
             [SpanInfo(3, 'softmax')],
@@ -231,7 +231,7 @@ class TestCTGANSynthesizer(TestCase):
             - even though the implementation of this is probably right, I'm not sure if the idea
               behind it is correct
         """
-        model = CTGANSynthesizer()
+        model = CTGAN()
         model._transformer = Mock()
         model._transformer.output_info_list = [
             [SpanInfo(1, 'tanh'), SpanInfo(2, 'softmax')],
@@ -292,7 +292,7 @@ class TestCTGANSynthesizer(TestCase):
         })
         discrete_columns = ['doesnt exist']
 
-        ctgan = CTGANSynthesizer(epochs=1)
+        ctgan = CTGAN(epochs=1)
         with pytest.raises(ValueError, match=r'Invalid columns found: {\'doesnt exist\'}'):
             ctgan.fit(data, discrete_columns)
 
