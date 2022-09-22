@@ -23,7 +23,7 @@
 
 # Overview
 
-CTGAN is a collection of Deep Learning based synthetic data generators for single table data, which are able to learn from real data and generate synthetic with high fidelity.
+CTGAN is a collection of Deep Learning based synthetic data generators for single table data, which are able to learn from real data and generate synthetic data with high fidelity.
 
 | Important Links                               |                                                                      |
 | --------------------------------------------- | -------------------------------------------------------------------- |
@@ -36,7 +36,7 @@ CTGAN is a collection of Deep Learning based synthetic data generators for s
 | [![][Slack Logo] **Community**][Community]    | Join our Slack Workspace for announcements and discussions.          |
 
 [Website]: https://sdv.dev
-[SDV Blog]: https://sdv.dev/blog
+[Blog]: https://sdv.dev/blog
 [Documentation]: https://bit.ly/sdv-docs
 [Repository]: https://github.com/sdv-dev/CTGAN
 [License]: https://github.com/sdv-dev/CTGAN/blob/master/LICENSE
@@ -50,7 +50,7 @@ Currently, this library implements the **CTGAN** and **TVAE** models described i
 
 ## Use CTGAN through the SDV library
 
-> :warning: If you're just getting started with synthetic data, we recommend installing the SDV library which provides user-friendly APIs for accessing CTGAN. :warning:
+:warning: If you're just getting started with synthetic data, we recommend installing the SDV library which provides user-friendly APIs for accessing CTGAN. :warning:
 
 The SDV library provides wrappers for preprocessing your data as well as additional usability features like constraints. See the [SDV documentation](https://bit.ly/sdv-docs) to get started.
 
@@ -114,7 +114,7 @@ Irvine, CA: University of California, School of Information and Computer Science
 
 Join our [Slack channel](https://bit.ly/sdv-slack-invite) to discuss more about CTGAN and synthetic data. If you find a bug or have a feature request, you can also [open an issue](https://github.com/sdv-dev/CTGAN/issues) on our GitHub.
 
-**Interested in contributing to CTGAN?** Read our Contribution Guide to get started.
+**Interested in contributing to CTGAN?** Read our [Contribution Guide](CONTRIBUTING.rst) to get started.
 
 # Citing CTGAN
 
