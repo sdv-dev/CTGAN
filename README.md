@@ -120,7 +120,7 @@ Join our [Slack channel](https://bit.ly/sdv-slack-invite) to discuss more about 
 
 If you use CTGAN, please cite the following work:
 
-- *Lei Xu, Maria Skoularidou, Alfredo Cuesta-Infante, Kalyan Veeramachaneni.* **Modeling Tabular data using Conditional GAN**. NeurIPS, 2019.
+*Lei Xu, Maria Skoularidou, Alfredo Cuesta-Infante, Kalyan Veeramachaneni.* **Modeling Tabular data using Conditional GAN**. NeurIPS, 2019.
 
 ```LaTeX
 @inproceedings{ctgan,
