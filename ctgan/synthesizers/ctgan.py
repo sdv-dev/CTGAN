@@ -1,4 +1,4 @@
-"""CTGANSynthesizer module."""
+"""CTGAN module."""
 
 import warnings
 
@@ -16,7 +16,7 @@ from ctgan.synthesizers.base import BaseSynthesizer, random_state
 
 
 class Discriminator(Module):
-    """Discriminator for the CTGANSynthesizer."""
+    """Discriminator for the CTGAN."""
 
     def __init__(self, input_dim, discriminator_dim, pac=10):
         super(Discriminator, self).__init__()
@@ -59,7 +59,7 @@ class Discriminator(Module):
 
 
 class Residual(Module):
-    """Residual layer for the CTGANSynthesizer."""
+    """Residual layer for the CTGAN."""
 
     def __init__(self, i, o):
         super(Residual, self).__init__()
@@ -76,7 +76,7 @@ class Residual(Module):
 
 
 class Generator(Module):
-    """Generator for the CTGANSynthesizer."""
+    """Generator for the CTGAN."""
 
     def __init__(self, embedding_dim, generator_dim, data_dim):
         super(Generator, self).__init__()
@@ -94,7 +94,7 @@ class Generator(Module):
         return data
 
 
-class CTGANSynthesizer(BaseSynthesizer):
+class CTGAN(BaseSynthesizer):
     """Conditional Table GAN Synthesizer.
 
     This is the core class of the CTGAN project, where the different components

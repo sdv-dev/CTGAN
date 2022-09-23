@@ -1,4 +1,4 @@
-"""TVAESynthesizer unit testing module."""
+"""TVAE unit testing module."""
 
 from unittest import TestCase
 
@@ -96,7 +96,7 @@ class TestLossFunction(TestCase):
         """
 
 
-class TestTVAESynthesizer(TestCase):
+class TestTVAE(TestCase):
 
     def test_set_device(self):
         """Test 'set_device' if a GPU is available.

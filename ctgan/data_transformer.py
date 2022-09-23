@@ -4,6 +4,7 @@ from collections import namedtuple
 
 import numpy as np
 import pandas as pd
+from joblib import Parallel, delayed
 from rdt.transformers import ClusterBasedNormalizer, OneHotEncoder
 
 SpanInfo = namedtuple('SpanInfo', ['dim', 'activation_fn'])
@@ -126,20 +127,58 @@ class DataTransformer(object):
         ohe = column_transform_info.transform
         return ohe.transform(data).to_numpy()
 
-    def transform(self, raw_data):
-        """Take raw data and output a matrix data."""
-        if not isinstance(raw_data, pd.DataFrame):
-            column_names = [str(num) for num in range(raw_data.shape[1])]
-            raw_data = pd.DataFrame(raw_data, columns=column_names)
+    def _synchronous_transform(self, raw_data, column_transform_info_list):
+        """Take a Pandas DataFrame and transform columns synchronous.
 
+        Outputs a list with Numpy arrays.
+        """
         column_data_list = []
-        for column_transform_info in self._column_transform_info_list:
+        for column_transform_info in column_transform_info_list:
             column_name = column_transform_info.column_name
             data = raw_data[[column_name]]
             if column_transform_info.column_type == 'continuous':
                 column_data_list.append(self._transform_continuous(column_transform_info, data))
             else:
                 column_data_list.append(self._transform_discrete(column_transform_info, data))
+
+        return column_data_list
+
+    def _parallel_transform(self, raw_data, column_transform_info_list):
+        """Take a Pandas DataFrame and transform columns in parallel.
+
+        Outputs a list with Numpy arrays.
+        """
+        processes = []
+        for column_transform_info in column_transform_info_list:
+            column_name = column_transform_info.column_name
+            data = raw_data[[column_name]]
+            process = None
+            if column_transform_info.column_type == 'continuous':
+                process = delayed(self._transform_continuous)(column_transform_info, data)
+            else:
+                process = delayed(self._transform_discrete)(column_transform_info, data)
+            processes.append(process)
+
+        return Parallel(n_jobs=-1)(processes)
+
+    def transform(self, raw_data):
+        """Take raw data and output a matrix data."""
+        if not isinstance(raw_data, pd.DataFrame):
+            column_names = [str(num) for num in range(raw_data.shape[1])]
+            raw_data = pd.DataFrame(raw_data, columns=column_names)
+
+        # Only use parallelization with larger data sizes.
+        # Otherwise, the transformation will be slower.
+        if raw_data.shape[0] < 500:
+            column_data_list = self._synchronous_transform(
+                raw_data,
+                self._column_transform_info_list
+            )
+        else:
+            column_data_list = self._parallel_transform(
+                raw_data,
+                self._column_transform_info_list
+            )
 
         return np.concatenate(column_data_list, axis=1).astype(float)
 
