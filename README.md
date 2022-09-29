@@ -23,7 +23,7 @@
 
 # Overview
 
-CTGAN is a collection of Deep Learning based Synthetic Data Generators for single table data, which are able to learn from real data and generate synthetic clones with high fidelity.
+CTGAN is a collection of Deep Learning-based Synthetic Data Generators for single table data, which are able to learn from real data and generate synthetic clones with high fidelity.
 
 | Important Links                               |                                                                      |
 | --------------------------------------------- | -------------------------------------------------------------------- |
@@ -123,7 +123,7 @@ samples = ctgan.sample(1000)
 3. Also, do not forget to check the [project documentation site](https://sdv.dev/SDV/)!
 
 
-# Citing TGAN
+# Citing CTGAN
 
 If you use CTGAN, please cite the following work:
 
