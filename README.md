@@ -36,7 +36,7 @@ CTGAN is a collection of Deep Learning based synthetic data generators for s
 | [![][Slack Logo] **Community**][Community]    | Join our Slack Workspace for announcements and discussions.          |
 
 [Website]: https://sdv.dev
-[Blog]: https://sdv.dev/blog
+[Blog]: https://datacebo.com/blog
 [Documentation]: https://bit.ly/sdv-docs
 [Repository]: https://github.com/sdv-dev/CTGAN
 [License]: https://github.com/sdv-dev/CTGAN/blob/master/LICENSE
