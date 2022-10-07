@@ -1,11 +1,11 @@
 """Synthesizers module."""
 
-from ctgan.synthesizers.ctgan import CTGANSynthesizer
-from ctgan.synthesizers.tvae import TVAESynthesizer
+from ctgan.synthesizers.ctgan import CTGAN
+from ctgan.synthesizers.tvae import TVAE
 
 __all__ = (
-    'CTGANSynthesizer',
-    'TVAESynthesizer'
+    'CTGAN',
+    'TVAE'
 )
 
 

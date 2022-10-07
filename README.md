@@ -23,43 +23,40 @@
 
 # Overview
 
-CTGAN is a collection of Deep Learning based Synthetic Data Generators for single table data, which are able to learn from real data and generate synthetic clones with high fidelity.
+CTGAN is a collection of Deep Learning based synthetic data generators for single table data, which are able to learn from real data and generate synthetic data with high fidelity.
 
 | Important Links                               |                                                                      |
 | --------------------------------------------- | -------------------------------------------------------------------- |
-| :computer: **[Website]**                      | Check out the SDV Website for more information about the project.    |
-| :orange_book: **[SDV Blog]**                  | Regular publshing of useful content about Synthetic Data Generation. |
+| :computer: **[Website]**                      | Check out the SDV Website for more information about our overall synthetic data ecosystem.|
+| :orange_book: **[Blog]**                      | A deeper look at open source, synthetic data creation and evaluation.|
 | :book: **[Documentation]**                    | Quickstarts, User and Development Guides, and API Reference.         |
 | :octocat: **[Repository]**                    | The link to the Github Repository of this library.                   |
-| :scroll: **[License]**                        | The entire ecosystem is published under the MIT License.             |
+| :scroll: **[License]**                        | This library is published under the MIT License.                     |
 | :keyboard: **[Development Status]**           | This software is in its Pre-Alpha stage.                             |
 | [![][Slack Logo] **Community**][Community]    | Join our Slack Workspace for announcements and discussions.          |
-| [![][MyBinder Logo] **Tutorials**][Tutorials] | Run the SDV Tutorials in a Binder environment.                       |
 
 [Website]: https://sdv.dev
-[SDV Blog]: https://sdv.dev/blog
-[Documentation]: https://sdv.dev/SDV
+[Blog]: https://datacebo.com/blog
+[Documentation]: https://bit.ly/sdv-docs
 [Repository]: https://github.com/sdv-dev/CTGAN
 [License]: https://github.com/sdv-dev/CTGAN/blob/master/LICENSE
 [Development Status]: https://pypi.org/search/?c=Development+Status+%3A%3A+2+-+Pre-Alpha
 [Slack Logo]: https://github.com/sdv-dev/SDV/blob/master/docs/images/slack.png
 [Community]: https://bit.ly/sdv-slack-invite
-[MyBinder Logo]: https://github.com/sdv-dev/SDV/blob/master/docs/images/mybinder.png
-[Tutorials]: https://mybinder.org/v2/gh/sdv-dev/SDV/master?filepath=tutorials
 
-## Implemented Models
-
-Currently, this library implements the **CTGAN** and **TVAE** models proposed in the [Modeling Tabular data using Conditional GAN](https://arxiv.org/abs/1907.00503) paper. For more information about these models, please check out the respective user guides:
-* [CTGAN User Guide](https://sdv.dev/SDV/user_guides/single_table/ctgan.html).
-* [TVAE User Guide](https://sdv.dev/SDV/user_guides/single_table/tvae.html).
+Currently, this library implements the **CTGAN** and **TVAE** models described in the [Modeling Tabular data using Conditional GAN](https://arxiv.org/abs/1907.00503) paper, presented at the 2019 NeurIPS conference.
 
 # Install
 
-**CTGAN** is part of the **SDV** project and is automatically installed alongside it. For
-details about this process please visit the [SDV Installation Guide](
-https://sdv.dev/SDV/getting_started/install.html)
+## Use CTGAN through the SDV library
 
-Optionally, **CTGAN** can also be installed as a standalone library using the following commands:
+:warning: If you're just getting started with synthetic data, we recommend installing the SDV library which provides user-friendly APIs for accessing CTGAN. :warning:
+
+The SDV library provides wrappers for preprocessing your data as well as additional usability features like constraints. See the [SDV documentation](https://bit.ly/sdv-docs) to get started.
+
+## Use the CTGAN standalone library
+
+Alternatively, you can also install and use **CTGAN** directly, as a standalone library:
 
 **Using `pip`:**
 
@@ -73,25 +70,21 @@ pip install ctgan
 conda install -c pytorch -c conda-forge ctgan
 ```
 
-For more installation options please visit the [CTGAN installation Guide](INSTALL.md)
+When using the CTGAN library directly, you may need to manually preprocess your data into the correct format, for example:
+
+* Continuous data must be represented as floats
+* Discrete data must be represented as ints or strings
+* The data should not contain any missing values
 
 # Usage Example
 
-> :warning: **WARNING**: If you're just getting started with synthetic data, we recommend using the SDV library which provides user-friendly APIs for interacting with CTGAN. To learn more about using CTGAN through SDV, check out the user guide [here](https://sdv.dev/SDV/user_guides/single_table/ctgan.html).
-
-To get started with CTGAN, you should prepare your data as either a `numpy.ndarray` or a `pandas.DataFrame` object with two types of columns:
-
-* **Continuous Columns**: can contain any numerical value.
-* **Discrete Columns**: contain a finite number values, whether these are string values or not.
-
-In this example we load the [Adult Census Dataset](https://archive.ics.uci.edu/ml/datasets/adult) which is a built-in demo dataset. We then model it using the **CTGANSynthesizer** and generate a synthetic copy of it.
-
+In this example we load the [Adult Census Dataset](https://archive.ics.uci.edu/ml/datasets/adult)* which is a built-in demo dataset. We use CTGAN to learn from the real data and then generate some synthetic data.
 
 ```python3
-from ctgan import CTGANSynthesizer
+from ctgan import CTGAN
 from ctgan import load_demo
 
-data = load_demo()
+real_data = load_demo()
 
 # Names of the columns that are discrete
 discrete_columns = [
@@ -106,31 +99,31 @@ discrete_columns = [
     'income'
 ]
 
-ctgan = CTGANSynthesizer(epochs=10)
-ctgan.fit(data, discrete_columns)
+ctgan = CTGAN(epochs=10)
+ctgan.fit(real_data, discrete_columns)
 
-# Synthetic copy
-samples = ctgan.sample(1000)
+# Create synthetic data
+synthetic_data = ctgan.sample(1000)
 ```
 
-
+*For more information about the dataset see:
+Dua, D. and Graff, C. (2019). UCI Machine Learning Repository [http://archive.ics.uci.edu/ml].
+Irvine, CA: University of California, School of Information and Computer Science.
 
 # Join our community
 
+Join our [Slack channel](https://bit.ly/sdv-slack-invite) to discuss more about CTGAN and synthetic data. If you find a bug or have a feature request, you can also [open an issue](https://github.com/sdv-dev/CTGAN/issues) on our GitHub.
 
-1. Please have a look at the [Contributing Guide](https://sdv.dev/SDV/developer_guides/contributing.html) to see how you can contribute to the project.
-2. If you have any doubts, feature requests or detect an error, please [open an issue on github](https://github.com/sdv-dev/CTGAN/issues) or [join our Slack Workspace](https://sdv-space.slack.com/join/shared_invite/zt-gdsfcb5w-0QQpFMVoyB2Yd6SRiMplcw#/).
-3. Also, do not forget to check the [project documentation site](https://sdv.dev/SDV/)!
+**Interested in contributing to CTGAN?** Read our [Contribution Guide](CONTRIBUTING.rst) to get started.
 
-
-# Citing TGAN
+# Citing CTGAN
 
 If you use CTGAN, please cite the following work:
 
-- *Lei Xu, Maria Skoularidou, Alfredo Cuesta-Infante, Kalyan Veeramachaneni.* **Modeling Tabular data using Conditional GAN**. NeurIPS, 2019.
+*Lei Xu, Maria Skoularidou, Alfredo Cuesta-Infante, Kalyan Veeramachaneni.* **Modeling Tabular data using Conditional GAN**. NeurIPS, 2019.
 
 ```LaTeX
-@inproceedings{xu2019modeling,
+@inproceedings{ctgan,
   title={Modeling Tabular data using Conditional GAN},
   author={Xu, Lei and Skoularidou, Maria and Cuesta-Infante, Alfredo and Veeramachaneni, Kalyan},
   booktitle={Advances in Neural Information Processing Systems},
@@ -139,21 +132,11 @@ If you use CTGAN, please cite the following work:
 ```
 
 # Related Projects
-Please note that these libraries are external contributions and are not maintained nor supervised by
-the MIT DAI-Lab team.
+Please note that these projects are external to the SDV Ecosystem. They are not affiliated with or maintained by DataCebo.
 
-## R interface for CTGAN
-
-A wrapper around **CTGAN** has been implemented by Kevin Kuo @kevinykuo, bringing the functionalities
-of **CTGAN** to **R** users.
-
+* **R Interface for CTGAN**: A wrapper around **CTGAN** that brings the functionalities to **R** users.
 More details can be found in the corresponding repository: https://github.com/kasaai/ctgan
-
-## CTGAN Server CLI
-
-A package to easily deploy **CTGAN** onto a remote server. This package is developed by Timothy Pillow @oregonpillow.
-
-More details can be found in the corresponding repository: https://github.com/oregonpillow/ctgan-server-cli
+* **CTGAN Server CLI**: A package to easily deploy CTGAN onto a remote server. Created by Timothy Pillow @oregonpillow at: https://github.com/oregonpillow/ctgan-server-cli
 
 ---
 
