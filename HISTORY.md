@@ -1,5 +1,13 @@
 # History
 
+## v0.6.0 - 2022-10-07
+
+This release renames the models in CTGAN. `CTGANSynthesizer` is now called `CTGAN` and `TVAESynthesizer` is now called `TVAE`.
+
+### New Features
+
+* Rename synthesizers - Issue [#243](https://github.com/sdv-dev/CTGAN/issues/243) by @amontanez24
+
 ## v0.5.2 - 2022-08-18
 
 This release updates CTGAN to use the latest version of RDT. It also includes performance and robustness updates to the data transformer.
