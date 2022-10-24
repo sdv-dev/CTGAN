@@ -115,14 +115,14 @@ class TVAE(BaseSynthesizer):
         cuda=True
     ):
 
-        self.embedding_dim = embedding_dim
-        self.compress_dims = compress_dims
-        self.decompress_dims = decompress_dims
+        self._embedding_dim = embedding_dim
+        self._compress_dims = compress_dims
+        self._decompress_dims = decompress_dims
 
-        self.l2scale = l2scale
-        self.batch_size = batch_size
-        self.loss_factor = loss_factor
-        self.epochs = epochs
+        self._l2scale = l2scale
+        self._batch_size = batch_size
+        self._loss_factor = loss_factor
+        self._epochs = epochs
 
         if not cuda or not torch.cuda.is_available():
             device = 'cpu'
@@ -146,35 +146,35 @@ class TVAE(BaseSynthesizer):
                 contain the integer indices of the columns. Otherwise, if it is
                 a ``pandas.DataFrame``, this list should contain the column names.
         """
-        self.transformer = DataTransformer()
-        self.transformer.fit(train_data, discrete_columns)
-        train_data = self.transformer.transform(train_data)
+        self._transformer = DataTransformer()
+        self._transformer.fit(train_data, discrete_columns)
+        train_data = self._transformer.transform(train_data)
         dataset = TensorDataset(torch.from_numpy(train_data.astype('float32')).to(self._device))
-        loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True, drop_last=False)
+        loader = DataLoader(dataset, batch_size=self._batch_size, shuffle=True, drop_last=False)
 
-        data_dim = self.transformer.output_dimensions
-        encoder = Encoder(data_dim, self.compress_dims, self.embedding_dim).to(self._device)
-        self.decoder = Decoder(self.embedding_dim, self.decompress_dims, data_dim).to(self._device)
+        data_dim = self._transformer.output_dimensions
+        encoder = Encoder(data_dim, self._compress_dims, self._embedding_dim).to(self._device)
+        self._decoder = Decoder(self._embedding_dim, self._decompress_dims, data_dim).to(self._device)
         optimizerAE = Adam(
-            list(encoder.parameters()) + list(self.decoder.parameters()),
-            weight_decay=self.l2scale)
+            list(encoder.parameters()) + list(self._decoder.parameters()),
+            weight_decay=self._l2scale)
 
-        for i in range(self.epochs):
+        for i in range(self._epochs):
             for id_, data in enumerate(loader):
                 optimizerAE.zero_grad()
                 real = data[0].to(self._device)
                 mu, std, logvar = encoder(real)
                 eps = torch.randn_like(std)
                 emb = eps * std + mu
-                rec, sigmas = self.decoder(emb)
+                rec, sigmas = self._decoder(emb)
                 loss_1, loss_2 = _loss_function(
                     rec, real, sigmas, mu, logvar,
-                    self.transformer.output_info_list, self.loss_factor
+                    self._transformer.output_info_list, self._loss_factor
                 )
                 loss = loss_1 + loss_2
                 loss.backward()
                 optimizerAE.step()
-                self.decoder.sigma.data.clamp_(0.01, 1.0)
+                self._decoder.sigma.data.clamp_(0.01, 1.0)
 
     @random_state
     def sample(self, samples):
@@ -187,23 +187,23 @@ class TVAE(BaseSynthesizer):
         Returns:
             numpy.ndarray or pandas.DataFrame
         """
-        self.decoder.eval()
+        self._decoder.eval()
 
-        steps = samples // self.batch_size + 1
+        steps = samples // self._batch_size + 1
         data = []
         for _ in range(steps):
-            mean = torch.zeros(self.batch_size, self.embedding_dim)
+            mean = torch.zeros(self._batch_size, self._embedding_dim)
             std = mean + 1
             noise = torch.normal(mean=mean, std=std).to(self._device)
-            fake, sigmas = self.decoder(noise)
+            fake, sigmas = self._decoder(noise)
             fake = torch.tanh(fake)
             data.append(fake.detach().cpu().numpy())
 
         data = np.concatenate(data, axis=0)
         data = data[:samples]
-        return self.transformer.inverse_transform(data, sigmas.detach().cpu().numpy())
+        return self._transformer.inverse_transform(data, sigmas.detach().cpu().numpy())
 
     def set_device(self, device):
         """Set the `device` to be used ('GPU' or 'CPU)."""
         self._device = device
-        self.decoder.to(self._device)
+        self._decoder.to(self._device)
