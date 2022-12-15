@@ -31,7 +31,6 @@ CTGAN is a collection of Deep Learning based synthetic data generators for s
 | :orange_book: **[Blog]**                      | A deeper look at open source, synthetic data creation and evaluation.|
 | :book: **[Documentation]**                    | Quickstarts, User and Development Guides, and API Reference.         |
 | :octocat: **[Repository]**                    | The link to the Github Repository of this library.                   |
-| :scroll: **[License]**                        | This library is published under the MIT License.                     |
 | :keyboard: **[Development Status]**           | This software is in its Pre-Alpha stage.                             |
 | [![][Slack Logo] **Community**][Community]    | Join our Slack Workspace for announcements and discussions.          |
 
