@@ -40,7 +40,7 @@ requirements:
 about:
   home: "https://github.com/sdv-dev/CTGAN"
   license: BUSL-1.1
-  license_file:
+  license_file: LICENSE
   summary: "Conditional GAN for Tabular Data"
   doc_url:
   dev_url:
