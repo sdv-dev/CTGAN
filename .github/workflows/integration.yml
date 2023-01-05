@@ -29,18 +29,3 @@ jobs:
           python -m pip install invoke .[test]
     - name: Run integration tests
       run: invoke integration
-
-  integration-python3-11:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v1
-    - name: Set up Python 3.11
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.11
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        python -m pip install invoke .[test]
-    - name: Run integration on python 3.11
-      run: invoke integration

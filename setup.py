@@ -13,13 +13,13 @@ with open('HISTORY.md', encoding='utf-8') as history_file:
 
 install_requires = [
     'packaging>=20,<22',
-    "numpy>=1.20.0,<2;python_version>='3.7' and python_version<'3.10'",
+    "numpy>=1.20.0,<2;python_version<'3.10'",
     "numpy>=1.23.3,<2;python_version>='3.10'",
     "pandas>=1.1.3,<2;python_version<'3.10'",
-    "pandas>=1.5.0,<2;python_version>='3.10'",
+    "pandas>=1.3.4,<2;python_version>='3.10'",
     "scikit-learn>=1.1.3,<2;python_version>='3.10'",
     "torch>=1.8.0,<2;python_version<'3.10'",
-    "torch>=1.13.0,<2;python_version>='3.10'",
+    "torch>=1.11.0,<2;python_version>='3.10'",
     'rdt @ git+https://github.com/sdv-dev/rdt.git@issue-593-support-python-3.10-and-3.11'
 ]
 
@@ -91,7 +91,6 @@ setup(
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
-        'Programming Language :: Python :: 3.11',
         'Topic :: Scientific/Engineering :: Artificial Intelligence',
     ],
     description='Create tabular synthetic data using a conditional GAN',
@@ -113,7 +112,7 @@ setup(
     keywords='ctgan CTGAN',
     name='ctgan',
     packages=find_packages(include=['ctgan', 'ctgan.*']),
-    python_requires='>=3.7,<3.12',
+    python_requires='>=3.7,<3.11',
     setup_requires=setup_requires,
     test_suite='tests',
     tests_require=tests_require,
