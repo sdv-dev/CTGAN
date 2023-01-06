@@ -20,7 +20,7 @@ install_requires = [
     "scikit-learn>=1.1.3,<2;python_version>='3.10'",
     "torch>=1.8.0,<2;python_version<'3.10'",
     "torch>=1.11.0,<2;python_version>='3.10'",
-    'rdt @ git+https://github.com/sdv-dev/rdt.git@issue-593-support-python-3.10-and-3.11'
+    'rdt>=1.3.0.dev1,<2.0',
 ]
 
 setup_requires = [

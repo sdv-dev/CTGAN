@@ -80,28 +80,20 @@ def install_minimum(c):
                 break
 
             line = line.strip()
-            try:
-                if _validate_python_version(line):
-                    requirement = re.match(r'[^>]*', line).group(0)
-                    requirement = re.sub(r"""['",]""", '', requirement)
-                    version = re.search(r'>=?(\d\.?)+', line).group(0)
-                    if version:
-                        version = re.sub(r'>=?', '==', version)
-                        version = re.sub(r"""['",]""", '', version)
-                        requirement += version
+            if _validate_python_version(line):
+                requirement = re.match(r'[^>]*', line).group(0)
+                requirement = re.sub(r"""['",]""", '', requirement)
+                version = re.search(r'>=?(\d\.?)+', line).group(0)
+                if version:
+                    version = re.sub(r'>=?', '==', version)
+                    version = re.sub(r"""['",]""", '', version)
+                    requirement += version
 
-                    versions.append(requirement)
-            except:
-                # Skipping because this is the RDT link
-                pass
+                versions.append(requirement)
 
         elif line.startswith('install_requires = ['):
             started = True
 
-    # Remove this after rdt release
-    versions.append(
-        'git+https://github.com/sdv-dev/rdt.git@issue-593-support-python-3.10-and-3.11'
-    )
     c.run(f'python -m pip install {" ".join(versions)}')
 
 
