@@ -2,6 +2,7 @@
 
 import numpy as np
 import torch
+import tqdm
 from torch.nn import Linear, Module, Parameter, ReLU, Sequential
 from torch.nn.functional import cross_entropy
 from torch.optim import Adam
@@ -159,22 +160,28 @@ class TVAE(BaseSynthesizer):
             list(encoder.parameters()) + list(self.decoder.parameters()),
             weight_decay=self.l2scale)
 
-        for i in range(self.epochs):
-            for id_, data in enumerate(loader):
-                optimizerAE.zero_grad()
-                real = data[0].to(self._device)
-                mu, std, logvar = encoder(real)
-                eps = torch.randn_like(std)
-                emb = eps * std + mu
-                rec, sigmas = self.decoder(emb)
-                loss_1, loss_2 = _loss_function(
-                    rec, real, sigmas, mu, logvar,
-                    self.transformer.output_info_list, self.loss_factor
+        with tqdm.trange(self.epochs) as epochs_bar:
+            for i in epochs_bar:
+                for id_, data in enumerate(loader):
+                    optimizerAE.zero_grad()
+                    real = data[0].to(self._device)
+                    mu, std, logvar = encoder(real)
+                    eps = torch.randn_like(std)
+                    emb = eps * std + mu
+                    rec, sigmas = self.decoder(emb)
+                    loss_1, loss_2 = _loss_function(
+                        rec, real, sigmas, mu, logvar,
+                        self.transformer.output_info_list, self.loss_factor
+                    )
+                    loss = loss_1 + loss_2
+                    loss.backward()
+                    optimizerAE.step()
+                    self.decoder.sigma.data.clamp_(0.01, 1.0)
+
+                epochs_bar.set_description(
+                    f'Epoch {i}, '
+                    f'Loss: {loss.detach().cpu(): .4f}'
                 )
-                loss = loss_1 + loss_2
-                loss.backward()
-                optimizerAE.step()
-                self.decoder.sigma.data.clamp_(0.01, 1.0)
 
     @random_state
     def sample(self, samples):
