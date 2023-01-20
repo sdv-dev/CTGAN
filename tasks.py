@@ -1,7 +1,9 @@
 import glob
+import inspect
 import operator
 import os
 import re
+import pkg_resources
 import platform
 import shutil
 import stat
@@ -15,6 +17,9 @@ COMPARISONS = {
     '<': operator.lt,
     '<=': operator.le
 }
+
+if not hasattr(inspect, 'getargspec'):
+    inspect.getargspec = inspect.getfullargspec
 
 
 @task
@@ -48,15 +53,18 @@ def readme(c):
 
 
 def _validate_python_version(line):
-    python_version_match = re.search(r"python_version(<=?|>=?)\'(\d\.?)+\'", line)
-    if python_version_match:
+    is_valid = True
+    for python_version_match in re.finditer(r"python_version(<=?|>=?|==)\'(\d\.?)+\'", line):
         python_version = python_version_match.group(0)
-        comparison = re.search(r'(>=?|<=?)', python_version).group(0)
+        comparison = re.search(r'(>=?|<=?|==)', python_version).group(0)
         version_number = python_version.split(comparison)[-1].replace("'", "")
         comparison_function = COMPARISONS[comparison]
-        return comparison_function(platform.python_version(), version_number)
+        is_valid = is_valid and comparison_function(
+            pkg_resources.parse_version(platform.python_version()),
+            pkg_resources.parse_version(version_number),
+        )
 
-    return True
+    return is_valid
 
 
 @task
@@ -69,8 +77,7 @@ def install_minimum(c):
     for line in lines:
         if started:
             if line == ']':
-                started = False
-                continue
+                break
 
             line = line.strip()
             if _validate_python_version(line):
@@ -84,8 +91,7 @@ def install_minimum(c):
 
                 versions.append(requirement)
 
-        elif (line.startswith('install_requires = [') or
-             line.startswith('pomegranate_requires = [')):
+        elif line.startswith('install_requires = ['):
             started = True
 
     c.run(f'python -m pip install {" ".join(versions)}')

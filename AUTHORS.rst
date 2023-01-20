@@ -1,13 +1,1 @@
-Credits
-=======
-
-Research and Development Lead
------------------------------
-
-* Lei Xu <leix@mit.edu>
-
-Contributors
-------------
-
-* Carles Sala <csala@csail.mit.edu>
-* Kevin Kuo <kevinykuo@gmail.com>
+See: https://github.com/sdv-dev/CTGAN/graphs/contributors

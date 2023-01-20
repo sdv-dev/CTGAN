@@ -1,12 +1,13 @@
 name: Style Checks
 
 on:
-  - push
-  - pull_request
+  push:
+  pull_request:
+    types: [opened, reopened]
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python 3.8
