@@ -1,6 +1,6 @@
 # History
 
-## v0.7.0 - 2023-01-23
+## v0.7.0 - 2023-01-20
 
 This release adds support for python 3.10 and drops support for python 3.6. It also fixes a couple of the most common warnings that were surfacing.
 
