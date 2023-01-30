@@ -53,7 +53,9 @@ class Discriminator(Module):
 
     def forward(self, input_):
         """Apply the Discriminator to the `input_`."""
-        assert input_.size()[0] % self.pac == 0
+        if input_.size()[0] % self.pac != 0:
+            raise ValueError("The batch size is not splittable by the pac size. "
+                             "The batch size must be a multiple of the pac parameter value.")
         return self.seq(input_.view(-1, self.pacdim))
 
 
