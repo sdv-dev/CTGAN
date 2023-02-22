@@ -273,3 +273,20 @@ def test_conditional():
 
 def test_batch_size_pack_size():
     """Test that if batch size is not a multiple of pack size, it raises a sane error."""
+
+
+def test_ctgan_save(tmpdir):
+    """Test that the ``CTGAN`` model can be saved."""
+    data = pd.DataFrame({
+        'continuous': np.random.random(100),
+        'discrete': np.random.choice(['a', 'b', 'c'], 100)
+    })
+    discrete_columns = [1]
+
+    ctgan = CTGAN(epochs=1)
+    ctgan.fit(data.to_numpy(), discrete_columns)
+    ctgan.set_random_state(0)
+
+    ctgan.sample(100)
+    model_path = tmpdir / 'model.pkl'
+    ctgan.save(str(model_path))

@@ -57,12 +57,37 @@ def random_state(function):
 
 
 class BaseSynthesizer:
-    """Base class for all default synthesizers of ``CTGAN``.
-
-    This should contain the save/load methods.
-    """
+    """Base class for all default synthesizers of ``CTGAN``."""
 
     random_states = None
+
+    def __getstate__(self):
+        """Remove the ``torch`` generator when pickling."""
+        state = self.__dict__.copy()
+        if (
+            isinstance(self.random_states, tuple) and
+            isinstance(self.random_states[0], np.random.RandomState) and
+            isinstance(self.random_states[1], torch.Generator)
+        ):
+            state['_numpy_random_state'] = self.random_states[0].get_state()
+            state['_torch_random_state'] = self.random_states[1].get_state()
+            state.pop('random_states')
+
+        return state
+
+    def __setstate__(self, state):
+        """Set the ``torch`` generator when loading a model."""
+        if '_numpy_random_state' in state and '_torch_random_state' in state:
+            np_state = state.pop('_numpy_random_state')
+            torch_state = state.pop('_torch_random_state')
+            current_torch_state = torch.Generator()
+            current_torch_state.set_state(torch_state)
+            state['random_state'] = (
+                np.random.RandomState.set_state(np_state),
+                current_torch_state
+            )
+
+        self.__dict__ = state
 
     def save(self, path):
         """Save the model in the passed `path`."""
