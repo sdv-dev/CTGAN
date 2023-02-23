@@ -132,7 +132,8 @@ def test_fixed_random_seed():
 
 
 def test_tvae_save(tmpdir):
-    """Test that the ``TVAE`` model can be saved."""
+    """Test that the ``TVAE`` model can be saved and loaded."""
+    # Setup
     data = pd.DataFrame({
         'continuous': np.random.random(100),
         'discrete': np.random.choice(['a', 'b', 'c'], 100)
@@ -145,4 +146,10 @@ def test_tvae_save(tmpdir):
 
     tvae.sample(100)
     model_path = tmpdir / 'model.pkl'
+
+    # Save
     tvae.save(str(model_path))
+
+    # Load
+    loaded_instance = TVAE.load(str(model_path))
+    loaded_instance.sample(100)
