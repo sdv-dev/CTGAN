@@ -210,7 +210,7 @@ def test_fixed_random_seed():
     })
     discrete_columns = ['discrete']
 
-    ctgan = CTGAN(epochs=1)
+    ctgan = CTGAN(epochs=1, cuda=False)
 
     # Run
     ctgan.fit(data, discrete_columns)
@@ -273,3 +273,27 @@ def test_conditional():
 
 def test_batch_size_pack_size():
     """Test that if batch size is not a multiple of pack size, it raises a sane error."""
+
+
+def test_ctgan_save_and_load(tmpdir):
+    """Test that the ``CTGAN`` model can be saved and loaded."""
+    # Setup
+    data = pd.DataFrame({
+        'continuous': np.random.random(100),
+        'discrete': np.random.choice(['a', 'b', 'c'], 100)
+    })
+    discrete_columns = [1]
+
+    ctgan = CTGAN(epochs=1)
+    ctgan.fit(data.to_numpy(), discrete_columns)
+    ctgan.set_random_state(0)
+
+    ctgan.sample(100)
+    model_path = tmpdir / 'model.pkl'
+
+    # Save
+    ctgan.save(str(model_path))
+
+    # Load
+    loaded_instance = CTGAN.load(str(model_path))
+    loaded_instance.sample(100)
