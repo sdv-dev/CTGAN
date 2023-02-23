@@ -62,7 +62,7 @@ class BaseSynthesizer:
     random_states = None
 
     def __getstate__(self):
-        """Improve pickling state for ``Synthesizer``.
+        """Improve pickling state for ``BaseSynthesizer``.
 
         Convert to ``cpu`` device before starting the pickling process in order to be able to
         load the model even when used from an external tool such as ``SDV``. Also, if
