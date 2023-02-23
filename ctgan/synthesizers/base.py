@@ -1,7 +1,6 @@
 """BaseSynthesizer module."""
 
 import contextlib
-from  copy import deepcopy
 
 import numpy as np
 import torch
