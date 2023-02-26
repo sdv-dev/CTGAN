@@ -112,7 +112,8 @@ class TVAE(BaseSynthesizer):
         batch_size=500,
         epochs=300,
         loss_factor=2,
-        cuda=True
+        cuda=True,
+        verbose=False,      # note: add verbose
     ):
 
         self.embedding_dim = embedding_dim
@@ -123,6 +124,7 @@ class TVAE(BaseSynthesizer):
         self.batch_size = batch_size
         self.loss_factor = loss_factor
         self.epochs = epochs
+        self._verbose = verbose
 
         if not cuda or not torch.cuda.is_available():
             device = 'cpu'
@@ -175,7 +177,14 @@ class TVAE(BaseSynthesizer):
                 loss.backward()
                 optimizerAE.step()
                 self.decoder.sigma.data.clamp_(0.01, 1.0)
-
+            
+            # note: add verbose
+            if self._verbose:
+                print(f'Epoch {i+1}, Loss 1: {loss_1.detach().cpu(): .4f}, '  # noqa: T001
+                      f'Loss 2: {loss_2.detach().cpu(): .4f} ',
+                      f'Loss: {loss.detach().cpu(): .4f}',
+                      flush=True)
+ 
     @random_state
     def sample(self, samples):
         """Sample data similar to the training data.

@@ -417,7 +417,7 @@ class CTGAN(BaseSynthesizer):
                 optimizerG.step()
 
             if self._verbose:
-                print(f'Epoch {i+1}, Loss G: {loss_g.detach().cpu(): .4f},'  # noqa: T001
+                print(f'Epoch {i+1}, Loss G: {loss_g.detach().cpu(): .4f}, '  # noqa: T001
                       f'Loss D: {loss_d.detach().cpu(): .4f}',
                       flush=True)
 
