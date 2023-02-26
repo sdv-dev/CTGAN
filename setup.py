@@ -20,6 +20,8 @@ install_requires = [
     "scikit-learn>=1.1.3,<2;python_version>='3.10'",
     "torch>=1.8.0,<2;python_version<'3.10'",
     "torch>=1.11.0,<2;python_version>='3.10'",
+    "intel_extension_for_pytorch>=1.8.0;python_version<'3.10'",
+    "intel_extension_for_pytorch>=1.11.0;python_version>='3.10'",
     'rdt>=1.3.0,<2.0',
 ]
 

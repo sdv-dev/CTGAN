@@ -6,6 +6,7 @@ from torch.nn import Linear, Module, Parameter, ReLU, Sequential
 from torch.nn.functional import cross_entropy
 from torch.optim import Adam
 from torch.utils.data import DataLoader, TensorDataset
+import intel_extension_for_pytorch as ipex
 
 from ctgan.data_transformer import DataTransformer
 from ctgan.synthesizers.base import BaseSynthesizer, random_state
@@ -74,6 +75,36 @@ class Decoder(Module):
     def forward(self, input_):
         """Decode the passed `input_`."""
         return self.seq(input_), self.sigma
+
+
+# note: add a new class to combine encoder and decoder
+class VAE(Module):
+    """VAE combines encoder and decoder
+
+    Args:
+        data_dim (int):
+            Dimensions of the data.
+        compress_dims (tuple or list of ints):
+            Size of each hidden layer.
+        embedding_dim (int):
+            Size of the output vector.
+        decompress_dims (tuple or list of ints):
+            Size of each hidden layer.
+    """
+
+    def __init__(self, data_dim, compress_dims, embedding_dim, decompress_dims) -> None:
+        super().__init__()
+
+        self.encoder = Encoder(data_dim, compress_dims, embedding_dim)
+        self.decoder = Decoder(embedding_dim, decompress_dims, data_dim)
+
+    def forward(self, input_):
+        mu, std, logvar = self.encoder(input_)
+        eps = torch.randn_like(std)
+        emb = eps * std + mu
+        rec, sigmas = self.decoder(emb)
+
+        return rec, sigmas, mu, logvar
 
 
 def _loss_function(recon_x, x, sigmas, mu, logvar, output_info, factor):
@@ -155,20 +186,20 @@ class TVAE(BaseSynthesizer):
         loader = DataLoader(dataset, batch_size=self.batch_size, shuffle=True, drop_last=False)
 
         data_dim = self.transformer.output_dimensions
-        encoder = Encoder(data_dim, self.compress_dims, self.embedding_dim).to(self._device)
-        self.decoder = Decoder(self.embedding_dim, self.decompress_dims, data_dim).to(self._device)
+        self.vae = VAE(data_dim, self.compress_dims, self.embedding_dim, self.decompress_dims).to(self._device)
         optimizerAE = Adam(
-            list(encoder.parameters()) + list(self.decoder.parameters()),
+            self.vae.parameters(),
             weight_decay=self.l2scale)
+        
+        # note: add ipex trainging optimization
+        self.vae.train()
+        self.vae, optimizerAE = ipex.optimize(self.vae, optimizer=optimizerAE)
 
         for i in range(self.epochs):
             for id_, data in enumerate(loader):
                 optimizerAE.zero_grad()
                 real = data[0].to(self._device)
-                mu, std, logvar = encoder(real)
-                eps = torch.randn_like(std)
-                emb = eps * std + mu
-                rec, sigmas = self.decoder(emb)
+                rec, sigmas, mu, logvar = self.vae(real)
                 loss_1, loss_2 = _loss_function(
                     rec, real, sigmas, mu, logvar,
                     self.transformer.output_info_list, self.loss_factor
@@ -176,7 +207,7 @@ class TVAE(BaseSynthesizer):
                 loss = loss_1 + loss_2
                 loss.backward()
                 optimizerAE.step()
-                self.decoder.sigma.data.clamp_(0.01, 1.0)
+                self.vae.decoder.sigma.data.clamp_(0.01, 1.0)
             
             # note: add verbose
             if self._verbose:
@@ -196,7 +227,10 @@ class TVAE(BaseSynthesizer):
         Returns:
             numpy.ndarray or pandas.DataFrame
         """
-        self.decoder.eval()
+        self.vae.decoder.eval()
+
+        # note: add ipex eval optimization
+        self.vae.decoder = ipex.optimize(self.vae.decoder)
 
         steps = samples // self.batch_size + 1
         data = []
@@ -204,7 +238,7 @@ class TVAE(BaseSynthesizer):
             mean = torch.zeros(self.batch_size, self.embedding_dim)
             std = mean + 1
             noise = torch.normal(mean=mean, std=std).to(self._device)
-            fake, sigmas = self.decoder(noise)
+            fake, sigmas = self.vae.decoder(noise)
             fake = torch.tanh(fake)
             data.append(fake.detach().cpu().numpy())
 
@@ -215,4 +249,4 @@ class TVAE(BaseSynthesizer):
     def set_device(self, device):
         """Set the `device` to be used ('GPU' or 'CPU)."""
         self._device = device
-        self.decoder.to(self._device)
+        self.vae.decoder.to(self._device)
