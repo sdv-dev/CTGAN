@@ -129,3 +129,27 @@ def test_fixed_random_seed():
     assert not np.array_equal(sampled_random, sampled_0_1)
     np.testing.assert_array_equal(sampled_0_0, sampled_1_0)
     np.testing.assert_array_equal(sampled_0_1, sampled_1_1)
+
+
+def test_tvae_save(tmpdir):
+    """Test that the ``TVAE`` model can be saved and loaded."""
+    # Setup
+    data = pd.DataFrame({
+        'continuous': np.random.random(100),
+        'discrete': np.random.choice(['a', 'b', 'c'], 100)
+    })
+    discrete_columns = [1]
+
+    tvae = TVAE(epochs=1)
+    tvae.fit(data.to_numpy(), discrete_columns)
+    tvae.set_random_state(0)
+
+    tvae.sample(100)
+    model_path = tmpdir / 'model.pkl'
+
+    # Save
+    tvae.save(str(model_path))
+
+    # Load
+    loaded_instance = TVAE.load(str(model_path))
+    loaded_instance.sample(100)

@@ -1,5 +1,38 @@
 # History
 
+## v0.7.1 - 2023-02-23
+
+This release fixes a bug that prevented the `CTGAN` model from being saved after sampling.
+
+### Bugs Fixed
+
+* Cannot save CTGANSynthesizer after sampling (TypeError) - Issue [#270](https://github.com/sdv-dev/CTGAN/issues/270) by @pvk-developer
+
+## v0.7.0 - 2023-01-20
+
+This release adds support for python 3.10 and drops support for python 3.6. It also fixes a couple of the most common warnings that were surfacing.
+
+### New Features
+
+* Support Python 3.10 and 3.11 - Issue [#259](https://github.com/sdv-dev/CTGAN/issues/259) by @pvk-developer
+
+### Bugs Fixed
+
+* Fix SettingWithCopyWarning (may be leading to a numerical calculation bug) - Issue [#215](https://github.com/sdv-dev/CTGAN/issues/215) by @amontanez24
+* FutureWarning in data_transformer with pandas 1.5.0 - Issue [#246](https://github.com/sdv-dev/CTGAN/issues/246) by @amontanez24
+
+### Maintenance
+
+* CTGAN Package Maintenance Updates - Issue [#257](https://github.com/sdv-dev/CTGAN/issues/257) by @amontanez24
+
+## v0.6.0 - 2022-10-07
+
+This release renames the models in CTGAN. `CTGANSynthesizer` is now called `CTGAN` and `TVAESynthesizer` is now called `TVAE`.
+
+### New Features
+
+* Rename synthesizers - Issue [#243](https://github.com/sdv-dev/CTGAN/issues/243) by @amontanez24
+
 ## v0.5.2 - 2022-08-18
 
 This release updates CTGAN to use the latest version of RDT. It also includes performance and robustness updates to the data transformer.

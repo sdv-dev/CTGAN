@@ -2,9 +2,9 @@
 
 """Top-level package for ctgan."""
 
-__author__ = 'MIT Data To AI Lab'
-__email__ = 'dailabmit@gmail.com'
-__version__ = '0.5.3.dev1'
+__author__ = 'DataCebo, Inc.'
+__email__ = 'info@sdv.dev'
+__version__ = '0.7.2.dev0'
 
 from ctgan.demo import load_demo
 from ctgan.synthesizers.ctgan import CTGAN
