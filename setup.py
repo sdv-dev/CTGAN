@@ -15,12 +15,12 @@ install_requires = [
     'packaging>=20,<22',
     "numpy>=1.20.0,<2;python_version<'3.10'",
     "numpy>=1.23.3,<2;python_version>='3.10'",
-    "pandas>=1.1.3,<2;python_version<'3.10'",
-    "pandas>=1.3.4,<2;python_version>='3.10'",
+    "pandas>=1.1.3;python_version<'3.10'",
+    "pandas>=1.3.4;python_version>='3.10'",
     "scikit-learn>=1.1.3,<2;python_version>='3.10'",
     "torch>=1.8.0;python_version<'3.10'",
     "torch>=1.11.0;python_version>='3.10'",
-    'rdt>=1.3.0,<2.0',
+    'rdt @ git+https://github.com/sdv-dev/RDT.git@issue-633-remove-pandas-upper-bound',
 ]
 
 setup_requires = [
