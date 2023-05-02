@@ -20,7 +20,7 @@ install_requires = [
     "scikit-learn>=1.1.3,<2;python_version>='3.10'",
     "torch>=1.8.0;python_version<'3.10'",
     "torch>=1.11.0;python_version>='3.10'",
-    'rdt @ git+https://github.com/sdv-dev/RDT.git@issue-633-remove-pandas-upper-bound',
+    'rdt>=1.3.0,<2.0',
 ]
 
 setup_requires = [
