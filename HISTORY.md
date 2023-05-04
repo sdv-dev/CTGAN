@@ -2,7 +2,7 @@
 
 ## v0.7.2 - 2023-05-04
 
-This release adds support for Pandas 2.0 and PyTorch 2.0!
+This release adds support for Pandas 2.0 and PyTorch 2.0! It also fixes a bug in the `load_demo` function.
 
 ### Bugs Fixed
 
