@@ -4,6 +4,10 @@
 
 This release adds support for Pandas 2.0 and PyTorch 2.0!
 
+### Bugs Fixed
+
+* load_demo raises urllib.error.HTTPError: HTTP Error 403: Forbidden - Issue [#284](https://github.com/sdv-dev/CTGAN/issues/284) by @amontanez24
+
 ### Maintenance
 
 * Remove upper bound for pandas - Issue [#282](https://github.com/sdv-dev/CTGAN/issues/282) by @frances-h
