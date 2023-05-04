@@ -1,5 +1,14 @@
 # History
 
+## v0.7.2 - 2023-05-04
+
+This release adds support for Pandas 2.0 and PyTorch 2.0!
+
+### Maintenance
+
+* Remove upper bound for pandas - Issue [#282](https://github.com/sdv-dev/CTGAN/issues/282) by @frances-h
+* Upgrade to torch 2.0 - Issue [#280](https://github.com/sdv-dev/CTGAN/issues/280) by @frances-h
+
 ## v0.7.1 - 2023-02-23
 
 This release fixes a bug that prevented the `CTGAN` model from being saved after sampling.
