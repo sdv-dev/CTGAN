@@ -2,7 +2,11 @@
 
 ## v0.7.2 - 2023-05-04
 
-This release adds support for Pandas 2.0 and PyTorch 2.0!
+This release adds support for Pandas 2.0 and PyTorch 2.0! It also fixes a bug in the `load_demo` function.
+
+### Bugs Fixed
+
+* load_demo raises urllib.error.HTTPError: HTTP Error 403: Forbidden - Issue [#284](https://github.com/sdv-dev/CTGAN/issues/284) by @amontanez24
 
 ### Maintenance
 
