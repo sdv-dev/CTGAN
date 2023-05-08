@@ -328,12 +328,12 @@ class CTGAN(BaseSynthesizer):
 
         optimizerG = optim.Adam(
             self._generator.parameters(), lr=self._generator_lr, betas=(0.5, 0.9),
-            weight_decay=self._generator_decay
+            weight_decay=self._generator_decay, foreach=True
         )
 
         optimizerD = optim.Adam(
             discriminator.parameters(), lr=self._discriminator_lr,
-            betas=(0.5, 0.9), weight_decay=self._discriminator_decay
+            betas=(0.5, 0.9), weight_decay=self._discriminator_decay, foreach=True
         )
 
         mean = torch.zeros(self._batch_size, self._embedding_dim, device=self._device)
@@ -381,7 +381,7 @@ class CTGAN(BaseSynthesizer):
                         real_cat, fake_cat, self._device, self.pac)
                     loss_d = -(torch.mean(y_real) - torch.mean(y_fake))
 
-                    optimizerD.zero_grad()
+                    optimizerD.zero_grad(set_to_none=False)
                     pen.backward(retain_graph=True)
                     loss_d.backward()
                     optimizerD.step()
@@ -412,7 +412,7 @@ class CTGAN(BaseSynthesizer):
 
                 loss_g = -torch.mean(y_fake) + cross_entropy
 
-                optimizerG.zero_grad()
+                optimizerG.zero_grad(set_to_none=False)
                 loss_g.backward()
                 optimizerG.step()
 
