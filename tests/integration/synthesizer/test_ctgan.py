@@ -239,6 +239,7 @@ def test_continuous():
     #   - uniform (assert p-value > 0.05)
     #   - gaussian (assert p-value > 0.05)
     #   - inversely correlated (assert correlation < 0)
+    pass
 
 
 def test_categorical():
@@ -248,6 +249,7 @@ def test_categorical():
     #   - uniform (assert p-value > 0.05)
     #   - very skewed / biased? (assert p-value > 0.05)
     #   - inversely correlated (assert correlation < 0)
+    pass
 
 
 def test_categorical_log_frequency():
@@ -257,22 +259,26 @@ def test_categorical_log_frequency():
     #   - uniform (assert p-value > 0.05)
     #   - very skewed / biased? (assert p-value > 0.05)
     #   - inversely correlated (assert correlation < 0)
+    pass
 
 
 def test_mixed():
     """Test training the CTGAN synthesizer on a small mixed-type dataset."""
     # assert the distribution of the samples is close to the distribution of the data
     # using a kstest for continuous + a cstest for categorical.
+    pass
 
 
 def test_conditional():
     """Test training the CTGAN synthesizer and sampling conditioned on a categorical."""
     # verify that conditioning increases the likelihood of getting a sample with the specified
     # categorical value
+    pass
 
 
 def test_batch_size_pack_size():
     """Test that if batch size is not a multiple of pack size, it raises a sane error."""
+    pass
 
 
 def test_ctgan_save_and_load(tmpdir):
