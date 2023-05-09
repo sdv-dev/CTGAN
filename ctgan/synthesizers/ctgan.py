@@ -220,6 +220,7 @@ class CTGAN(BaseSynthesizer):
                 elif span_info.activation_fn == 'softmax':
                     ed = st + span_info.dim
                     transformed = self._gumbel_softmax(data[:, st:ed], tau=0.2)
+                    # Nans are being introduced here!!
                     data_t.append(transformed)
                     st = ed
                 else:
@@ -328,12 +329,12 @@ class CTGAN(BaseSynthesizer):
 
         optimizerG = optim.Adam(
             self._generator.parameters(), lr=self._generator_lr, betas=(0.5, 0.9),
-            weight_decay=self._generator_decay, foreach=True
+            weight_decay=self._generator_decay
         )
 
         optimizerD = optim.Adam(
             discriminator.parameters(), lr=self._discriminator_lr,
-            betas=(0.5, 0.9), weight_decay=self._discriminator_decay, foreach=True
+            betas=(0.5, 0.9), weight_decay=self._discriminator_decay
         )
 
         mean = torch.zeros(self._batch_size, self._embedding_dim, device=self._device)
