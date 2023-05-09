@@ -1,8 +1,8 @@
 # History
 
-## v0.7.2 - 2023-05-04
+## v0.7.2 - 2023-05-09
 
-This release adds support for Pandas 2.0 and PyTorch 2.0! It also fixes a bug in the `load_demo` function.
+This release adds support for Pandas 2.0! It also fixes a bug in the `load_demo` function.
 
 ### Bugs Fixed
 
@@ -11,7 +11,6 @@ This release adds support for Pandas 2.0 and PyTorch 2.0! It also fixes a bug in
 ### Maintenance
 
 * Remove upper bound for pandas - Issue [#282](https://github.com/sdv-dev/CTGAN/issues/282) by @frances-h
-* Upgrade to torch 2.0 - Issue [#280](https://github.com/sdv-dev/CTGAN/issues/280) by @frances-h
 
 ## v0.7.1 - 2023-02-23
 
