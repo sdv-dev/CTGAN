@@ -5,7 +5,6 @@ import warnings
 import numpy as np
 import pandas as pd
 import torch
-from packaging import version
 from torch import optim
 from torch.nn import BatchNorm1d, Dropout, LeakyReLU, Linear, Module, ReLU, Sequential, functional
 
@@ -197,15 +196,12 @@ class CTGAN(BaseSynthesizer):
         Returns:
             Sampled tensor of same shape as logits from the Gumbel-Softmax distribution.
         """
-        if version.parse(torch.__version__) < version.parse('1.2.0'):
-            for i in range(10):
-                transformed = functional.gumbel_softmax(logits, tau=tau, hard=hard,
-                                                        eps=eps, dim=dim)
-                if not torch.isnan(transformed).any():
-                    return transformed
-            raise ValueError('gumbel_softmax returning NaN.')
+        for _ in range(10):
+            transformed = functional.gumbel_softmax(logits, tau=tau, hard=hard, eps=eps, dim=dim)
+            if not torch.isnan(transformed).any():
+                return transformed
 
-        return functional.gumbel_softmax(logits, tau=tau, hard=hard, eps=eps, dim=dim)
+        raise ValueError('gumbel_softmax returning NaN.')
 
     def _apply_activate(self, data):
         """Apply proper activation function to the output of the generator."""
@@ -220,7 +216,6 @@ class CTGAN(BaseSynthesizer):
                 elif span_info.activation_fn == 'softmax':
                     ed = st + span_info.dim
                     transformed = self._gumbel_softmax(data[:, st:ed], tau=0.2)
-                    # Nans are being introduced here!!
                     data_t.append(transformed)
                     st = ed
                 else:
