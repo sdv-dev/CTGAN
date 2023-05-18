@@ -23,6 +23,7 @@
 
 # Overview
 
+
 CTGAN is a collection of Deep Learning based synthetic data generators for single table data, which are able to learn from real data and generate synthetic data with high fidelity.
 
 | Important Links                               |                                                                      |
