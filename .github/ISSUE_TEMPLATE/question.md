@@ -2,7 +2,7 @@
 name: Question
 about: Doubts about CTGAN usage
 title: ''
-labels: question, pending review
+labels: question, new
 assignees: ''
 
 ---

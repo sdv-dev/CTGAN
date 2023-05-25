@@ -5,7 +5,6 @@ import warnings
 import numpy as np
 import pandas as pd
 import torch
-from packaging import version
 from torch import optim
 from torch.nn import BatchNorm1d, Dropout, LeakyReLU, Linear, Module, ReLU, Sequential, functional
 
@@ -197,15 +196,12 @@ class CTGAN(BaseSynthesizer):
         Returns:
             Sampled tensor of same shape as logits from the Gumbel-Softmax distribution.
         """
-        if version.parse(torch.__version__) < version.parse('1.2.0'):
-            for i in range(10):
-                transformed = functional.gumbel_softmax(logits, tau=tau, hard=hard,
-                                                        eps=eps, dim=dim)
-                if not torch.isnan(transformed).any():
-                    return transformed
-            raise ValueError('gumbel_softmax returning NaN.')
+        for _ in range(10):
+            transformed = functional.gumbel_softmax(logits, tau=tau, hard=hard, eps=eps, dim=dim)
+            if not torch.isnan(transformed).any():
+                return transformed
 
-        return functional.gumbel_softmax(logits, tau=tau, hard=hard, eps=eps, dim=dim)
+        raise ValueError('gumbel_softmax returning NaN.')
 
     def _apply_activate(self, data):
         """Apply proper activation function to the output of the generator."""
@@ -381,7 +377,7 @@ class CTGAN(BaseSynthesizer):
                         real_cat, fake_cat, self._device, self.pac)
                     loss_d = -(torch.mean(y_real) - torch.mean(y_fake))
 
-                    optimizerD.zero_grad()
+                    optimizerD.zero_grad(set_to_none=False)
                     pen.backward(retain_graph=True)
                     loss_d.backward()
                     optimizerD.step()
@@ -412,7 +408,7 @@ class CTGAN(BaseSynthesizer):
 
                 loss_g = -torch.mean(y_fake) + cross_entropy
 
-                optimizerG.zero_grad()
+                optimizerG.zero_grad(set_to_none=False)
                 loss_g.backward()
                 optimizerG.step()
 

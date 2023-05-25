@@ -2,7 +2,7 @@
 name: Feature request
 about: Request a new feature that you would like to see implemented in CTGAN
 title: ''
-labels: new feature, pending review
+labels: new feature, new
 assignees: ''
 
 ---
