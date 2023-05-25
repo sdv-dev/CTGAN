@@ -1,5 +1,17 @@
 # History
 
+## v0.7.3 - 2023-05-25
+
+This release adds support for Torch 2.0!
+
+### Bugs Fixed
+
+* Torch 2.0 fails with cuda=False - Issue [#288](https://github.com/sdv-dev/CTGAN/issues/288) by @amontanez24
+
+### Maintenance
+
+* Upgrade to torch 2.0 - Issue [#280](https://github.com/sdv-dev/CTGAN/issues/280) by @frances-h
+
 ## v0.7.2 - 2023-05-09
 
 This release adds support for Pandas 2.0! It also fixes a bug in the `load_demo` function.
