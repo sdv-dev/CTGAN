@@ -15,7 +15,7 @@ COMPARISONS = {
     '>=': operator.ge,
     '>': operator.gt,
     '<': operator.lt,
-    '<=': operator.le,
+    '<=': operator.le
 }
 
 if not hasattr(inspect, 'getargspec'):
