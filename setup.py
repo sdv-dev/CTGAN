@@ -19,8 +19,8 @@ install_requires = [
     "pandas>=1.5.0;python_version>'3.10'",
     "scikit-learn>=1.1.3,<2;python_version>='3.10'",
     "torch>=1.8.0;python_version<'3.10'",
-    "torch>=1.11.0;python_version=='3.10'",
-    "torch>=2.0.0;python_version>'3.10'",
+    "torch>=1.11.0;python_version>='3.10' and python_version<'3.11'",
+    "torch>=2.0.0;python_version>='3.11'",
     'rdt>=1.3.0,<2.0',
 ]
 
