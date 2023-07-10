@@ -2,9 +2,11 @@
 
 import pandas as pd
 
-DEMO_URL = 'http://ctgan-demo.s3.amazonaws.com/census.csv.gz'
-
+dataset_path = ['/Users/macharya/Downloads/CTGAN/preprocessed_dataset.csv','',''
+dataset_path = '/spark/benchmark/mortgage/input/'
 
 def load_demo():
     """Load the demo."""
-    return pd.read_csv(DEMO_URL, compression='gzip')
+    for file_name in dataset_path:
+        
+        return pd.read_csv(file_name)
