@@ -2,7 +2,7 @@
 
 ## v0.7.4 - 2023-07-24
 
-This release adds support for python 3.11 and drops support for python 3.7.
+This release adds support for Python 3.11 and drops support for Python 3.7.
 
 ### Maintenance
 
