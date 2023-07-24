@@ -1,5 +1,15 @@
 # History
 
+## v0.7.4 - 2023-07-24
+
+This release adds support for python 3.11 and drops support for python 3.7.
+
+### Maintenance
+
+* Why is there an upper bound in the packaging requirement? (packaging<22) - Issue [#276](https://github.com/sdv-dev/CTGAN/issues/276) by @fealho
+* Add support for Python 3.11 - Issue [#296](https://github.com/sdv-dev/CTGAN/issues/296) by @fealho
+* Drop support for Python 3.7 - Issue [#302](https://github.com/sdv-dev/CTGAN/issues/302) by @fealho
+
 ## v0.7.3 - 2023-05-25
 
 This release adds support for Torch 2.0!
