@@ -1,6 +1,6 @@
 # History
 
-## v0.7.4 - 2023-07-24
+## v0.7.4 - 2023-07-25
 
 This release adds support for Python 3.11 and drops support for Python 3.7.
 
