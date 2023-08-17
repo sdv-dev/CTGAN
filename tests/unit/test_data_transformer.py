@@ -75,7 +75,8 @@ class TestDataTransformer(TestCase):
         transformer._fit_continuous(data)
 
         # Assert
-        MockCBN.assert_called_once_with(model_missing_values=True, max_clusters=len(data))
+        MockCBN.assert_called_once_with(
+            missing_value_generation='from_column', max_clusters=len(data))
 
     @patch('ctgan.data_transformer.OneHotEncoder')
     def test___fit_discrete(self, MockOHE):

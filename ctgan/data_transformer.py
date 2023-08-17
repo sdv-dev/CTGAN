@@ -46,7 +46,8 @@ class DataTransformer(object):
                 A ``ColumnTransformInfo`` object.
         """
         column_name = data.columns[0]
-        gm = ClusterBasedNormalizer(model_missing_values=True, max_clusters=min(len(data), 10))
+        gm = ClusterBasedNormalizer(
+            missing_value_generation='from_column', max_clusters=min(len(data), 10))
         gm.fit(data, column_name)
         num_components = sum(gm.valid_component_indicator)
 
