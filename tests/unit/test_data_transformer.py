@@ -429,33 +429,6 @@ class TestDataTransformer(TestCase):
             expected_data
         )
 
-    def test_inverse_transform(self):
-        """Test ``inverse_transform`` on a np.ndarray with continuous and discrete columns.
-
-        It should use the appropriate '_fit' type for each column and should return
-        the corresponding columns. Since we are using the same example as the 'test_transform',
-        and these two functions are inverse of each other, the returned value here should
-        match the input of that function.
-
-        Setup:
-            - Mock _column_transform_info_list
-            - Mock _inverse_transform_discrete
-            - Mock _inverse_trarnsform_continuous
-
-        Input:
-            - column_data = a concatenation of two np.ndarrays
-              - the first one refers to the continuous values
-                - the first column contains the normalized values
-                - the remaining columns correspond to the a one-hot
-              - the second one refers to the discrete values
-                - the columns correspond to a one-hot
-        Output:
-            - numpy array containing a discrete column and a continuous column
-
-        Side Effects:
-            - _transform_discrete and _transform_continuous should each be called once.
-        """
-
     def test_convert_column_name_value_to_id(self):
         """Test ``convert_column_name_value_to_id`` on a simple ``_column_transform_info_list``.
 
