@@ -5,6 +5,7 @@ from collections import namedtuple
 import numpy as np
 import pandas as pd
 from joblib import Parallel, delayed
+
 from rdt.transformers import ClusterBasedNormalizer, OneHotEncoder
 
 SpanInfo = namedtuple('SpanInfo', ['dim', 'activation_fn'])
@@ -18,11 +19,11 @@ ColumnTransformInfo = namedtuple(
 class DataTransformer(object):
     """Data Transformer.
 
-    Model continuous columns with a BayesianGMM and normalized to a scalar [0, 1] and a vector.
-    Discrete columns are encoded using a scikit-learn OneHotEncoder.
+    Model continuous columns with a BayesianGMM and normalizes them to a scalar between [-1, 1]
+    and a vector. Discrete columns are encoded using a scikit-learn's OneHotEncoder.
     """
 
-    def __init__(self, max_clusters=10, weight_threshold=0.005):
+    def __init__(self, max_clusters=2, weight_threshold=0.005):
         """Create a data transformer.
 
         Args:
@@ -47,7 +48,7 @@ class DataTransformer(object):
         """
         column_name = data.columns[0]
         gm = ClusterBasedNormalizer(
-            missing_value_generation='from_column', max_clusters=min(len(data), 10))
+            missing_value_generation='from_column', max_clusters=min(len(data), self._max_clusters))
         gm.fit(data, column_name)
         num_components = sum(gm.valid_component_indicator)
 
