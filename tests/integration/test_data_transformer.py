@@ -25,7 +25,7 @@ class TestDataTransformer(TestCase):
         assert (new_data[:, 0] > -np.ones(len(new_data))).all()
         assert (new_data[:, 0] < np.ones(len(new_data))).all()
 
-        # Assert transformed values are a gaussian centerd in 0 and with std ~ 0
+        # Assert transformed values are a gaussian centered in 0 and with std ~ 0
         assert -.1 < np.mean(new_data[:, 0]) < .1
         assert 0 <= np.std(new_data[:, 0]) < .1
 
@@ -49,7 +49,7 @@ class TestDataTransformer(TestCase):
         assert (new_data[:, 0] > -np.ones(len(new_data))).all()
         assert (new_data[:, 0] < np.ones(len(new_data))).all()
 
-        # Assert transformed values are a gaussian centerd in 0 and with std = 1/4
+        # Assert transformed values are a gaussian centered in 0 and with std = 1/4
         assert -.1 < np.mean(new_data[:, 0]) < .1
         assert .2 < np.std(new_data[:, 0]) < .3
 
@@ -106,7 +106,7 @@ class TestDataTransformer(TestCase):
         assert (new_data[:, 0] > -np.ones(len(new_data))).all()
         assert (new_data[:, 0] < np.ones(len(new_data))).all()
 
-        # Assert transformed numerical values are a gaussian centerd in 0 and with std = 1/4
+        # Assert transformed numerical values are a gaussian centered in 0 and with std = 1/4
         assert -.1 < np.mean(new_data[:, 0]) < .1
         assert .2 < np.std(new_data[:, 0]) < .3
 
@@ -135,7 +135,7 @@ class TestDataTransformer(TestCase):
         assert (new_data[:, 0] > -np.ones(len(new_data))).all()
         assert (new_data[:, 0] < np.ones(len(new_data))).all()
 
-        # Assert transformed numerical values are a gaussian centerd in 0 and with std = 1/4
+        # Assert transformed numerical values are a gaussian centered in 0 and with std = 1/4
         assert -.1 < np.mean(new_data[:, 0]) < .1
         assert .2 < np.std(new_data[:, 0]) < .3
 
