@@ -30,7 +30,8 @@ class TestDataTransformer(TestCase):
         assert 0 <= np.std(new_data[:, 0]) < .1
 
         # Assert there are at most `max_columns=10` one hot columns
-        assert new_data.shape[0] == 1000 and new_data.shape[1] <= 11
+        assert new_data.shape[0] == 1000
+        assert new_data.shape[1] <= 11
         assert np.isin(new_data[:, 1:], [0, 1]).all()
 
     def test_df_continuous(self):
@@ -53,7 +54,8 @@ class TestDataTransformer(TestCase):
         assert .2 < np.std(new_data[:, 0]) < .3
 
         # Assert there are at most `max_columns=10` one hot columns
-        assert new_data.shape[0] == 1000 and new_data.shape[1] <= 11
+        assert new_data.shape[0] == 1000
+        assert new_data.shape[1] <= 11
         assert np.isin(new_data[:, 1:], [0, 1]).all()
 
     def test_df_categorical_constant(self):
@@ -65,7 +67,6 @@ class TestDataTransformer(TestCase):
         # Run
         transformer.fit(data, ['cnt'])
         new_data = transformer.transform(data)
-        print(new_data)
         transformer.inverse_transform(new_data)
 
         # Assert there is only 1 one hot vector
@@ -83,7 +84,8 @@ class TestDataTransformer(TestCase):
         transformer.inverse_transform(new_data)
 
         # Assert there are 3 one hot vectors
-        assert new_data.shape[0] == 1000 and new_data.shape[1] == 3
+        assert new_data.shape[0] == 1000
+        assert new_data.shape[1] == 3
         assert np.isin(new_data[:, 1:], [0, 1]).all()
 
     def test_df_mixed(self):
@@ -110,7 +112,8 @@ class TestDataTransformer(TestCase):
 
         # Assert there are at most `max_columns=10` one hot columns for the numerical values
         # and 3 for the categorical ones
-        assert new_data.shape[0] == 1000 and (5 <= new_data.shape[1] <= 17)
+        assert new_data.shape[0] == 1000
+        assert 5 <= new_data.shape[1] <= 17
         assert np.isin(new_data[:, 1:], [0, 1]).all()
 
     def test_numpy(self):
@@ -138,5 +141,6 @@ class TestDataTransformer(TestCase):
 
         # Assert there are at most `max_columns=10` one hot columns for the numerical values
         # and 3 for the categorical ones
-        assert new_data.shape[0] == 1000 and (5 <= new_data.shape[1] <= 17)
+        assert new_data.shape[0] == 1000
+        assert 5 <= new_data.shape[1] <= 17
         assert np.isin(new_data[:, 1:], [0, 1]).all()
