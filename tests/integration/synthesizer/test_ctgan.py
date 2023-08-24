@@ -231,56 +231,6 @@ def test_fixed_random_seed():
     np.testing.assert_array_equal(sampled_0_1, sampled_1_1)
 
 
-# Below are CTGAN tests that should be implemented in the future
-def test_continuous():
-    """Test training the CTGAN synthesizer on a continuous dataset."""
-    # assert the distribution of the samples is close to the distribution of the data
-    # using kstest:
-    #   - uniform (assert p-value > 0.05)
-    #   - gaussian (assert p-value > 0.05)
-    #   - inversely correlated (assert correlation < 0)
-    pass
-
-
-def test_categorical():
-    """Test training the CTGAN synthesizer on a categorical dataset."""
-    # assert the distribution of the samples is close to the distribution of the data
-    # using cstest:
-    #   - uniform (assert p-value > 0.05)
-    #   - very skewed / biased? (assert p-value > 0.05)
-    #   - inversely correlated (assert correlation < 0)
-    pass
-
-
-def test_categorical_log_frequency():
-    """Test training the CTGAN synthesizer on a small categorical dataset."""
-    # assert the distribution of the samples is close to the distribution of the data
-    # using cstest:
-    #   - uniform (assert p-value > 0.05)
-    #   - very skewed / biased? (assert p-value > 0.05)
-    #   - inversely correlated (assert correlation < 0)
-    pass
-
-
-def test_mixed():
-    """Test training the CTGAN synthesizer on a small mixed-type dataset."""
-    # assert the distribution of the samples is close to the distribution of the data
-    # using a kstest for continuous + a cstest for categorical.
-    pass
-
-
-def test_conditional():
-    """Test training the CTGAN synthesizer and sampling conditioned on a categorical."""
-    # verify that conditioning increases the likelihood of getting a sample with the specified
-    # categorical value
-    pass
-
-
-def test_batch_size_pack_size():
-    """Test that if batch size is not a multiple of pack size, it raises a sane error."""
-    pass
-
-
 def test_ctgan_save_and_load(tmpdir):
     """Test that the ``CTGAN`` model can be saved and loaded."""
     # Setup

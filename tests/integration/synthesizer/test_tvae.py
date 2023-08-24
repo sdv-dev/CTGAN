@@ -56,28 +56,6 @@ def test_drop_last_false():
     assert correct >= 95
 
 
-# TVAE tests that should be implemented in the future.
-def test_continuous():
-    """Test training the TVAE synthesizer on a small continuous dataset."""
-    # verify that the distribution of the samples is close to the distribution of the data
-    # using a kstest.
-    pass
-
-
-def test_categorical():
-    """Test training the TVAE synthesizer on a small categorical dataset."""
-    # verify that the distribution of the samples is close to the distribution of the data
-    # using a cstest.
-    pass
-
-
-def test_mixed():
-    """Test training the TVAE synthesizer on a small mixed-type dataset."""
-    # verify that the distribution of the samples is close to the distribution of the data
-    # using a kstest for continuous + a cstest for categorical.
-    pass
-
-
 def test__loss_function():
     """Test the TVAE produces average values similar to the training data."""
     data = pd.DataFrame({

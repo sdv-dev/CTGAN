@@ -18,8 +18,8 @@ ColumnTransformInfo = namedtuple(
 class DataTransformer(object):
     """Data Transformer.
 
-    Model continuous columns with a BayesianGMM and normalized to a scalar [0, 1] and a vector.
-    Discrete columns are encoded using a scikit-learn OneHotEncoder.
+    Model continuous columns with a BayesianGMM and normalize them to a scalar between [-1, 1]
+    and a vector. Discrete columns are encoded using a OneHotEncoder.
     """
 
     def __init__(self, max_clusters=10, weight_threshold=0.005):
@@ -47,7 +47,10 @@ class DataTransformer(object):
         """
         column_name = data.columns[0]
         gm = ClusterBasedNormalizer(
-            missing_value_generation='from_column', max_clusters=min(len(data), 10))
+            missing_value_generation='from_column',
+            max_clusters=min(len(data), self._max_clusters),
+            weight_threshold=self._weight_threshold
+        )
         gm.fit(data, column_name)
         num_components = sum(gm.valid_component_indicator)
 
