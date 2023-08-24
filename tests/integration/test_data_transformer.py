@@ -72,7 +72,7 @@ class TestDataTransformer(TestCase):
         assert np.array_equal(new_data, np.ones((len(data), 1)))
 
     def test_df_categorical(self):
-        """Test transforming a dataframe containing only constant categorical values."""
+        """Test transforming a dataframe containing only categorical values."""
         # Setup
         data = pd.DataFrame({'cat': np.random.choice(['a', 'b', 'c'], size=1000)})
         transformer = DataTransformer()

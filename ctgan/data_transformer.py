@@ -23,7 +23,7 @@ class DataTransformer(object):
     and a vector. Discrete columns are encoded using a scikit-learn's OneHotEncoder.
     """
 
-    def __init__(self, max_clusters=2, weight_threshold=0.005):
+    def __init__(self, max_clusters=10, weight_threshold=0.005):
         """Create a data transformer.
 
         Args:
@@ -48,7 +48,9 @@ class DataTransformer(object):
         """
         column_name = data.columns[0]
         gm = ClusterBasedNormalizer(
-            missing_value_generation='from_column', max_clusters=min(len(data), self._max_clusters))
+            missing_value_generation='from_column',
+            max_clusters=min(len(data), self._max_clusters)
+        )
         gm.fit(data, column_name)
         num_components = sum(gm.valid_component_indicator)
 
