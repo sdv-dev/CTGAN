@@ -76,7 +76,10 @@ class TestDataTransformer(TestCase):
 
         # Assert
         MockCBN.assert_called_once_with(
-            missing_value_generation='from_column', max_clusters=len(data))
+            missing_value_generation='from_column',
+            max_clusters=len(data),
+            weight_threshold=.005
+        )
 
     @patch('ctgan.data_transformer.OneHotEncoder')
     def test___fit_discrete(self, MockOHE):
