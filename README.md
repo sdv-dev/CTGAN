@@ -8,13 +8,13 @@
 [![PyPI Shield](https://img.shields.io/pypi/v/ctgan.svg)](https://pypi.python.org/pypi/ctgan)
 [![Unit Tests](https://github.com/sdv-dev/CTGAN/actions/workflows/unit.yml/badge.svg)](https://github.com/sdv-dev/CTGAN/actions/workflows/unit.yml)
 [![Downloads](https://pepy.tech/badge/ctgan)](https://pepy.tech/project/ctgan)
-[![Coverage Status](https://codecov.io/gh/sdv-dev/CTGAN/branch/master/graph/badge.svg)](https://codecov.io/gh/sdv-dev/CTGAN)
+[![Coverage Status](https://codecov.io/gh/sdv-dev/CTGAN/branch/main/graph/badge.svg)](https://codecov.io/gh/sdv-dev/CTGAN)
 
 <div align="left">
 <br/>
 <p align="center">
 <a href="https://github.com/sdv-dev/CTGAN">
-<img align="center" width=40% src="https://github.com/sdv-dev/SDV/blob/master/docs/images/CTGAN-DataCebo.png"></img>
+<img align="center" width=40% src="https://github.com/sdv-dev/SDV/blob/stable/docs/images/CTGAN-DataCebo.png"></img>
 </a>
 </p>
 </div>
@@ -38,9 +38,9 @@ CTGAN is a collection of Deep Learning based synthetic data generators for s
 [Blog]: https://datacebo.com/blog
 [Documentation]: https://bit.ly/sdv-docs
 [Repository]: https://github.com/sdv-dev/CTGAN
-[License]: https://github.com/sdv-dev/CTGAN/blob/master/LICENSE
+[License]: https://github.com/sdv-dev/CTGAN/blob/main/LICENSE
 [Development Status]: https://pypi.org/search/?c=Development+Status+%3A%3A+2+-+Pre-Alpha
-[Slack Logo]: https://github.com/sdv-dev/SDV/blob/master/docs/images/slack.png
+[Slack Logo]: https://github.com/sdv-dev/SDV/blob/stable/docs/images/slack.png
 [Community]: https://bit.ly/sdv-slack-invite
 
 Currently, this library implements the **CTGAN** and **TVAE** models described in the [Modeling Tabular data using Conditional GAN](https://arxiv.org/abs/1907.00503) paper, presented at the 2019 NeurIPS conference.
@@ -141,7 +141,7 @@ More details can be found in the corresponding repository: https://github.com/ka
 
 
 <div align="center">
-<a href="https://datacebo.com"><img align="center" width=40% src="https://github.com/sdv-dev/SDV/blob/master/docs/images/DataCebo.png"></img></a>
+<a href="https://datacebo.com"><img align="center" width=40% src="https://github.com/sdv-dev/SDV/blob/stable/docs/images/DataCebo.png"></img></a>
 </div>
 <br/>
 <br/>
