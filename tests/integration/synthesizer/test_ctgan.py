@@ -32,6 +32,8 @@ def test_ctgan_no_categoricals():
     assert sampled.shape == (100, 1)
     assert isinstance(sampled, pd.DataFrame)
     assert set(sampled.columns) == {'continuous'}
+    assert len(ctgan.loss_values) == 1
+    assert list(ctgan.loss_values.columns) == ['Epoch', 'Generator Loss', 'Discriminator Loss']
 
 
 def test_ctgan_dataframe():
@@ -51,6 +53,8 @@ def test_ctgan_dataframe():
     assert isinstance(sampled, pd.DataFrame)
     assert set(sampled.columns) == {'continuous', 'discrete'}
     assert set(sampled['discrete'].unique()) == {'a', 'b', 'c'}
+    assert len(ctgan.loss_values) == 1
+    assert list(ctgan.loss_values.columns) == ['Epoch', 'Generator Loss', 'Discriminator Loss']
 
 
 def test_ctgan_numpy():
@@ -69,6 +73,8 @@ def test_ctgan_numpy():
     assert sampled.shape == (100, 2)
     assert isinstance(sampled, np.ndarray)
     assert set(np.unique(sampled[:, 1])) == {'a', 'b', 'c'}
+    assert len(ctgan.loss_values) == 1
+    assert list(ctgan.loss_values.columns) == ['Epoch', 'Generator Loss', 'Discriminator Loss']
 
 
 def test_log_frequency():
@@ -83,12 +89,22 @@ def test_log_frequency():
     ctgan = CTGAN(epochs=100)
     ctgan.fit(data, discrete_columns)
 
+    assert len(ctgan.loss_values) == 100
+    assert list(ctgan.loss_values.columns) == ['Epoch', 'Generator Loss', 'Discriminator Loss']
+    pd.testing.assert_series_equal(ctgan.loss_values['Epoch'],
+                                   pd.Series(range(100), name='Epoch'))
+
     sampled = ctgan.sample(10000)
     counts = sampled['discrete'].value_counts()
     assert counts['a'] < 6500
 
     ctgan = CTGAN(log_frequency=False, epochs=100)
     ctgan.fit(data, discrete_columns)
+
+    assert len(ctgan.loss_values) == 100
+    assert list(ctgan.loss_values.columns) == ['Epoch', 'Generator Loss', 'Discriminator Loss']
+    pd.testing.assert_series_equal(ctgan.loss_values['Epoch'],
+                                   pd.Series(range(100), name='Epoch'))
 
     sampled = ctgan.sample(10000)
     counts = sampled['discrete'].value_counts()
