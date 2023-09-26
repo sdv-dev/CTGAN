@@ -7,6 +7,7 @@ import pandas as pd
 import torch
 from torch import optim
 from torch.nn import BatchNorm1d, Dropout, LeakyReLU, Linear, Module, ReLU, Sequential, functional
+from tqdm import tqdm
 
 from ctgan.data_sampler import DataSampler
 from ctgan.data_transformer import DataTransformer
@@ -298,6 +299,14 @@ class CTGAN(BaseSynthesizer):
                 DeprecationWarning
             )
 
+        epoch_iterator = range(epochs)
+        if self._verbose:
+            progress_bar = tqdm(range(epochs))
+            epoch_iterator = progress_bar
+
+            description = 'Gen. ({gen:.2f}) | Discrim. ({dis:.2f})'
+            progress_bar.set_description(description.format(gen=0, dis=0))
+
         self._transformer = DataTransformer()
         self._transformer.fit(train_data, discrete_columns)
 
@@ -336,7 +345,7 @@ class CTGAN(BaseSynthesizer):
         std = mean + 1
 
         steps_per_epoch = max(len(train_data) // self._batch_size, 1)
-        for i in range(epochs):
+        for i in epoch_iterator:
             for id_ in range(steps_per_epoch):
 
                 for n in range(self._discriminator_steps):
@@ -413,9 +422,9 @@ class CTGAN(BaseSynthesizer):
                 optimizerG.step()
 
             if self._verbose:
-                print(f'Epoch {i+1}, Loss G: {loss_g.detach().cpu(): .4f},'  # noqa: T001
-                      f'Loss D: {loss_d.detach().cpu(): .4f}',
-                      flush=True)
+                progress_bar.set_description(
+                    description.format(gen=loss_g.detach().cpu(), dis=loss_d.detach().cpu())
+                )
 
     @random_state
     def sample(self, n, condition_column=None, condition_value=None):
