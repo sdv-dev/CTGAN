@@ -301,14 +301,6 @@ class CTGAN(BaseSynthesizer):
                 DeprecationWarning
             )
 
-        epoch_iterator = range(epochs)
-        if self._verbose:
-            progress_bar = tqdm(range(epochs))
-            epoch_iterator = progress_bar
-
-            description = 'Gen. ({gen:.2f}) | Discrim. ({dis:.2f})'
-            progress_bar.set_description(description.format(gen=0, dis=0))
-
         self._transformer = DataTransformer()
         self._transformer.fit(train_data, discrete_columns)
 
@@ -347,6 +339,11 @@ class CTGAN(BaseSynthesizer):
         std = mean + 1
 
         self.loss_values = pd.DataFrame(columns=['Epoch', 'Generator Loss', 'Distriminator Loss'])
+
+        epoch_iterator = tqdm(range(epochs), disable=(not self._verbose))
+        if self._verbose:
+            description = 'Gen. ({gen:.2f}) | Discrim. ({dis:.2f})'
+            epoch_iterator.set_description(description.format(gen=0, dis=0))
 
         steps_per_epoch = max(len(train_data) // self._batch_size, 1)
         for i in epoch_iterator:
@@ -441,7 +438,7 @@ class CTGAN(BaseSynthesizer):
                 self.loss_values = epoch_loss_df
 
             if self._verbose:
-                progress_bar.set_description(
+                epoch_iterator.set_description(
                     description.format(gen=generator_loss, dis=discriminator_loss)
                 )
 
