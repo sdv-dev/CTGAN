@@ -176,6 +176,8 @@ class CTGAN(BaseSynthesizer):
         self._data_sampler = None
         self._generator = None
 
+        self.loss_values = pd.DataFrame(columns=['Epoch', 'Generator Loss', 'Distriminator Loss'])
+
     @staticmethod
     def _gumbel_softmax(logits, tau=1, hard=False, eps=1e-10, dim=-1):
         """Deals with the instability of the gumbel_softmax for older versions of torch.
@@ -344,6 +346,8 @@ class CTGAN(BaseSynthesizer):
         mean = torch.zeros(self._batch_size, self._embedding_dim, device=self._device)
         std = mean + 1
 
+        self.loss_values = pd.DataFrame(columns=['Epoch', 'Generator Loss', 'Distriminator Loss'])
+
         steps_per_epoch = max(len(train_data) // self._batch_size, 1)
         for i in epoch_iterator:
             for id_ in range(steps_per_epoch):
@@ -421,9 +425,24 @@ class CTGAN(BaseSynthesizer):
                 loss_g.backward()
                 optimizerG.step()
 
+            generator_loss = loss_g.detach().cpu()
+            discriminator_loss = loss_d.detach().cpu()
+
+            epoch_loss_df = pd.DataFrame({
+                'Epoch': [i],
+                'Generator Loss': [generator_loss],
+                'Discriminator Loss': [discriminator_loss]
+            })
+            if not self.loss_values.empty:
+                self.loss_values = pd.concat(
+                    [self.loss_values, epoch_loss_df]
+                ).reset_index(drop=True)
+            else:
+                self.loss_values = epoch_loss_df
+
             if self._verbose:
                 progress_bar.set_description(
-                    description.format(gen=loss_g.detach().cpu(), dis=loss_d.detach().cpu())
+                    description.format(gen=generator_loss, dis=discriminator_loss)
                 )
 
     @random_state
