@@ -21,6 +21,7 @@ install_requires = [
     "torch>=1.8.0;python_version<'3.10'",
     "torch>=1.11.0;python_version>='3.10' and python_version<'3.11'",
     "torch>=2.0.0;python_version>='3.11'",
+    'tqdm>=4.15,<5',
     'rdt>=1.6.1,<2.0',
 ]
 
