@@ -7,6 +7,7 @@ import pandas as pd
 import torch
 from torch import optim
 from torch.nn import BatchNorm1d, Dropout, LeakyReLU, Linear, Module, ReLU, Sequential, functional
+from tqdm import tqdm
 
 from ctgan.data_sampler import DataSampler
 from ctgan.data_transformer import DataTransformer
@@ -175,6 +176,8 @@ class CTGAN(BaseSynthesizer):
         self._data_sampler = None
         self._generator = None
 
+        self.loss_values = pd.DataFrame(columns=['Epoch', 'Generator Loss', 'Distriminator Loss'])
+
     @staticmethod
     def _gumbel_softmax(logits, tau=1, hard=False, eps=1e-10, dim=-1):
         """Deals with the instability of the gumbel_softmax for older versions of torch.
@@ -335,8 +338,15 @@ class CTGAN(BaseSynthesizer):
         mean = torch.zeros(self._batch_size, self._embedding_dim, device=self._device)
         std = mean + 1
 
+        self.loss_values = pd.DataFrame(columns=['Epoch', 'Generator Loss', 'Distriminator Loss'])
+
+        epoch_iterator = tqdm(range(epochs), disable=(not self._verbose))
+        if self._verbose:
+            description = 'Gen. ({gen:.2f}) | Discrim. ({dis:.2f})'
+            epoch_iterator.set_description(description.format(gen=0, dis=0))
+
         steps_per_epoch = max(len(train_data) // self._batch_size, 1)
-        for i in range(epochs):
+        for i in epoch_iterator:
             for id_ in range(steps_per_epoch):
 
                 for n in range(self._discriminator_steps):
@@ -412,10 +422,25 @@ class CTGAN(BaseSynthesizer):
                 loss_g.backward()
                 optimizerG.step()
 
+            generator_loss = loss_g.detach().cpu()
+            discriminator_loss = loss_d.detach().cpu()
+
+            epoch_loss_df = pd.DataFrame({
+                'Epoch': [i],
+                'Generator Loss': [generator_loss],
+                'Discriminator Loss': [discriminator_loss]
+            })
+            if not self.loss_values.empty:
+                self.loss_values = pd.concat(
+                    [self.loss_values, epoch_loss_df]
+                ).reset_index(drop=True)
+            else:
+                self.loss_values = epoch_loss_df
+
             if self._verbose:
-                print(f'Epoch {i+1}, Loss G: {loss_g.detach().cpu(): .4f},'  # noqa: T001
-                      f'Loss D: {loss_d.detach().cpu(): .4f}',
-                      flush=True)
+                epoch_iterator.set_description(
+                    description.format(gen=generator_loss, dis=discriminator_loss)
+                )
 
     @random_state
     def sample(self, n, condition_column=None, condition_value=None):

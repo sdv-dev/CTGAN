@@ -32,6 +32,8 @@ def test_ctgan_no_categoricals():
     assert sampled.shape == (100, 1)
     assert isinstance(sampled, pd.DataFrame)
     assert set(sampled.columns) == {'continuous'}
+    assert len(ctgan.loss_values) == 1
+    assert list(ctgan.loss_values.columns) == ['Epoch', 'Generator Loss', 'Discriminator Loss']
 
 
 def test_ctgan_dataframe():
@@ -51,6 +53,8 @@ def test_ctgan_dataframe():
     assert isinstance(sampled, pd.DataFrame)
     assert set(sampled.columns) == {'continuous', 'discrete'}
     assert set(sampled['discrete'].unique()) == {'a', 'b', 'c'}
+    assert len(ctgan.loss_values) == 1
+    assert list(ctgan.loss_values.columns) == ['Epoch', 'Generator Loss', 'Discriminator Loss']
 
 
 def test_ctgan_numpy():
@@ -69,6 +73,8 @@ def test_ctgan_numpy():
     assert sampled.shape == (100, 2)
     assert isinstance(sampled, np.ndarray)
     assert set(np.unique(sampled[:, 1])) == {'a', 'b', 'c'}
+    assert len(ctgan.loss_values) == 1
+    assert list(ctgan.loss_values.columns) == ['Epoch', 'Generator Loss', 'Discriminator Loss']
 
 
 def test_log_frequency():
@@ -83,12 +89,22 @@ def test_log_frequency():
     ctgan = CTGAN(epochs=100)
     ctgan.fit(data, discrete_columns)
 
+    assert len(ctgan.loss_values) == 100
+    assert list(ctgan.loss_values.columns) == ['Epoch', 'Generator Loss', 'Discriminator Loss']
+    pd.testing.assert_series_equal(ctgan.loss_values['Epoch'],
+                                   pd.Series(range(100), name='Epoch'))
+
     sampled = ctgan.sample(10000)
     counts = sampled['discrete'].value_counts()
     assert counts['a'] < 6500
 
     ctgan = CTGAN(log_frequency=False, epochs=100)
     ctgan.fit(data, discrete_columns)
+
+    assert len(ctgan.loss_values) == 100
+    assert list(ctgan.loss_values.columns) == ['Epoch', 'Generator Loss', 'Discriminator Loss']
+    pd.testing.assert_series_equal(ctgan.loss_values['Epoch'],
+                                   pd.Series(range(100), name='Epoch'))
 
     sampled = ctgan.sample(10000)
     counts = sampled['discrete'].value_counts()
@@ -229,56 +245,6 @@ def test_fixed_random_seed():
     assert not np.array_equal(sampled_random, sampled_0_1)
     np.testing.assert_array_equal(sampled_0_0, sampled_1_0)
     np.testing.assert_array_equal(sampled_0_1, sampled_1_1)
-
-
-# Below are CTGAN tests that should be implemented in the future
-def test_continuous():
-    """Test training the CTGAN synthesizer on a continuous dataset."""
-    # assert the distribution of the samples is close to the distribution of the data
-    # using kstest:
-    #   - uniform (assert p-value > 0.05)
-    #   - gaussian (assert p-value > 0.05)
-    #   - inversely correlated (assert correlation < 0)
-    pass
-
-
-def test_categorical():
-    """Test training the CTGAN synthesizer on a categorical dataset."""
-    # assert the distribution of the samples is close to the distribution of the data
-    # using cstest:
-    #   - uniform (assert p-value > 0.05)
-    #   - very skewed / biased? (assert p-value > 0.05)
-    #   - inversely correlated (assert correlation < 0)
-    pass
-
-
-def test_categorical_log_frequency():
-    """Test training the CTGAN synthesizer on a small categorical dataset."""
-    # assert the distribution of the samples is close to the distribution of the data
-    # using cstest:
-    #   - uniform (assert p-value > 0.05)
-    #   - very skewed / biased? (assert p-value > 0.05)
-    #   - inversely correlated (assert correlation < 0)
-    pass
-
-
-def test_mixed():
-    """Test training the CTGAN synthesizer on a small mixed-type dataset."""
-    # assert the distribution of the samples is close to the distribution of the data
-    # using a kstest for continuous + a cstest for categorical.
-    pass
-
-
-def test_conditional():
-    """Test training the CTGAN synthesizer and sampling conditioned on a categorical."""
-    # verify that conditioning increases the likelihood of getting a sample with the specified
-    # categorical value
-    pass
-
-
-def test_batch_size_pack_size():
-    """Test that if batch size is not a multiple of pack size, it raises a sane error."""
-    pass
 
 
 def test_ctgan_save_and_load(tmpdir):
