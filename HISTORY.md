@@ -1,6 +1,6 @@
 # History
 
-## v0.7.5 - 2023-10-06
+## v0.7.5 - 2023-10-05
 
 This release adds a progress bar that will show when setting the `verbose` parameter to True when initializing `CTGAN`. It also removes a warning that was showing.
 
