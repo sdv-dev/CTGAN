@@ -422,8 +422,8 @@ class CTGAN(BaseSynthesizer):
                 loss_g.backward()
                 optimizerG.step()
 
-            generator_loss = loss_g.detach().cpu()
-            discriminator_loss = loss_d.detach().cpu()
+            generator_loss = loss_g.detach().cpu().item()
+            discriminator_loss = loss_d.detach().cpu().item()
 
             epoch_loss_df = pd.DataFrame({
                 'Epoch': [i],
