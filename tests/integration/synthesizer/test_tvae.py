@@ -18,11 +18,13 @@ from ctgan.synthesizers.tvae import TVAE
 
 def test_tvae(tmpdir):
     """Test the TVAE load/save methods."""
+    # Setup
     iris = datasets.load_iris()
     data = pd.DataFrame(iris.data, columns=iris.feature_names)
     data['class'] = pd.Series(iris.target).map(iris.target_names.__getitem__)
-
     tvae = TVAE(epochs=10)
+
+    # Run
     tvae.fit(data, ['class'])
 
     path = str(tmpdir / 'test_tvae.pkl')
@@ -31,10 +33,15 @@ def test_tvae(tmpdir):
 
     sampled = tvae.sample(100)
 
+    # Assert
     assert sampled.shape == (100, 5)
     assert isinstance(sampled, pd.DataFrame)
     assert set(sampled.columns) == set(data.columns)
     assert set(sampled.dtypes) == set(data.dtypes)
+    loss_values = tvae.loss_values
+    assert len(loss_values) == 10
+    assert set(loss_values.columns) == {'Epoch', 'Batch', 'Loss'}
+    assert all(loss_values['Batch'] == 0)
 
 
 def test_drop_last_false():
