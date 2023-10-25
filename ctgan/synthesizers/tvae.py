@@ -164,6 +164,7 @@ class TVAE(BaseSynthesizer):
             list(encoder.parameters()) + list(self.decoder.parameters()),
             weight_decay=self.l2scale)
 
+        self.loss_values = pd.DataFrame(columns=['Epoch', 'Batch', 'Loss'])
         iterator = tqdm(range(self.epochs), disable=(not self.verbose))
         if self.verbose:
             iterator_description = 'Loss: {loss:.3f}'
