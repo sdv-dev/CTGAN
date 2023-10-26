@@ -44,7 +44,7 @@ def test_tvae(tmpdir, capsys):
     assert set(loss_values.columns) == {'Epoch', 'Batch', 'Loss'}
     assert all(loss_values['Batch'] == 0)
     last_loss_val = loss_values['Loss'].iloc[-1]
-    assert f'Loss: {round(last_loss_val, 3)}: 100%|' in captured_out
+    assert f'Loss: {round(last_loss_val, 3)}: 100%' in captured_out
 
 
 def test_drop_last_false():
