@@ -1,5 +1,14 @@
 # History
 
+## v0.8.0 - 2023-11-13
+
+This release adds a progress bar that will show when setting the `verbose` parameter to `True`
+when initializing `TVAE`.
+
+### New Features
+
+* Add verbosity TVAE (progress bar + save the loss values) - Issue [#300]((https://github.com/sdv-dev/CTGAN/issues/300) by @frances-h
+
 ## v0.7.5 - 2023-10-05
 
 This release adds a progress bar that will show when setting the `verbose` parameter to True when initializing `CTGAN`. It also removes a warning that was showing.
