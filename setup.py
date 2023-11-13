@@ -12,14 +12,17 @@ with open('HISTORY.md', encoding='utf-8') as history_file:
     history = history_file.read()
 
 install_requires = [
-    'packaging>=20,<22',
-    "numpy>=1.18.0,<1.20.0;python_version<'3.7'",
-    "numpy>=1.20.0,<2;python_version>='3.7'",
-    'pandas>=1.1.3,<2',
-    'scikit-learn>=0.24,<2',
-    'torch>=1.8.0,<2',
-    'torchvision>=0.9.0,<1',
-    'rdt>=0.6.1,<0.7',
+    "numpy>=1.20.0,<2;python_version<'3.10'",
+    "numpy>=1.23.3,<2;python_version>='3.10'",
+    "pandas>=1.1.3;python_version<'3.10'",
+    "pandas>=1.3.4;python_version>='3.10' and python_version<'3.11'",
+    "pandas>=1.5.0;python_version>='3.11'",
+    "scikit-learn>=1.1.3,<2;python_version>='3.10'",
+    "torch>=1.8.0;python_version<'3.10'",
+    "torch>=1.11.0;python_version>='3.10' and python_version<'3.11'",
+    "torch>=2.0.0;python_version>='3.11'",
+    'tqdm>=4.15,<5',
+    'rdt>=1.6.1,<2.0',
 ]
 
 setup_requires = [
@@ -30,6 +33,7 @@ tests_require = [
     'pytest>=3.4.2',
     'pytest-rerunfailures>=9.1.1,<10',
     'pytest-cov>=2.6.0',
+    'rundoc>=0.4.3,<0.5',
 ]
 
 development_requires = [
@@ -41,6 +45,25 @@ development_requires = [
     # style check
     'flake8>=3.7.7,<4',
     'isort>=4.3.4,<5',
+    'dlint>=0.11.0,<0.12',  # code security addon for flake8
+    'flake8-debugger>=4.0.0,<4.1',
+    'flake8-mock>=0.3,<0.4',
+    'flake8-mutable>=1.2.0,<1.3',
+    'flake8-absolute-import>=1.0,<2',
+    'flake8-multiline-containers>=0.0.18,<0.1',
+    'flake8-print>=4.0.0,<4.1',
+    'flake8-quotes>=3.3.0,<4',
+    'flake8-fixme>=1.1.1,<1.2',
+    'flake8-expression-complexity>=0.0.9,<0.1',
+    'flake8-eradicate>=1.1.0,<1.2',
+    'flake8-builtins>=1.5.3,<1.6',
+    'flake8-variables-names>=0.0.4,<0.1',
+    'pandas-vet>=0.2.2,<0.3',
+    'flake8-comprehensions>=3.6.1,<3.7',
+    'dlint>=0.11.0,<0.12',
+    'flake8-docstrings>=1.5.0,<2',
+    'flake8-sfs>=0.0.3,<0.1',
+    'flake8-pytest-style>=1.5.0,<2',
 
     # fix style issues
     'autoflake>=1.1,<2',
@@ -58,20 +81,21 @@ development_requires = [
 ]
 
 setup(
-    author='MIT Data To AI Lab',
-    author_email='dailabmit@gmail.com',
+    author='DataCebo, Inc.',
+    author_email='info@sdv.dev',
     classifiers=[
         'Development Status :: 2 - Pre-Alpha',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: MIT License',
+        'License :: Free for non-commercial use',
         'Natural Language :: English',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.6',
-        'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
+        'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Topic :: Scientific/Engineering :: Artificial Intelligence',
     ],
-    description='Conditional GAN for Tabular Data',
+    description='Create tabular synthetic data using a conditional GAN',
     entry_points={
         'console_scripts': [
             'ctgan=ctgan.__main__:main'
@@ -83,18 +107,18 @@ setup(
     },
     install_package_data=True,
     install_requires=install_requires,
-    license='MIT license',
+    license='BSL-1.1',
     long_description=readme + '\n\n' + history,
     long_description_content_type='text/markdown',
     include_package_data=True,
     keywords='ctgan CTGAN',
     name='ctgan',
     packages=find_packages(include=['ctgan', 'ctgan.*']),
-    python_requires='>=3.6,<3.10',
+    python_requires='>=3.8,<3.12',
     setup_requires=setup_requires,
     test_suite='tests',
     tests_require=tests_require,
     url='https://github.com/sdv-dev/CTGAN',
-    version='0.5.0',
+    version='0.8.0.dev1',
     zip_safe=False,
 )

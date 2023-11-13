@@ -1,6 +1,119 @@
 # History
 
-## v0.5.0 - 2021-18-12
+## v0.8.0 - 2023-11-13
+
+This release adds a progress bar that will show when setting the `verbose` parameter to `True`
+when initializing `TVAE`.
+
+### New Features
+
+* Add verbosity TVAE (progress bar + save the loss values) - Issue [#300]((https://github.com/sdv-dev/CTGAN/issues/300) by @frances-h
+
+## v0.7.5 - 2023-10-05
+
+This release adds a progress bar that will show when setting the `verbose` parameter to True when initializing `CTGAN`. It also removes a warning that was showing.
+
+### Maintenance
+
+* Remove model_missing_values from ClusterBasedNormalizer call - PR [#310](https://github.com/sdv-dev/CTGAN/pull/310) by @fealho
+* Switch default branch from master to main - Issue [#311](https://github.com/sdv-dev/CTGAN/issues/311) by @amontanez24
+* Remove or implement CTGAN tests - Issue [#312](https://github.com/sdv-dev/CTGAN/issues/312) by @fealho
+
+### New Features
+
+* Add progress bar for CTGAN fitting (+ save the loss values) - Issue [#298](https://github.com/sdv-dev/CTGAN/issues/298) by @frances-h
+
+## v0.7.4 - 2023-07-25
+
+This release adds support for Python 3.11 and drops support for Python 3.7.
+
+### Maintenance
+
+* Why is there an upper bound in the packaging requirement? (packaging<22) - Issue [#276](https://github.com/sdv-dev/CTGAN/issues/276) by @fealho
+* Add support for Python 3.11 - Issue [#296](https://github.com/sdv-dev/CTGAN/issues/296) by @fealho
+* Drop support for Python 3.7 - Issue [#302](https://github.com/sdv-dev/CTGAN/issues/302) by @fealho
+
+## v0.7.3 - 2023-05-25
+
+This release adds support for Torch 2.0!
+
+### Bugs Fixed
+
+* Torch 2.0 fails with cuda=False - Issue [#288](https://github.com/sdv-dev/CTGAN/issues/288) by @amontanez24
+
+### Maintenance
+
+* Upgrade to torch 2.0 - Issue [#280](https://github.com/sdv-dev/CTGAN/issues/280) by @frances-h
+
+## v0.7.2 - 2023-05-09
+
+This release adds support for Pandas 2.0! It also fixes a bug in the `load_demo` function.
+
+### Bugs Fixed
+
+* load_demo raises urllib.error.HTTPError: HTTP Error 403: Forbidden - Issue [#284](https://github.com/sdv-dev/CTGAN/issues/284) by @amontanez24
+
+### Maintenance
+
+* Remove upper bound for pandas - Issue [#282](https://github.com/sdv-dev/CTGAN/issues/282) by @frances-h
+
+## v0.7.1 - 2023-02-23
+
+This release fixes a bug that prevented the `CTGAN` model from being saved after sampling.
+
+### Bugs Fixed
+
+* Cannot save CTGANSynthesizer after sampling (TypeError) - Issue [#270](https://github.com/sdv-dev/CTGAN/issues/270) by @pvk-developer
+
+## v0.7.0 - 2023-01-20
+
+This release adds support for python 3.10 and drops support for python 3.6. It also fixes a couple of the most common warnings that were surfacing.
+
+### New Features
+
+* Support Python 3.10 and 3.11 - Issue [#259](https://github.com/sdv-dev/CTGAN/issues/259) by @pvk-developer
+
+### Bugs Fixed
+
+* Fix SettingWithCopyWarning (may be leading to a numerical calculation bug) - Issue [#215](https://github.com/sdv-dev/CTGAN/issues/215) by @amontanez24
+* FutureWarning in data_transformer with pandas 1.5.0 - Issue [#246](https://github.com/sdv-dev/CTGAN/issues/246) by @amontanez24
+
+### Maintenance
+
+* CTGAN Package Maintenance Updates - Issue [#257](https://github.com/sdv-dev/CTGAN/issues/257) by @amontanez24
+
+## v0.6.0 - 2022-10-07
+
+This release renames the models in CTGAN. `CTGANSynthesizer` is now called `CTGAN` and `TVAESynthesizer` is now called `TVAE`.
+
+### New Features
+
+* Rename synthesizers - Issue [#243](https://github.com/sdv-dev/CTGAN/issues/243) by @amontanez24
+
+## v0.5.2 - 2022-08-18
+
+This release updates CTGAN to use the latest version of RDT. It also includes performance and robustness updates to the data transformer.
+
+### Issues closed
+* Bump rdt version - Issue [#242](https://github.com/sdv-dev/CTGAN/issues/242) by @katxiao
+* Single thread data transform is slow for huge table - Issue [#151](https://github.com/sdv-dev/CTGAN/issues/151) by @mfhbree
+* Fix RDT api - Issue [#232](https://github.com/sdv-dev/CTGAN/issues/232) by @pvk-developer
+* Update macos to use latest version. - Issue [#237](https://github.com/sdv-dev/CTGAN/issues/237) by @pvk-developer
+* Update the RDT version to 1.0 - Issue [#224](https://github.com/sdv-dev/CTGAN/issues/224) by @pvk-developer
+* Update slack invite link. - Issue [#222](https://github.com/sdv-dev/CTGAN/issues/222) by @pvk-developer
+* robustness fix, when data have less rows than the default number of cl… - Issue [#211](https://github.com/sdv-dev/CTGAN/issues/211) by @Deathn0t
+
+## v0.5.1 - 2022-02-25
+
+This release fixes a bug with the decoder instantiation, and also allows users to set a random state for the model
+fitting and sampling.
+
+### Issues closed
+
+* Update self.decoder with correct variable name - Issue [#203](https://github.com/sdv-dev/CTGAN/issues/203) by @tejuafonja
+* Add random state - Issue [#204](https://github.com/sdv-dev/CTGAN/issues/204) by @katxiao
+
+## v0.5.0 - 2021-11-18
 
 This release adds support for Python 3.9 and updates dependencies to ensure compatibility with the
 rest of the SDV ecosystem, and upgrades to the latests [RDT](https://github.com/sdv-dev/RDT/releases/tag/v0.6.1)

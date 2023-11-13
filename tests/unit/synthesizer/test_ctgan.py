@@ -1,3 +1,5 @@
+"""CTGAN unit testing module."""
+
 from unittest import TestCase
 from unittest.mock import Mock
 
@@ -6,7 +8,7 @@ import pytest
 import torch
 
 from ctgan.data_transformer import SpanInfo
-from ctgan.synthesizers.ctgan import CTGANSynthesizer, Discriminator, Generator, Residual
+from ctgan.synthesizers.ctgan import CTGAN, Discriminator, Generator, Residual
 
 
 class TestDiscriminator(TestCase):
@@ -168,12 +170,12 @@ class TestGenerator(TestCase):
 
 
 def _assert_is_between(data, lower, upper):
-    """Asserts all values of the tensor 'data' are within range."""
+    """Assert all values of the tensor 'data' are within range."""
     assert all((data >= lower).numpy().tolist())
     assert all((data <= upper).numpy().tolist())
 
 
-class TestCTGANSynthesizer(TestCase):
+class TestCTGAN(TestCase):
 
     def test__apply_activate_(self):
         """Test `_apply_activate` for tables with both continuous and categoricals.
@@ -190,7 +192,7 @@ class TestCTGANSynthesizer(TestCase):
         Output:
             - tensor = tensor of shape (N, data_dims)
         """
-        model = CTGANSynthesizer()
+        model = CTGAN()
         model._transformer = Mock()
         model._transformer.output_info_list = [
             [SpanInfo(3, 'softmax')],
@@ -229,7 +231,7 @@ class TestCTGANSynthesizer(TestCase):
             - even though the implementation of this is probably right, I'm not sure if the idea
               behind it is correct
         """
-        model = CTGANSynthesizer()
+        model = CTGAN()
         model._transformer = Mock()
         model._transformer.output_info_list = [
             [SpanInfo(1, 'tanh'), SpanInfo(2, 'softmax')],
@@ -284,59 +286,12 @@ class TestCTGANSynthesizer(TestCase):
 
         Note:
             - could create another function for numpy array
-            - TODO: it is currently a integration test, needs to be changed to a proper unit test
         """
         data = pd.DataFrame({
             'discrete': ['a', 'b']
         })
         discrete_columns = ['doesnt exist']
 
-        ctgan = CTGANSynthesizer(epochs=1)
-        with pytest.raises(ValueError):
+        ctgan = CTGAN(epochs=1)
+        with pytest.raises(ValueError, match=r'Invalid columns found: {\'doesnt exist\'}'):
             ctgan.fit(data, discrete_columns)
-
-    def test_sample(self):
-        """Test `sample` correctly sets `condition_info` and `global_condition_vec`.
-
-        Tests the first 7 lines of sample by mocking the DataTransformer and DataSampler
-        and checking that they are being correctly used.
-
-        Setup:
-            - Create and fit the synthesizer
-            - Mock DataTransformer, DataSampler
-
-        Input:
-            - n = integer
-            - condition_column = string (not None)
-            - condition_value = string (not None)
-
-        Output:
-            Not relevant
-
-        Note:
-            - I'm not sure we need this test
-        """
-
-    def test_set_device(self):
-        """Test 'set_device' if a GPU is available.
-
-        Check that decoder/encoder can successfully be moved to the device.
-        If the machine doesn't have a GPU, this test shouldn't run.
-
-        Setup:
-            - Move decoder/encoder to device
-
-        Input:
-            - device = string
-
-        Output:
-            None
-
-        Side Effects:
-            - Set `self._device` to `device`
-            - Moves `self.decoder` to `self._device`
-
-        Note:
-            - Need to be careful when checking whether the encoder is actually set
-            to the right device, since it's not saved (it's only used in fit).
-        """

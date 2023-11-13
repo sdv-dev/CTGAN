@@ -1,121 +1,47 @@
-from unittest import TestCase
+"""TVAE unit testing module."""
+
+from unittest.mock import MagicMock, Mock, call, patch
+
+import pandas as pd
+
+from ctgan.synthesizers import TVAE
 
 
-class TestEncoder(TestCase):
+class TestTVAE:
+    @patch('ctgan.synthesizers.tvae._loss_function')
+    @patch('ctgan.synthesizers.tvae.tqdm')
+    def test_fit_verbose(self, tqdm_mock, loss_func_mock):
+        """Test verbose parameter prints progress bar."""
+        # Setup
+        epochs = 1
 
-    def test___init__(self):
-        """Test `__init__` for a generic case.
+        def mock_iter():
+            for i in range(epochs):
+                yield i
 
-        Make sure 'self.seq' has same length as 2*`compress_dims`.
+        def mock_add(a, b):
+            mock_loss = Mock()
+            mock_loss.detach().cpu().item.return_value = 1.23456789
+            return mock_loss
 
-        Setup:
-            - Create Encoder
+        loss_mock = MagicMock()
+        loss_mock.__add__ = mock_add
+        loss_func_mock.return_value = (loss_mock, loss_mock)
 
-        Input:
-            - data_dim = positive integer
-            - compress_dims = list of integers
-            - embedding_dim = positive integer
+        iterator_mock = MagicMock()
+        iterator_mock.__iter__.side_effect = mock_iter
+        tqdm_mock.return_value = iterator_mock
+        synth = TVAE(epochs=epochs, verbose=True)
+        train_data = pd.DataFrame({
+            'col1': [0, 1, 2, 3, 4],
+            'col2': [10, 11, 12, 13, 14]
+        })
 
-        Output:
-            - None
+        # Run
+        synth.fit(train_data)
 
-        Side Effects:
-            - Set `self.seq`, `self.fc1` and `self.fc2`
-        """
-
-    def test_forward(self):
-        """Test `test_forward` for a generic case.
-
-        Check that the output shapes are correct and that std is positive.
-        We can also test that all parameters have a gradient attached to them
-        by running `encoder.parameters()`. To do that, we just need to use `loss.backward()`
-        for some loss, like `loss = torch.mean(mu) + torch.mean(std) + torch.mean(logvar)`.
-
-        Setup:
-            - Create random tensor
-
-        Input:
-            - input = random tensor of shape (N, data_dim)
-
-        Output:
-            - Tuple of (mu, std, logvar):
-              mu - tensor of shape (N, embedding_dim)
-              std - tensor of shape (N, embedding_dim), non-negative values
-              logvar - tensor of shape (N, embedding_dim)
-        """
-
-
-class TestDecoder(TestCase):
-
-    def test___init__(self):
-        """Test `__init__` for a generic case.
-
-        Make sure 'self.seq' has same length as 2*`decompress_dims` + 1.
-
-        Setup:
-            - Create Decoder
-
-        Input:
-            - data_dim = positive integer
-            - decompress_dims = list of integers
-            - embedding_dim = positive integer
-
-        Output:
-            - None
-
-        Side Effects:
-            - Set `self.seq`, `self.sigma`
-        """
-
-
-class TestLossFunction(TestCase):
-
-    def test_loss_function(self):
-        """Test 'loss_function'
-
-        Check loss values = to specific numbers.
-
-        Setup:
-            Build all the tensors, lists, etc.
-
-        Input:
-            recon_x = tensor of shape (N, data_dims)
-            x = tensor of shape (N, data_dims)
-            sigmas = tensor of shape (N,)
-            mu = tensor of shape (N,)
-            logvar = tensor of shape (N,)
-            output_info = list of SpanInfo objects from the data transformer,
-                          including at least 1 continuous and 1 discrete
-            factor = scalar
-
-        Output:
-            reconstruction loss = scalar = f(recon_x, x, sigmas, output_info, factor)
-            kld loss = scalar = f(logvar, mu)
-        """
-
-
-class TestTVAESynthesizer(TestCase):
-
-    def test_set_device(self):
-        """Test 'set_device' if a GPU is available.
-
-        Check that decoder/encoder can successfully be moved to the device.
-        If the machine doesn't have a GPU, this test shouldn't run.
-
-        Setup:
-            - Move decoder/encoder to device
-
-        Input:
-            - device = string
-
-        Output:
-            None
-
-        Side Effects:
-            - Set `self._device` to `device`
-            - Moves `self.decoder` to `self._device`
-
-        Note:
-            - Need to be careful when checking whether the encoder is actually set
-            to the right device, since it's not saved (it's only used in fit).
-        """
+        # Assert
+        tqdm_mock.assert_called_once_with(range(epochs), disable=False)
+        assert iterator_mock.set_description.call_args_list[0] == call('Loss: 0.000')
+        assert iterator_mock.set_description.call_args_list[1] == call('Loss: 1.235')
+        assert iterator_mock.set_description.call_count == 2
