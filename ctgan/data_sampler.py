@@ -116,9 +116,9 @@ class DataSampler(object):
             return None
 
         category_freq = self._discrete_column_category_prob.flatten()
+        category_freq = category_freq[category_freq != 0]
         category_freq = category_freq / np.sum(category_freq)
         col_idxs = np.random.choice(np.arange(len(category_freq)), batch, p=category_freq)
-
         cond = np.zeros((batch, self._n_categories), dtype='float32')
         cond[np.arange(batch), col_idxs] = 1
 
