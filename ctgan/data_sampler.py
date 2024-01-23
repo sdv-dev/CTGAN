@@ -128,7 +128,10 @@ class DataSampler(object):
         """Sample data from original training data satisfying the sampled conditional vector.
 
         Returns:
-            n rows of matrix data.
+            data:
+                The training data.
+            n:
+                n rows of matrix data.
         """
         if col is None:
             idx = np.random.randint(len(data), size=n)
