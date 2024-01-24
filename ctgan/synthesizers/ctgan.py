@@ -355,7 +355,8 @@ class CTGAN(BaseSynthesizer):
                     condvec = self._data_sampler.sample_condvec(self._batch_size)
                     if condvec is None:
                         c1, m1, col, opt = None, None, None, None
-                        real = self._data_sampler.sample_data(self._batch_size, col, opt)
+                        real = self._data_sampler.sample_data(
+                            train_data, self._batch_size, col, opt)
                     else:
                         c1, m1, col, opt = condvec
                         c1 = torch.from_numpy(c1).to(self._device)
@@ -365,7 +366,7 @@ class CTGAN(BaseSynthesizer):
                         perm = np.arange(self._batch_size)
                         np.random.shuffle(perm)
                         real = self._data_sampler.sample_data(
-                            self._batch_size, col[perm], opt[perm])
+                            train_data, self._batch_size, col[perm], opt[perm])
                         c2 = c1[perm]
 
                     fake = self._generator(fakez)
