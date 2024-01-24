@@ -127,9 +127,10 @@ class DataSampler(object):
     def sample_data(self, data, n, col, opt):
         """Sample data from original training data satisfying the sampled conditional vector.
 
-        Returns:
+        Args:
             data:
                 The training data.
+        Returns:
             n:
                 n rows of matrix data.
         """
