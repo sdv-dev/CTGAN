@@ -1,5 +1,13 @@
 # History
 
+## v0.9.0 - 2024-02-13
+
+This release makes CTGAN sampling more efficient by saving the frequency of each categorical value.
+
+### New Features
+
+* Improve DataSampler efficiency - Issue [#327] ((https://github.com/sdv-dev/CTGAN/issue/327)) by @fealho
+
 ## v0.8.0 - 2023-11-13
 
 This release adds a progress bar that will show when setting the `verbose` parameter to `True`
