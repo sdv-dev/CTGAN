@@ -175,8 +175,7 @@ class CTGAN(BaseSynthesizer):
         self._transformer = None
         self._data_sampler = None
         self._generator = None
-
-        self.loss_values = pd.DataFrame(columns=['Epoch', 'Generator Loss', 'Distriminator Loss'])
+        self.loss_values = None
 
     @staticmethod
     def _gumbel_softmax(logits, tau=1, hard=False, eps=1e-10, dim=-1):
@@ -423,8 +422,8 @@ class CTGAN(BaseSynthesizer):
                 loss_g.backward()
                 optimizerG.step()
 
-            generator_loss = loss_g.detach().cpu()
-            discriminator_loss = loss_d.detach().cpu()
+            generator_loss = loss_g.detach().cpu().item()
+            discriminator_loss = loss_d.detach().cpu().item()
 
             epoch_loss_df = pd.DataFrame({
                 'Epoch': [i],
