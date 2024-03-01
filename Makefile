@@ -238,3 +238,10 @@ release-minor: check-release bumpversion-minor release
 
 .PHONY: release-major
 release-major: check-release bumpversion-major release
+
+# Dependency targets
+
+.PHONY: check-deps
+checkdeps:
+	$(eval allow_list='numpy|pandas|scikit-learn|tqdm|torch|rdt')
+	pip freeze | grep -v "CTGAN.git" | grep -E $(allow_list) > $(OUTPUT_FILEPATH)
