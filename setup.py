@@ -12,17 +12,17 @@ with open('HISTORY.md', encoding='utf-8') as history_file:
     history = history_file.read()
 
 install_requires = [
-    "numpy>=1.20.0,<2;python_version<'3.10'",
-    "numpy>=1.23.3,<2;python_version>='3.10'",
+    "numpy>=1.20.0;python_version<'3.10'",
+    "numpy>=1.23.3;python_version>='3.10'",
     "pandas>=1.1.3;python_version<'3.10'",
     "pandas>=1.3.4;python_version>='3.10' and python_version<'3.11'",
     "pandas>=1.5.0;python_version>='3.11'",
-    "scikit-learn>=1.1.3,<2;python_version>='3.10'",
+    "scikit-learn>=1.1.3;python_version>='3.10'",
     "torch>=1.8.0;python_version<'3.10'",
     "torch>=1.11.0;python_version>='3.10' and python_version<'3.11'",
     "torch>=2.0.0;python_version>='3.11'",
-    'tqdm>=4.15,<5',
-    'rdt>=1.6.1,<2.0',
+    'tqdm>=4.15',
+    'rdt>=1.6.1',
 ]
 
 setup_requires = [
