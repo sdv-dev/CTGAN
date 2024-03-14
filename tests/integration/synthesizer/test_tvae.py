@@ -16,14 +16,17 @@ from sklearn import datasets
 from ctgan.synthesizers.tvae import TVAE
 
 
-def test_tvae(tmpdir):
+def test_tvae(tmpdir, capsys):
     """Test the TVAE load/save methods."""
+    # Setup
     iris = datasets.load_iris()
     data = pd.DataFrame(iris.data, columns=iris.feature_names)
     data['class'] = pd.Series(iris.target).map(iris.target_names.__getitem__)
+    tvae = TVAE(epochs=10, verbose=True)
 
-    tvae = TVAE(epochs=10)
+    # Run
     tvae.fit(data, ['class'])
+    captured_out = capsys.readouterr().err
 
     path = str(tmpdir / 'test_tvae.pkl')
     tvae.save(path)
@@ -31,10 +34,17 @@ def test_tvae(tmpdir):
 
     sampled = tvae.sample(100)
 
+    # Assert
     assert sampled.shape == (100, 5)
     assert isinstance(sampled, pd.DataFrame)
     assert set(sampled.columns) == set(data.columns)
     assert set(sampled.dtypes) == set(data.dtypes)
+    loss_values = tvae.loss_values
+    assert len(loss_values) == 10
+    assert set(loss_values.columns) == {'Epoch', 'Batch', 'Loss'}
+    assert all(loss_values['Batch'] == 0)
+    last_loss_val = loss_values['Loss'].iloc[-1]
+    assert f'Loss: {round(last_loss_val, 3):.3f}: 100%' in captured_out
 
 
 def test_drop_last_false():

@@ -76,15 +76,8 @@ install-test: clean-build clean-pyc ## install the package and test dependencies
 install-develop: clean-build clean-pyc ## install the package in editable mode and dependencies for development
 	pip install -e .[dev]
 
-MINIMUM := $(shell sed -n '/install_requires = \[/,/]/p' setup.py | head -n-1 | tail -n+2 | sed 's/ *\(.*\),$?$$/\1/g' | tr '>' '=')
-
-.PHONY: install-minimum
-install-minimum: ## install the minimum supported versions of the package dependencies
-	pip install $(MINIMUM)
-
 
 # LINT TARGETS
-
 
 .PHONY: lint
 lint: ## check style with flake8 and isort
@@ -138,8 +131,7 @@ coverage: ## check code coverage quickly with the default Python
 
 .PHONY: dist
 dist: clean ## builds source and wheel package
-	python setup.py sdist
-	python setup.py bdist_wheel
+	python -m build --wheel --sdist
 	ls -l dist
 
 .PHONY: publish-confirm
@@ -161,34 +153,34 @@ publish: dist publish-confirm ## package and upload a release
 bumpversion-release: ## Merge main to stable and bumpversion release
 	git checkout stable || git checkout -b stable
 	git merge --no-ff main -m"make release-tag: Merge branch 'main' into stable"
-	bumpversion release
+	bump-my-version bump release
 	git push --tags origin stable
 
 .PHONY: bumpversion-release-test
 bumpversion-release-test: ## Merge main to stable and bumpversion release
 	git checkout stable || git checkout -b stable
 	git merge --no-ff main -m"make release-tag: Merge branch 'main' into stable"
-	bumpversion release --no-tag
+	bump-my-version bump release --no-tag
 	@echo git push --tags origin stable
 
 .PHONY: bumpversion-patch
 bumpversion-patch: ## Merge stable to main and bumpversion patch
 	git checkout main
 	git merge stable
-	bumpversion --no-tag patch
+	bump-my-version bump --no-tag patch
 	git push
 
 .PHONY: bumpversion-candidate
 bumpversion-candidate: ## Bump the version to the next candidate
-	bumpversion candidate --no-tag
+	bump-my-version bump candidate --no-tag
 
 .PHONY: bumpversion-minor
 bumpversion-minor: ## Bump the version the next minor skipping the release
-	bumpversion --no-tag minor
+	bump-my-version bump --no-tag minor
 
 .PHONY: bumpversion-major
 bumpversion-major: ## Bump the version the next major skipping the release
-	bumpversion --no-tag major
+	bump-my-version bump --no-tag major
 
 .PHONY: bumpversion-revert
 bumpversion-revert: ## Undo a previous bumpversion-release
@@ -238,3 +230,10 @@ release-minor: check-release bumpversion-minor release
 
 .PHONY: release-major
 release-major: check-release bumpversion-major release
+
+# Dependency targets
+
+.PHONY: check-deps
+check-deps:
+	$(eval allow_list='numpy=|pandas=|scikit-learn=|tqdm=|torch=|rdt=')
+	pip freeze | grep -v "CTGAN.git" | grep -E $(allow_list) > $(OUTPUT_FILEPATH)
