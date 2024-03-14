@@ -1,5 +1,19 @@
 # History
 
+## v0.9.1 - 2024-03-14
+
+This release changes the `loss_values` attribute of a CTGAN model to contain floats instead of `torch.Tensors`.
+
+### New Features
+
+* Return loss values as float values not PyTorch objects - Issue [#332](https://github.com/sdv-dev/CTGAN/issues/332) by @fealho
+
+### Maintenance
+
+* Transition from using setup.py to pyproject.toml to specify project metadata - Issue [#333](https://github.com/sdv-dev/CTGAN/issues/333) by @R-Palazzo
+* Remove bumpversion and use bump-my-version - Issue [#334](https://github.com/sdv-dev/CTGAN/issues/334) by @R-Palazzo
+* Add dependency checker - Issue [#336](https://github.com/sdv-dev/CTGAN/issues/336) by @amontanez24
+
 ## v0.9.0 - 2024-02-13
 
 This release makes CTGAN sampling more efficient by saving the frequency of each categorical value.
