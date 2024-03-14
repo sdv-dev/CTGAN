@@ -58,6 +58,7 @@ dev = [
 
     # general
     'pip>=9.0.1',
+    'build>=1.0.0,<2',
     'bump-my-version>=0.18.3,<1',
     'watchdog>=0.8.3,<0.11',
 
