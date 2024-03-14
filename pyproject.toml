@@ -150,7 +150,7 @@ add-ignore = ['D107', 'D407', 'D417']
 collect_ignore = ['pyproject.toml']
 
 [tool.bumpversion]
-current_version = "0.9.1.dev1"
+current_version = "0.9.1"
 parse = '(?P<major>\d+)\.(?P<minor>\d+)\.(?P<patch>\d+)(\.(?P<release>[a-z]+)(?P<candidate>\d+))?'
 serialize = [
     '{major}.{minor}.{patch}.{release}{candidate}',
