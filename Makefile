@@ -235,5 +235,5 @@ release-major: check-release bumpversion-major release
 
 .PHONY: check-deps
 check-deps:
-	$(eval allow_list='numpy=|pandas=|scikit-learn=|tqdm=|torch=|rdt=')
+	$(eval allow_list='numpy=|pandas=|tqdm=|torch=|rdt=')
 	pip freeze | grep -v "CTGAN.git" | grep -E $(allow_list) > $(OUTPUT_FILEPATH)
