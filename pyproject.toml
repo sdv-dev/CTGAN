@@ -103,7 +103,7 @@ include-package-data = true
 license-files = ['LICENSE']
 
 [tool.setuptools.packages.find]
-include = ['ctgan', 'ctgan.*', 'tests', 'tests.*']
+include = ['ctgan', 'ctgan.*']
 namespaces = false
 
 [tool.setuptools.package-data]
