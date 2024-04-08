@@ -1,4 +1,5 @@
 """Tests for the ``tasks.py`` file."""
+
 from tasks import _get_minimum_versions
 
 
@@ -15,7 +16,7 @@ def test_get_minimum_versions():
         "pandas>=1.2.0,<2;python_version<'3.10'",
         "pandas>=1.3.0,<2;python_version>='3.10'",
         'humanfriendly>=8.2,<11',
-        'pandas @ git+https://github.com/pandas-dev/pandas.git@master#egg=pandas'
+        'pandas @ git+https://github.com/pandas-dev/pandas.git@master',
     ]
 
     # Run
@@ -25,12 +26,12 @@ def test_get_minimum_versions():
     # Assert
     expected_versions_39 = [
         'numpy==1.20.0',
-        'pandas @ git+https://github.com/pandas-dev/pandas.git@master#egg=pandas',
+        'git+https://github.com/pandas-dev/pandas.git@master#egg=pandas',
         'humanfriendly==8.2',
     ]
     expected_versions_310 = [
         'numpy==1.23.3',
-        'pandas @ git+https://github.com/pandas-dev/pandas.git@master#egg=pandas',
+        'git+https://github.com/pandas-dev/pandas.git@master#egg=pandas',
         'humanfriendly==8.2',
     ]
 
