@@ -126,7 +126,6 @@ namespaces = false
 '*' = [
     '* __pycache__',
     '*.py[co]',
-    'static_code_analysis.txt',
 ]
 
 [tool.setuptools.dynamic]
