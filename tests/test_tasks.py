@@ -1,4 +1,5 @@
 """Tests for the ``tasks.py`` file."""
+
 from tasks import _get_minimum_versions
 
 
