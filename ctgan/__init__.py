@@ -4,7 +4,7 @@
 
 __author__ = 'DataCebo, Inc.'
 __email__ = 'info@sdv.dev'
-__version__ = '0.10.0'
+__version__ = '0.10.1.dev0'
 
 from ctgan.demo import load_demo
 from ctgan.synthesizers.ctgan import CTGAN
