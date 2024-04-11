@@ -1,6 +1,6 @@
 # History
 
-## v0.10.0 - 2024-04-10
+## v0.10.0 - 2024-04-11
 
 This release adds support for Python 3.12!
 
