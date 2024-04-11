@@ -1,5 +1,23 @@
 # History
 
+## v0.10.0 - 2024-04-11
+
+This release adds support for Python 3.12!
+
+### Maintenance
+
+* Support Python 3.12 - Issue [#324](https://github.com/sdv-dev/CTGAN/issues/324) by @fealho
+* Remove scikit-learn dependency - Issue [#346](https://github.com/sdv-dev/CTGAN/issues/346) by @R-Palazzo
+* Add bandit workflow - Issue [#353](https://github.com/sdv-dev/CTGAN/issues/353) by @R-Palazzo
+
+### Internal
+
+* Replace integration test that uses the iris demo data - Issue [#352](https://github.com/sdv-dev/CTGAN/issues/352) by @R-Palazzo
+
+### Bugs Fixed
+
+* Fix minimum version workflow when pointing to github branch - Issue [#355](https://github.com/sdv-dev/CTGAN/issues/355) by @R-Palazzo
+
 ## v0.9.1 - 2024-03-14
 
 This release changes the `loss_values` attribute of a CTGAN model to contain floats instead of `torch.Tensors`.
