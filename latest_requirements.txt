@@ -1,6 +1,4 @@
 numpy==1.26.4
 pandas==2.2.1
-rdt==1.10.0
-scikit-learn==1.4.1.post1
-torch==2.2.1
+torch==2.2.2
 tqdm==4.66.2
