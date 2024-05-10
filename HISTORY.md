@@ -1,6 +1,6 @@
 # History
 
-## v0.10.1 -2024-05-13
+## v0.10.1 - 2024-05-13
 
 This release removes a warning that was cluttering the console.
 
