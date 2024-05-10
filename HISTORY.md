@@ -1,5 +1,18 @@
 # History
 
+## v0.10.1 -2024-05-13
+
+This release removes a warning that was cluttering the console.
+
+### Maintenance
+
+* Cleanup automated PR workflows - Issue [#370](https://github.com/sdv-dev/CTGAN/issues/370) by @R-Palazzo
+* Only run unit and integration tests on oldest and latest python versions for macos - Issue [#375](https://github.com/sdv-dev/CTGAN/issues/375) by @R-Palazzo
+
+### Internal
+
+* Remove FutureWarning: Setting an item of incompatible dtype is deprecated - Issue [#373](https://github.com/sdv-dev/CTGAN/issues/373) by @fealho
+
 ## v0.10.0 - 2024-04-11
 
 This release adds support for Python 3.12!
