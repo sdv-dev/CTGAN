@@ -11,16 +11,12 @@ model are not checked.
 
 import numpy as np
 import pandas as pd
-
 from ctgan.synthesizers.tvae import TVAE
 
 
 def test_drop_last_false():
     """Test the TVAE predicts the correct values."""
-    data = pd.DataFrame({
-        '1': ['a', 'b', 'c'] * 150,
-        '2': ['a', 'b', 'c'] * 150
-    })
+    data = pd.DataFrame({'1': ['a', 'b', 'c'] * 150, '2': ['a', 'b', 'c'] * 150})
 
     tvae = TVAE(epochs=300)
     tvae.fit(data, ['1', '2'])
@@ -38,7 +34,7 @@ def test__loss_function():
     """Test the TVAE produces average values similar to the training data."""
     data = pd.DataFrame({
         '1': [float(i) for i in range(1000)],
-        '2': [float(2 * i) for i in range(1000)]
+        '2': [float(2 * i) for i in range(1000)],
     })
 
     tvae = TVAE(epochs=300)
@@ -65,7 +61,7 @@ def test_fixed_random_seed():
     # Setup
     data = pd.DataFrame({
         'continuous': np.random.random(100),
-        'discrete': np.random.choice(['a', 'b', 'c'], 100)
+        'discrete': np.random.choice(['a', 'b', 'c'], 100),
     })
     discrete_columns = ['discrete']
 
@@ -95,7 +91,7 @@ def test_tvae_save(tmpdir, capsys):
     # Setup
     data = pd.DataFrame({
         'continuous': np.random.random(100),
-        'discrete': np.random.choice(['a', 'b', 'c'], 100)
+        'discrete': np.random.choice(['a', 'b', 'c'], 100),
     })
     discrete_columns = ['discrete']
 

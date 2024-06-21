@@ -6,13 +6,11 @@ from unittest.mock import Mock
 import pandas as pd
 import pytest
 import torch
-
 from ctgan.data_transformer import SpanInfo
 from ctgan.synthesizers.ctgan import CTGAN, Discriminator, Generator, Residual
 
 
 class TestDiscriminator(TestCase):
-
     def test___init__(self):
         """Test `__init__` for a generic case.
 
@@ -74,7 +72,6 @@ class TestDiscriminator(TestCase):
 
 
 class TestResidual(TestCase):
-
     def test_forward(self):
         """Test `test_forward` for a generic case.
 
@@ -110,7 +107,6 @@ class TestResidual(TestCase):
 
 
 class TestGenerator(TestCase):
-
     def test___init__(self):
         """Test `__init__` for a generic case.
 
@@ -176,7 +172,6 @@ def _assert_is_between(data, lower, upper):
 
 
 class TestCTGAN(TestCase):
-
     def test__apply_activate_(self):
         """Test `_apply_activate` for tables with both continuous and categoricals.
 
@@ -196,7 +191,7 @@ class TestCTGAN(TestCase):
         model._transformer = Mock()
         model._transformer.output_info_list = [
             [SpanInfo(3, 'softmax')],
-            [SpanInfo(1, 'tanh'), SpanInfo(2, 'softmax')]
+            [SpanInfo(1, 'tanh'), SpanInfo(2, 'softmax')],
         ]
 
         data = torch.randn(100, 6)
@@ -204,7 +199,7 @@ class TestCTGAN(TestCase):
 
         assert result.shape == (100, 6)
         _assert_is_between(result[:, 0:3], 0.0, 1.0)
-        _assert_is_between(result[: 3], -1.0, 1.0)
+        _assert_is_between(result[:3], -1.0, 1.0)
         _assert_is_between(result[:, 4:6], 0.0, 1.0)
 
     def test__cond_loss(self):
@@ -259,7 +254,7 @@ class TestCTGAN(TestCase):
             torch.tensor([
                 [0.05, 0.05, 0.9],  # 3 categories, one hot
             ]),
-            torch.tensor([2])
+            torch.tensor([2]),
         )
 
         assert (result - expected).abs() < 1e-3
@@ -287,9 +282,7 @@ class TestCTGAN(TestCase):
         Note:
             - could create another function for numpy array
         """
-        data = pd.DataFrame({
-            'discrete': ['a', 'b']
-        })
+        data = pd.DataFrame({'discrete': ['a', 'b']})
         discrete_columns = ['doesnt exist']
 
         ctgan = CTGAN(epochs=1)

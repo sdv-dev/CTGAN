@@ -30,10 +30,7 @@ class Encoder(Module):
         dim = data_dim
         seq = []
         for item in list(compress_dims):
-            seq += [
-                Linear(dim, item),
-                ReLU()
-            ]
+            seq += [Linear(dim, item), ReLU()]
             dim = item
 
         self.seq = Sequential(*seq)
@@ -87,14 +84,17 @@ def _loss_function(recon_x, x, sigmas, mu, logvar, output_info, factor):
                 ed = st + span_info.dim
                 std = sigmas[st]
                 eq = x[:, st] - torch.tanh(recon_x[:, st])
-                loss.append((eq ** 2 / 2 / (std ** 2)).sum())
+                loss.append((eq**2 / 2 / (std**2)).sum())
                 loss.append(torch.log(std) * x.size()[0])
                 st = ed
 
             else:
                 ed = st + span_info.dim
-                loss.append(cross_entropy(
-                    recon_x[:, st:ed], torch.argmax(x[:, st:ed], dim=-1), reduction='sum'))
+                loss.append(
+                    cross_entropy(
+                        recon_x[:, st:ed], torch.argmax(x[:, st:ed], dim=-1), reduction='sum'
+                    )
+                )
                 st = ed
 
     assert st == recon_x.size()[1]
@@ -115,9 +115,8 @@ class TVAE(BaseSynthesizer):
         epochs=300,
         loss_factor=2,
         cuda=True,
-        verbose=False
+        verbose=False,
     ):
-
         self.embedding_dim = embedding_dim
         self.compress_dims = compress_dims
         self.decompress_dims = decompress_dims
@@ -161,8 +160,8 @@ class TVAE(BaseSynthesizer):
         encoder = Encoder(data_dim, self.compress_dims, self.embedding_dim).to(self._device)
         self.decoder = Decoder(self.embedding_dim, self.decompress_dims, data_dim).to(self._device)
         optimizerAE = Adam(
-            list(encoder.parameters()) + list(self.decoder.parameters()),
-            weight_decay=self.l2scale)
+            list(encoder.parameters()) + list(self.decoder.parameters()), weight_decay=self.l2scale
+        )
 
         self.loss_values = pd.DataFrame(columns=['Epoch', 'Batch', 'Loss'])
         iterator = tqdm(range(self.epochs), disable=(not self.verbose))
@@ -181,8 +180,13 @@ class TVAE(BaseSynthesizer):
                 emb = eps * std + mu
                 rec, sigmas = self.decoder(emb)
                 loss_1, loss_2 = _loss_function(
-                    rec, real, sigmas, mu, logvar,
-                    self.transformer.output_info_list, self.loss_factor
+                    rec,
+                    real,
+                    sigmas,
+                    mu,
+                    logvar,
+                    self.transformer.output_info_list,
+                    self.loss_factor,
                 )
                 loss = loss_1 + loss_2
                 loss.backward()
@@ -195,19 +199,19 @@ class TVAE(BaseSynthesizer):
             epoch_loss_df = pd.DataFrame({
                 'Epoch': [i] * len(batch),
                 'Batch': batch,
-                'Loss': loss_values
+                'Loss': loss_values,
             })
             if not self.loss_values.empty:
-                self.loss_values = pd.concat(
-                    [self.loss_values, epoch_loss_df]
-                ).reset_index(drop=True)
+                self.loss_values = pd.concat([self.loss_values, epoch_loss_df]).reset_index(
+                    drop=True
+                )
             else:
                 self.loss_values = epoch_loss_df
 
             if self.verbose:
                 iterator.set_description(
-                    iterator_description.format(
-                        loss=loss.detach().cpu().item()))
+                    iterator_description.format(loss=loss.detach().cpu().item())
+                )
 
     @random_state
     def sample(self, samples):

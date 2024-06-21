@@ -5,12 +5,10 @@ from unittest.mock import Mock, patch
 
 import numpy as np
 import pandas as pd
-
 from ctgan.data_transformer import ColumnTransformInfo, DataTransformer, SpanInfo
 
 
 class TestDataTransformer(TestCase):
-
     @patch('ctgan.data_transformer.ClusterBasedNormalizer')
     def test___fit_continuous(self, MockCBN):
         """Test ``_fit_continuous`` on a simple continuous column.
@@ -76,9 +74,7 @@ class TestDataTransformer(TestCase):
 
         # Assert
         MockCBN.assert_called_once_with(
-            missing_value_generation='from_column',
-            max_clusters=len(data),
-            weight_threshold=.005
+            missing_value_generation='from_column', max_clusters=len(data), weight_threshold=0.005
         )
 
     @patch('ctgan.data_transformer.OneHotEncoder')
@@ -151,21 +147,25 @@ class TestDataTransformer(TestCase):
         transformer = DataTransformer()
         transformer._fit_continuous = Mock()
         transformer._fit_continuous.return_value = ColumnTransformInfo(
-            column_name='x', column_type='continuous', transform=None,
+            column_name='x',
+            column_type='continuous',
+            transform=None,
             output_info=[SpanInfo(1, 'tanh'), SpanInfo(3, 'softmax')],
-            output_dimensions=1 + 3
+            output_dimensions=1 + 3,
         )
 
         transformer._fit_discrete = Mock()
         transformer._fit_discrete.return_value = ColumnTransformInfo(
-            column_name='y', column_type='discrete', transform=None,
+            column_name='y',
+            column_type='discrete',
+            transform=None,
             output_info=[SpanInfo(2, 'softmax')],
-            output_dimensions=2
+            output_dimensions=2,
         )
 
         data = pd.DataFrame({
             'x': np.random.random(size=100),
-            'y': np.random.choice(['yes', 'no'], size=100)
+            'y': np.random.choice(['yes', 'no'], size=100),
         })
 
         # Run
@@ -198,15 +198,17 @@ class TestDataTransformer(TestCase):
         cbn_instance = MockCBN.return_value
         cbn_instance.transform.return_value = pd.DataFrame({
             'x.normalized': [0.1, 0.2, 0.3],
-            'x.component': [0.0, 1.0, 1.0]
+            'x.component': [0.0, 1.0, 1.0],
         })
 
         transformer = DataTransformer()
         data = pd.DataFrame({'x': np.array([0.1, 0.3, 0.5])})
         column_transform_info = ColumnTransformInfo(
-            column_name='x', column_type='continuous', transform=cbn_instance,
+            column_name='x',
+            column_type='continuous',
+            transform=cbn_instance,
             output_info=[SpanInfo(1, 'tanh'), SpanInfo(3, 'softmax')],
-            output_dimensions=1 + 3
+            output_dimensions=1 + 3,
         )
 
         # Run
@@ -238,23 +240,24 @@ class TestDataTransformer(TestCase):
             - np.array containing the transformed columns.
         """
         # Setup
-        data = pd.DataFrame({
-            'x': np.array([0.1, 0.3, 0.5]),
-            'y': np.array(['yes', 'yes', 'no'])
-        })
+        data = pd.DataFrame({'x': np.array([0.1, 0.3, 0.5]), 'y': np.array(['yes', 'yes', 'no'])})
 
         transformer = DataTransformer()
         transformer._column_transform_info_list = [
             ColumnTransformInfo(
-                column_name='x', column_type='continuous', transform=None,
+                column_name='x',
+                column_type='continuous',
+                transform=None,
                 output_info=[SpanInfo(1, 'tanh'), SpanInfo(3, 'softmax')],
-                output_dimensions=1 + 3
+                output_dimensions=1 + 3,
             ),
             ColumnTransformInfo(
-                column_name='y', column_type='discrete', transform=None,
+                column_name='y',
+                column_type='discrete',
+                transform=None,
                 output_info=[SpanInfo(2, 'softmax')],
-                output_dimensions=2
-            )
+                output_dimensions=2,
+            ),
         ]
 
         transformer._transform_continuous = Mock()
@@ -265,7 +268,8 @@ class TestDataTransformer(TestCase):
             [0, 1, 0],
         ])
         return_value = np.concatenate(
-            (selected_normalized_value, selected_component_onehot), axis=1)
+            (selected_normalized_value, selected_component_onehot), axis=1
+        )
         transformer._transform_continuous.return_value = return_value
 
         transformer._transform_discrete = Mock()
@@ -307,23 +311,24 @@ class TestDataTransformer(TestCase):
             - A list containing the transformed columns.
         """
         # Setup
-        data = pd.DataFrame({
-            'x': np.array([0.1, 0.3, 0.5]),
-            'y': np.array(['yes', 'yes', 'no'])
-        })
+        data = pd.DataFrame({'x': np.array([0.1, 0.3, 0.5]), 'y': np.array(['yes', 'yes', 'no'])})
 
         transformer = DataTransformer()
         transformer._column_transform_info_list = [
             ColumnTransformInfo(
-                column_name='x', column_type='continuous', transform=None,
+                column_name='x',
+                column_type='continuous',
+                transform=None,
                 output_info=[SpanInfo(1, 'tanh'), SpanInfo(3, 'softmax')],
-                output_dimensions=1 + 3
+                output_dimensions=1 + 3,
             ),
             ColumnTransformInfo(
-                column_name='y', column_type='discrete', transform=None,
+                column_name='y',
+                column_type='discrete',
+                transform=None,
                 output_info=[SpanInfo(2, 'softmax')],
-                output_dimensions=2
-            )
+                output_dimensions=2,
+            ),
         ]
 
         transformer._transform_continuous = Mock()
@@ -334,7 +339,8 @@ class TestDataTransformer(TestCase):
             [0, 1, 0],
         ])
         return_value = np.concatenate(
-            (selected_normalized_value, selected_component_onehot), axis=1)
+            (selected_normalized_value, selected_component_onehot), axis=1
+        )
         transformer._transform_continuous.return_value = return_value
 
         transformer._transform_discrete = Mock()
@@ -346,12 +352,10 @@ class TestDataTransformer(TestCase):
 
         # Run
         parallel_result = transformer._parallel_transform(
-            data,
-            transformer._column_transform_info_list
+            data, transformer._column_transform_info_list
         )
         sync_result = transformer._synchronous_transform(
-            data,
-            transformer._column_transform_info_list
+            data, transformer._column_transform_info_list
         )
         parallel_result_np = np.concatenate(parallel_result, axis=1).astype(float)
         sync_result_np = np.concatenate(sync_result, axis=1).astype(float)
@@ -389,12 +393,12 @@ class TestDataTransformer(TestCase):
         cbn_instance = MockCBN.return_value
         cbn_instance.get_output_sdtypes.return_value = {
             'x.normalized': 'numerical',
-            'x.component': 'numerical'
+            'x.component': 'numerical',
         }
 
         cbn_instance.reverse_transform.return_value = pd.DataFrame({
             'x.normalized': [0.1, 0.2, 0.3],
-            'x.component': [0.0, 1.0, 1.0]
+            'x.component': [0.0, 1.0, 1.0],
         })
 
         transformer = DataTransformer()
@@ -405,32 +409,26 @@ class TestDataTransformer(TestCase):
         ])
 
         column_transform_info = ColumnTransformInfo(
-            column_name='x', column_type='continuous', transform=cbn_instance,
+            column_name='x',
+            column_type='continuous',
+            transform=cbn_instance,
             output_info=[SpanInfo(1, 'tanh'), SpanInfo(3, 'softmax')],
-            output_dimensions=1 + 3
+            output_dimensions=1 + 3,
         )
 
         # Run
         result = transformer._inverse_transform_continuous(
-            column_transform_info, column_data, None, None)
+            column_transform_info, column_data, None, None
+        )
 
         # Assert
-        expected = pd.DataFrame({
-            'x.normalized': [0.1, 0.2, 0.3],
-            'x.component': [0.0, 1.0, 1.0]
-        })
+        expected = pd.DataFrame({'x.normalized': [0.1, 0.2, 0.3], 'x.component': [0.0, 1.0, 1.0]})
 
         np.testing.assert_array_equal(result, expected)
 
-        expected_data = pd.DataFrame({
-            'x.normalized': [0.1, 0.3, 0.5],
-            'x.component': [0, 1, 1]
-        })
+        expected_data = pd.DataFrame({'x.normalized': [0.1, 0.3, 0.5], 'x.component': [0, 1, 1]})
 
-        pd.testing.assert_frame_equal(
-            cbn_instance.reverse_transform.call_args[0][0],
-            expected_data
-        )
+        pd.testing.assert_frame_equal(cbn_instance.reverse_transform.call_args[0][0], expected_data)
 
     def test_convert_column_name_value_to_id(self):
         """Test ``convert_column_name_value_to_id`` on a simple ``_column_transform_info_list``.
@@ -461,15 +459,19 @@ class TestDataTransformer(TestCase):
         transformer = DataTransformer()
         transformer._column_transform_info_list = [
             ColumnTransformInfo(
-                column_name='x', column_type='continuous', transform=None,
+                column_name='x',
+                column_type='continuous',
+                transform=None,
                 output_info=[SpanInfo(1, 'tanh'), SpanInfo(3, 'softmax')],
-                output_dimensions=1 + 3
+                output_dimensions=1 + 3,
             ),
             ColumnTransformInfo(
-                column_name='y', column_type='discrete', transform=ohe,
+                column_name='y',
+                column_type='discrete',
+                transform=ohe,
                 output_info=[SpanInfo(2, 'softmax')],
-                output_dimensions=2
-            )
+                output_dimensions=2,
+            ),
         ]
 
         # Run
@@ -490,20 +492,26 @@ class TestDataTransformer(TestCase):
         transformer = DataTransformer()
         transformer._column_transform_info_list = [
             ColumnTransformInfo(
-                column_name='x', column_type='continuous', transform=None,
+                column_name='x',
+                column_type='continuous',
+                transform=None,
                 output_info=[SpanInfo(1, 'tanh'), SpanInfo(3, 'softmax')],
-                output_dimensions=1 + 3
+                output_dimensions=1 + 3,
             ),
             ColumnTransformInfo(
-                column_name='y', column_type='discrete', transform=ohe,
+                column_name='y',
+                column_type='discrete',
+                transform=ohe,
                 output_info=[SpanInfo(2, 'softmax')],
-                output_dimensions=2
+                output_dimensions=2,
             ),
             ColumnTransformInfo(
-                column_name='z', column_type='discrete', transform=ohe,
+                column_name='z',
+                column_type='discrete',
+                transform=ohe,
                 output_info=[SpanInfo(2, 'softmax')],
-                output_dimensions=2
-            )
+                output_dimensions=2,
+            ),
         ]
 
         # Run
