@@ -4,6 +4,7 @@ from unittest import TestCase
 
 import numpy as np
 import pandas as pd
+
 from ctgan.data_transformer import DataTransformer
 
 

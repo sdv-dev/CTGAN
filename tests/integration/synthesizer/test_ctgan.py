@@ -14,6 +14,7 @@ import tempfile as tf
 import numpy as np
 import pandas as pd
 import pytest
+
 from ctgan.synthesizers.ctgan import CTGAN
 
 

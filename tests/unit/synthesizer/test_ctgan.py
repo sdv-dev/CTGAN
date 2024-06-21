@@ -6,6 +6,7 @@ from unittest.mock import Mock
 import pandas as pd
 import pytest
 import torch
+
 from ctgan.data_transformer import SpanInfo
 from ctgan.synthesizers.ctgan import CTGAN, Discriminator, Generator, Residual
 

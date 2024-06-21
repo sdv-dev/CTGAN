@@ -155,7 +155,7 @@ build-backend = 'setuptools.build_meta'
 preview = true
 line-length = 100
 indent-width = 4
-src = ["sdv"]
+src = ["ctgan"]
 exclude = [
     "docs",
     ".tox",
@@ -207,7 +207,7 @@ docstring-code-format = true
 docstring-code-line-length = "dynamic"
 
 [tool.ruff.lint.isort]
-known-first-party = ["sdv"]
+known-first-party = ["ctgan"]
 lines-between-types = 0
 
 [tool.ruff.lint.per-file-ignores]

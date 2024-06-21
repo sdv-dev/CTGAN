@@ -4,6 +4,7 @@ from unittest.mock import MagicMock, call, patch
 
 import numpy as np
 import torch
+
 from ctgan.synthesizers.base import BaseSynthesizer, random_state
 
 

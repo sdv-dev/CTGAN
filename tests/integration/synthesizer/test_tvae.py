@@ -11,6 +11,7 @@ model are not checked.
 
 import numpy as np
 import pandas as pd
+
 from ctgan.synthesizers.tvae import TVAE
 
 

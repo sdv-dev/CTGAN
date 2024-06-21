@@ -3,6 +3,7 @@
 from unittest.mock import MagicMock, Mock, call, patch
 
 import pandas as pd
+
 from ctgan.synthesizers import TVAE
 
 

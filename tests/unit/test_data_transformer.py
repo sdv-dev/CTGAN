@@ -5,6 +5,7 @@ from unittest.mock import Mock, patch
 
 import numpy as np
 import pandas as pd
+
 from ctgan.data_transformer import ColumnTransformInfo, DataTransformer, SpanInfo
 
 
