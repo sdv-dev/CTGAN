@@ -20,9 +20,7 @@ from ctgan.synthesizers.ctgan import CTGAN
 
 def test_ctgan_no_categoricals():
     """Test the CTGAN with no categorical values."""
-    data = pd.DataFrame({
-        'continuous': np.random.random(1000)
-    })
+    data = pd.DataFrame({'continuous': np.random.random(1000)})
 
     ctgan = CTGAN(epochs=1)
     ctgan.fit(data, [])
@@ -40,7 +38,7 @@ def test_ctgan_dataframe():
     """Test the CTGAN when passed a dataframe."""
     data = pd.DataFrame({
         'continuous': np.random.random(100),
-        'discrete': np.random.choice(['a', 'b', 'c'], 100)
+        'discrete': np.random.choice(['a', 'b', 'c'], 100),
     })
     discrete_columns = ['discrete']
 
@@ -61,7 +59,7 @@ def test_ctgan_numpy():
     """Test the CTGAN when passed a numpy array."""
     data = pd.DataFrame({
         'continuous': np.random.random(100),
-        'discrete': np.random.choice(['a', 'b', 'c'], 100)
+        'discrete': np.random.choice(['a', 'b', 'c'], 100),
     })
     discrete_columns = [1]
 
@@ -81,7 +79,7 @@ def test_log_frequency():
     """Test the CTGAN with no `log_frequency` set to False."""
     data = pd.DataFrame({
         'continuous': np.random.random(1000),
-        'discrete': np.repeat(['a', 'b', 'c'], [950, 25, 25])
+        'discrete': np.repeat(['a', 'b', 'c'], [950, 25, 25]),
     })
 
     discrete_columns = ['discrete']
@@ -91,8 +89,7 @@ def test_log_frequency():
 
     assert len(ctgan.loss_values) == 100
     assert list(ctgan.loss_values.columns) == ['Epoch', 'Generator Loss', 'Discriminator Loss']
-    pd.testing.assert_series_equal(ctgan.loss_values['Epoch'],
-                                   pd.Series(range(100), name='Epoch'))
+    pd.testing.assert_series_equal(ctgan.loss_values['Epoch'], pd.Series(range(100), name='Epoch'))
 
     sampled = ctgan.sample(10000)
     counts = sampled['discrete'].value_counts()
@@ -103,8 +100,7 @@ def test_log_frequency():
 
     assert len(ctgan.loss_values) == 100
     assert list(ctgan.loss_values.columns) == ['Epoch', 'Generator Loss', 'Discriminator Loss']
-    pd.testing.assert_series_equal(ctgan.loss_values['Epoch'],
-                                   pd.Series(range(100), name='Epoch'))
+    pd.testing.assert_series_equal(ctgan.loss_values['Epoch'], pd.Series(range(100), name='Epoch'))
 
     sampled = ctgan.sample(10000)
     counts = sampled['discrete'].value_counts()
@@ -116,7 +112,7 @@ def test_categorical_nan():
     data = pd.DataFrame({
         'continuous': np.random.random(30),
         # This must be a list (not a np.array) or NaN will be cast to a string.
-        'discrete': [np.nan, 'b', 'c'] * 10
+        'discrete': [np.nan, 'b', 'c'] * 10,
     })
     discrete_columns = ['discrete']
 
@@ -138,9 +134,7 @@ def test_categorical_nan():
 
 def test_synthesizer_sample():
     """Test the CTGAN samples the correct datatype."""
-    data = pd.DataFrame({
-        'discrete': np.random.choice(['a', 'b', 'c'], 100)
-    })
+    data = pd.DataFrame({'discrete': np.random.choice(['a', 'b', 'c'], 100)})
     discrete_columns = ['discrete']
 
     ctgan = CTGAN(epochs=1)
@@ -154,7 +148,7 @@ def test_save_load():
     """Test the CTGAN load/save methods."""
     data = pd.DataFrame({
         'continuous': np.random.random(100),
-        'discrete': np.random.choice(['a', 'b', 'c'], 100)
+        'discrete': np.random.choice(['a', 'b', 'c'], 100),
     })
     discrete_columns = ['discrete']
 
@@ -172,9 +166,7 @@ def test_save_load():
 
 def test_wrong_discrete_columns_dataframe():
     """Test the CTGAN correctly crashes when passed non-existing discrete columns."""
-    data = pd.DataFrame({
-        'discrete': ['a', 'b']
-    })
+    data = pd.DataFrame({'discrete': ['a', 'b']})
     discrete_columns = ['b', 'c']
 
     ctgan = CTGAN(epochs=1)
@@ -184,9 +176,7 @@ def test_wrong_discrete_columns_dataframe():
 
 def test_wrong_discrete_columns_numpy():
     """Test the CTGAN correctly crashes when passed non-existing discrete columns."""
-    data = pd.DataFrame({
-        'discrete': ['a', 'b']
-    })
+    data = pd.DataFrame({'discrete': ['a', 'b']})
     discrete_columns = [0, 1]
 
     ctgan = CTGAN(epochs=1)
@@ -198,7 +188,7 @@ def test_wrong_sampling_conditions():
     """Test the CTGAN correctly crashes when passed incorrect sampling conditions."""
     data = pd.DataFrame({
         'continuous': np.random.random(100),
-        'discrete': np.random.choice(['a', 'b', 'c'], 100)
+        'discrete': np.random.choice(['a', 'b', 'c'], 100),
     })
     discrete_columns = ['discrete']
 
@@ -222,7 +212,7 @@ def test_fixed_random_seed():
     # Setup
     data = pd.DataFrame({
         'continuous': np.random.random(100),
-        'discrete': np.random.choice(['a', 'b', 'c'], 100)
+        'discrete': np.random.choice(['a', 'b', 'c'], 100),
     })
     discrete_columns = ['discrete']
 
@@ -252,7 +242,7 @@ def test_ctgan_save_and_load(tmpdir):
     # Setup
     data = pd.DataFrame({
         'continuous': np.random.random(100),
-        'discrete': np.random.choice(['a', 'b', 'c'], 100)
+        'discrete': np.random.choice(['a', 'b', 'c'], 100),
     })
     discrete_columns = [1]
 

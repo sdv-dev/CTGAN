@@ -10,8 +10,4 @@ from ctgan.demo import load_demo
 from ctgan.synthesizers.ctgan import CTGAN
 from ctgan.synthesizers.tvae import TVAE
 
-__all__ = (
-    'CTGAN',
-    'TVAE',
-    'load_demo'
-)
+__all__ = ('CTGAN', 'TVAE', 'load_demo')
