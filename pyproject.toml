@@ -165,20 +165,6 @@ exclude = [
     "tasks.py",
 ]
 
-[tool.ruff]
-preview = true
-line-length = 100
-indent-width = 4
-src = ["ctgan"]
-exclude = [
-    "docs",
-    ".tox",
-    ".git",
-    "__pycache__",
-    ".ipynb_checkpoints",
-    "tasks.py",
-]
-
 [tool.ruff.lint]
 select = [
     # Pyflakes
