@@ -30,6 +30,8 @@ jobs:
     - if: matrix.os == 'macos-latest'
       name: Set xcode version
       run: |
+          python -V
+          uname -p
           sw_vers
           sudo xcode-select -s "/Applications/Xcode_15.0.1.app"
     - name: Test with minimum versions
