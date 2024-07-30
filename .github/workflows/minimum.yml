@@ -31,10 +31,10 @@ jobs:
       if: ${{ matrix.os == 'macos-latest' && matrix.python-version == '3.8' }}
       run: |
           python -V
-          brew uninstall --ignore-dependencies openssl
-          brew install openssl@3
+          brew uninstall --ignore-dependencies openssl@1.1
+          brew install openssl@1.1
+          brew link --force openssl@1.1
           export CPPFLAGS="-I$(brew --prefix)/include"
           export LDFLAGS="-L$(brew --prefix)/lib"
-          brew link --force openssl@3
     - name: Test with minimum versions
       run: invoke minimum
