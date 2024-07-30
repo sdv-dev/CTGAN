@@ -17,6 +17,8 @@ jobs:
           - os: macos-12
             python-version: '3.8'
           - os: macos-latest
+            python-version: '3.9'
+          - os: macos-latest
             python-version: '3.12'
     steps:
     - uses: actions/checkout@v4
