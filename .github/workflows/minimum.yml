@@ -13,7 +13,7 @@ jobs:
         python-version: ['3.8', '3.9', '3.10', '3.11','3.12']
         os: [ubuntu-latest, windows-latest]
         include:
-          - os: macos-latest
+          - os: macos-14-arm64/20240722.3
             python-version: '3.8'
           - os: macos-latest
             python-version: '3.12'
@@ -27,15 +27,5 @@ jobs:
       run: |
           python -m pip install --upgrade pip
           python -m pip install invoke .[test]
-    - name: Install openssl
-      if: ${{ matrix.os == 'macos-latest' && matrix.python-version == '3.8' }}
-      run: |
-          python -V
-          brew uninstall --ignore-dependencies openssl@3
-          brew unlink openssl@3 --verbose
-          brew install openssl@1.1
-          export LDFLAGS="-L/opt/homebrew/opt/openssl@1.1/lib"
-          export CPPFLAGS="-I/opt/homebrew/opt/openssl@1.1/include"
-          brew link --overwrite openssl@1.1 --verbose
     - name: Test with minimum versions
       run: invoke minimum
