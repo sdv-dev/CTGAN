@@ -33,7 +33,7 @@ jobs:
           python -V
           brew uninstall --ignore-dependencies openssl@1.1
           brew install openssl@1.1
-          brew link --force openssl@1.1
+          brew link --overwrite openssl@1.1
           export CPPFLAGS="-I$(brew --prefix)/include"
           export LDFLAGS="-L$(brew --prefix)/lib"
     - name: Test with minimum versions
