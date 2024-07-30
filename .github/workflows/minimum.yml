@@ -13,7 +13,7 @@ jobs:
         python-version: ['3.8', '3.9', '3.10', '3.11','3.12']
         os: [ubuntu-latest, windows-latest]
         include:
-          - os: macos-14-arm64/20240722.3
+          - os: macos-14-arm64/20240714.2
             python-version: '3.8'
           - os: macos-latest
             python-version: '3.12'
