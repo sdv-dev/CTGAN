@@ -28,12 +28,13 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install invoke .[test]
     - name: Install openssl
-      if: ${{ matrix.os == 'macos-latest' && matrix.python_version == '3.8' }}
+      if: ${{ matrix.os == 'macos-latest' && matrix.python-version == '3.8' }}
       run: |
           python -V
-          brew uninstall --ignore-dependencies openssl@1.1
-          brew install openssl@1.1
+          brew uninstall --ignore-dependencies openssl
+          brew install openssl@3
           export CPPFLAGS="-I$(brew --prefix)/include"
           export LDFLAGS="-L$(brew --prefix)/lib"
+          brew link --force openssl@3
     - name: Test with minimum versions
       run: invoke minimum
