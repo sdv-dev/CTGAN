@@ -15,17 +15,19 @@ jobs:
         python-version: ['3.8', '3.9', '3.10', '3.11','3.12']
         os: [ubuntu-latest, windows-latest]
         include:
-          - os: macos-12
-            python-version: '3.8'
-          - os: macos-12
-            python-version: '3.12'
           - os: macos-latest
-            python-version: '3.10'
+            python-version: '3.8'
           - os: macos-latest
             python-version: '3.12'
     steps:
     - uses: actions/checkout@v4
+    - name: Set up Python ${{ matrix.python-version }} for arm64
+      if: matrix.os == 'macos-latest'
+      uses: "gabrielfalcao/pyenv-action@v17"
+      with:
+        default: ${{ matrix.python-version }}
     - name: Set up Python ${{ matrix.python-version }}
+      if: matrix.os != 'macos-latest'
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
