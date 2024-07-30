@@ -32,9 +32,10 @@ jobs:
       run: |
           python -V
           brew uninstall --ignore-dependencies openssl@3
+          brew unlink openssl@3 --verbose
           brew install openssl@1.1
           export LDFLAGS="-L/opt/homebrew/opt/openssl@1.1/lib"
           export CPPFLAGS="-I/opt/homebrew/opt/openssl@1.1/include"
-          brew link --overwrite openssl@1.1
+          brew link --overwrite openssl@1.1 --verbose
     - name: Test with minimum versions
       run: invoke minimum
