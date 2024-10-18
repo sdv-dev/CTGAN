@@ -1,6 +1,25 @@
 # History
 
-## v0.10.1 - 2024-05-13
+### v0.10.2 - 2024-10-21
+
+### Bugs Fixed
+
+* Cap numpy to less than 2.0.0 until CTGan supports  - Issue [#387](https://github.com/sdv-dev/CTGAN/issues/387) by @gsheni
+* Redundant whitespace in the demo data - Issue [#233](https://github.com/sdv-dev/CTGAN/issues/233)
+
+### Internal
+
+* Add workflow to generate release notes - Issue [#404](https://github.com/sdv-dev/CTGAN/issues/404) by @amontanez24
+
+### Maintenance
+
+* Switch to using ruff for Python linting and code formatting - Issue [#335](https://github.com/sdv-dev/CTGAN/issues/335) by @gsheni
+
+### Miscellaneous
+
+* Add support for numpy 2.0.0  - Issue [#386](https://github.com/sdv-dev/CTGAN/issues/386) by @R-Palazzo
+
+# v0.10.1 - 2024-05-13
 
 This release removes a warning that was cluttering the console.
 
