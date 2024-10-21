@@ -20,13 +20,7 @@ jobs:
             python-version: '3.12'
     steps:
     - uses: actions/checkout@v4
-    - name: Set up Python ${{ matrix.python-version }} for arm64
-      if: ${{ matrix.os == 'macos-latest' && matrix.python-version == '3.8' }}
-      uses: "gabrielfalcao/pyenv-action@v17"
-      with:
-        default: ${{ matrix.python-version }}
     - name: Set up Python ${{ matrix.python-version }}
-      if: ${{ matrix.os != 'macos-latest' || matrix.python-version != '3.8' }}
       uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
