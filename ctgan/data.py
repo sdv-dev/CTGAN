@@ -15,9 +15,7 @@ def read_csv(csv_filename, meta_filename=None, header=True, discrete=None):
             metadata = json.load(meta_file)
 
         discrete_columns = [
-            column['name']
-            for column in metadata['columns']
-            if column['type'] != 'continuous'
+            column['name'] for column in metadata['columns'] if column['type'] != 'continuous'
         ]
 
     elif discrete:
@@ -36,10 +34,7 @@ def read_tsv(data_filename, meta_filename):
     with open(meta_filename) as f:
         column_info = f.readlines()
 
-    column_info_raw = [
-        x.replace('{', ' ').replace('}', ' ').split()
-        for x in column_info
-    ]
+    column_info_raw = [x.replace('{', ' ').replace('}', ' ').split() for x in column_info]
 
     discrete = []
     continuous = []
@@ -57,7 +52,7 @@ def read_tsv(data_filename, meta_filename):
     meta = {
         'continuous_columns': continuous,
         'discrete_columns': discrete,
-        'column_info': column_info
+        'column_info': column_info,
     }
 
     with open(data_filename) as f:
@@ -82,7 +77,6 @@ def read_tsv(data_filename, meta_filename):
 def write_tsv(data, meta, output_filename):
     """Write to a tsv file."""
     with open(output_filename, 'w') as f:
-
         for row in data:
             for idx, col in enumerate(row):
                 if idx in meta['continuous_columns']:

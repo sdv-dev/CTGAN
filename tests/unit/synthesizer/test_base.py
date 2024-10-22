@@ -1,4 +1,3 @@
-
 """BaseSynthesizer unit testing module."""
 
 from unittest.mock import MagicMock, call, patch
@@ -44,11 +43,16 @@ def test_valid_random_state(random_mock, torch_mock):
     instance.assert_not_called
     assert random_mock.get_state.call_count == 2
     assert torch_mock.get_rng_state.call_count == 2
-    random_mock.RandomState.assert_has_calls(
-        [call().get_state(), call(), call().set_state('random state')])
+    random_mock.RandomState.assert_has_calls([
+        call().get_state(),
+        call(),
+        call().set_state('random state'),
+    ])
     random_mock.set_state.assert_has_calls([call('desired numpy state'), call('random state')])
-    torch_mock.set_rng_state.assert_has_calls(
-        [call('desired torch state'), call('torch random state')])
+    torch_mock.set_rng_state.assert_has_calls([
+        call('desired torch state'),
+        call('torch random state'),
+    ])
 
 
 @patch('ctgan.synthesizers.base.torch')
@@ -84,7 +88,6 @@ def test_no_random_seed(random_mock, torch_mock):
 
 
 class TestBaseSynthesizer:
-
     def test_set_random_state(self):
         """Test ``set_random_state`` works as expected."""
         # Setup

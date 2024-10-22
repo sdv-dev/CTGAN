@@ -77,9 +77,9 @@ class BaseSynthesizer:
         state = self.__dict__.copy()
         self.set_device(device_backup)
         if (
-            isinstance(self.random_states, tuple) and
-            isinstance(self.random_states[0], np.random.RandomState) and
-            isinstance(self.random_states[1], torch.Generator)
+            isinstance(self.random_states, tuple)
+            and isinstance(self.random_states[0], np.random.RandomState)
+            and isinstance(self.random_states[1], torch.Generator)
         ):
             state['_numpy_random_state'] = self.random_states[0].get_state()
             state['_torch_random_state'] = self.random_states[1].get_state()
@@ -102,10 +102,7 @@ class BaseSynthesizer:
 
             current_numpy_state = np.random.RandomState()
             current_numpy_state.set_state(np_state)
-            state['random_states'] = (
-                current_numpy_state,
-                current_torch_state
-            )
+            state['random_states'] = (current_numpy_state, current_torch_state)
 
         self.__dict__ = state
         device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -142,12 +139,13 @@ class BaseSynthesizer:
                 torch.Generator().manual_seed(random_state),
             )
         elif (
-            isinstance(random_state, tuple) and
-            isinstance(random_state[0], np.random.RandomState) and
-            isinstance(random_state[1], torch.Generator)
+            isinstance(random_state, tuple)
+            and isinstance(random_state[0], np.random.RandomState)
+            and isinstance(random_state[1], torch.Generator)
         ):
             self.random_states = random_state
         else:
             raise TypeError(
                 f'`random_state` {random_state} expected to be an int or a tuple of '
-                '(`np.random.RandomState`, `torch.Generator`)')
+                '(`np.random.RandomState`, `torch.Generator`)'
+            )

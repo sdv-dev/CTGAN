@@ -9,7 +9,6 @@ from ctgan.data_transformer import DataTransformer
 
 
 class TestDataTransformer(TestCase):
-
     def test_constant(self):
         """Test transforming a dataframe containing constant values."""
         # Setup
@@ -26,8 +25,8 @@ class TestDataTransformer(TestCase):
         assert (new_data[:, 0] < np.ones(len(new_data))).all()
 
         # Assert transformed values are a gaussian centered in 0 and with std ~ 0
-        assert -.1 < np.mean(new_data[:, 0]) < .1
-        assert 0 <= np.std(new_data[:, 0]) < .1
+        assert -0.1 < np.mean(new_data[:, 0]) < 0.1
+        assert 0 <= np.std(new_data[:, 0]) < 0.1
 
         # Assert there are at most `max_columns=10` one hot columns
         assert new_data.shape[0] == 1000
@@ -50,8 +49,8 @@ class TestDataTransformer(TestCase):
         assert (new_data[:, 0] < np.ones(len(new_data))).all()
 
         # Assert transformed values are a gaussian centered in 0 and with std = 1/4
-        assert -.1 < np.mean(new_data[:, 0]) < .1
-        assert .2 < np.std(new_data[:, 0]) < .3
+        assert -0.1 < np.mean(new_data[:, 0]) < 0.1
+        assert 0.2 < np.std(new_data[:, 0]) < 0.3
 
         # Assert there are at most `max_columns=10` one hot columns
         assert new_data.shape[0] == 1000
@@ -93,7 +92,7 @@ class TestDataTransformer(TestCase):
         # Setup
         data = pd.DataFrame({
             'num': np.random.normal(size=1000),
-            'cat': np.random.choice(['a', 'b', 'c'], size=1000)
+            'cat': np.random.choice(['a', 'b', 'c'], size=1000),
         })
         transformer = DataTransformer()
 
@@ -107,8 +106,8 @@ class TestDataTransformer(TestCase):
         assert (new_data[:, 0] < np.ones(len(new_data))).all()
 
         # Assert transformed numerical values are a gaussian centered in 0 and with std = 1/4
-        assert -.1 < np.mean(new_data[:, 0]) < .1
-        assert .2 < np.std(new_data[:, 0]) < .3
+        assert -0.1 < np.mean(new_data[:, 0]) < 0.1
+        assert 0.2 < np.std(new_data[:, 0]) < 0.3
 
         # Assert there are at most `max_columns=10` one hot columns for the numerical values
         # and 3 for the categorical ones
@@ -121,7 +120,7 @@ class TestDataTransformer(TestCase):
         # Setup
         data = pd.DataFrame({
             'num': np.random.normal(size=1000),
-            'cat': np.random.choice(['a', 'b', 'c'], size=1000)
+            'cat': np.random.choice(['a', 'b', 'c'], size=1000),
         })
         data = np.array(data)
         transformer = DataTransformer()
@@ -136,8 +135,8 @@ class TestDataTransformer(TestCase):
         assert (new_data[:, 0] < np.ones(len(new_data))).all()
 
         # Assert transformed numerical values are a gaussian centered in 0 and with std = 1/4
-        assert -.1 < np.mean(new_data[:, 0]) < .1
-        assert .2 < np.std(new_data[:, 0]) < .3
+        assert -0.1 < np.mean(new_data[:, 0]) < 0.1
+        assert 0.2 < np.std(new_data[:, 0]) < 0.3
 
         # Assert there are at most `max_columns=10` one hot columns for the numerical values
         # and 3 for the categorical ones

@@ -4,14 +4,10 @@
 
 __author__ = 'DataCebo, Inc.'
 __email__ = 'info@sdv.dev'
-__version__ = '0.10.1'
+__version__ = '0.10.2.dev1'
 
 from ctgan.demo import load_demo
 from ctgan.synthesizers.ctgan import CTGAN
 from ctgan.synthesizers.tvae import TVAE
 
-__all__ = (
-    'CTGAN',
-    'TVAE',
-    'load_demo'
-)
+__all__ = ('CTGAN', 'TVAE', 'load_demo')
