@@ -51,14 +51,13 @@ def _parse_args():
         '--generator_dim',
         type=str,
         default='256,256',
-        help='Dimension of each generator layer. ' 'Comma separated integers with no whitespaces.',
+        help='Dimension of each generator layer. Comma separated integers with no whitespaces.',
     )
     parser.add_argument(
         '--discriminator_dim',
         type=str,
         default='256,256',
-        help='Dimension of each discriminator layer. '
-        'Comma separated integers with no whitespaces.',
+        help='Dimension of each discriminator layer. Comma separated integers with no whitespaces.',
     )
 
     parser.add_argument(
