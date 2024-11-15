@@ -105,3 +105,6 @@ ENV/
 
 # Vim
 .*.swp
+
+# Codecov
+*_cov.xml
