@@ -47,6 +47,7 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 tests/readme_test/
+*_cov.xml
 
 # Translations
 *.mo
