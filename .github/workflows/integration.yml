@@ -29,3 +29,11 @@ jobs:
           python -m pip install invoke .[test]
     - name: Run integration tests
       run: invoke integration
+
+    - if: matrix.os == 'ubuntu-latest' && matrix.python-version == 3.9
+      name: Upload integration codecov report
+      uses: codecov/codecov-action@v4
+      with:
+        flags: integration
+        file: './integration_cov.xml'
+        token: ${{ secrets.CODECOV_TOKEN }}
