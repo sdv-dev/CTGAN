@@ -128,6 +128,8 @@ class TVAE(BaseSynthesizer):
         self.loss_values = pd.DataFrame(columns=['Epoch', 'Batch', 'Loss'])
         self.verbose = verbose
 
+        self.decoder = None
+
         if not cuda or not torch.cuda.is_available():
             device = 'cpu'
         elif isinstance(cuda, str):
@@ -243,4 +245,5 @@ class TVAE(BaseSynthesizer):
     def set_device(self, device):
         """Set the `device` to be used ('GPU' or 'CPU)."""
         self._device = device
-        self.decoder.to(self._device)
+        if self.decoder:
+            self.decoder.to(self._device)
