@@ -164,7 +164,6 @@ class CTGAN(BaseSynthesizer):
         pac=10,
         cuda=True,
         mps=False,
-
     ):
         assert batch_size % 2 == 0
 
@@ -184,14 +183,16 @@ class CTGAN(BaseSynthesizer):
         self._epochs = epochs
         self.pac = pac
 
-        if not cuda or not torch.cuda.is_available():
+        if not cuda and not mps:
             device = 'cpu'
         elif mps and torch.backends.mps.is_available():
             device = 'mps'
+        elif cuda and torch.cuda.is_available():
+            device = 'cuda'
         elif isinstance(cuda, str):
             device = cuda
         else:
-            device = 'cuda'
+            device = 'cpu'
 
         self._device = torch.device(device)
 
