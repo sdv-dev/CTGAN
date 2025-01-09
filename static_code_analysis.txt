@@ -1,14 +1,14 @@
-Run started:2024-10-22 16:18:16.010383
+Run started:2025-01-09 11:06:33.730015
 
 Test results:
 >> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
    Severity: Low   Confidence: High
    CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
    More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b101_assert_used.html
-   Location: ./ctgan/__main__.py:122:8
-121	    if args.sample_condition_column is not None:
-122	        assert args.sample_condition_column_value is not None
-123	
+   Location: ./ctgan/__main__.py:121:8
+120	    if args.sample_condition_column is not None:
+121	        assert args.sample_condition_column_value is not None
+122	
 
 --------------------------------------------------
 >> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
@@ -81,33 +81,21 @@ Test results:
 101	    KLD = -0.5 * torch.sum(1 + logvar - mu**2 - logvar.exp())
 
 --------------------------------------------------
->> Issue: [B105:hardcoded_password_string] Possible hardcoded password: '# History
-
-'
-   Severity: Low   Confidence: Medium
-   CWE: CWE-259 (https://cwe.mitre.org/data/definitions/259.html)
-   More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b105_hardcoded_password_string.html
-   Location: ./scripts/release_notes_generator.py:134:12
-133	
-134	    token = '# History\n\n'
-135	    split_index = history.find(token) + len(token) + 1
-
---------------------------------------------------
 
 Code scanned:
-	Total lines of code: 1508
+	Total lines of code: 1387
 	Total lines skipped (#nosec): 0
 	Total potential issues skipped due to specifically being disabled (e.g., #nosec BXXX): 0
 
 Run metrics:
 	Total issues (by severity):
 		Undefined: 0
-		Low: 9
+		Low: 8
 		Medium: 0
 		High: 0
 	Total issues (by confidence):
 		Undefined: 0
 		Low: 0
-		Medium: 1
+		Medium: 0
 		High: 8
 Files skipped (0):
