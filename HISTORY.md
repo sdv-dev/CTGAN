@@ -1,6 +1,12 @@
 # History
 
-### v0.10.2 - 2024-10-22
+### v0.10.3 - 2025-01-09
+
+### Maintenance
+
+* Combine  `static_code_analysis.yml` with `release_notes.yml` - Issue [#421](https://github.com/sdv-dev/CTGAN/issues/421) by @R-Palazzo
+
+## v0.10.2 - 2024-10-22
 
 ### Bugs Fixed
 
