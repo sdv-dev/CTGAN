@@ -105,7 +105,13 @@ class BaseSynthesizer:
             state['random_states'] = (current_numpy_state, current_torch_state)
 
         self.__dict__ = state
-        device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+        # Prioritize CUDA if available, then MPSCUDA, finally CPU
+        if torch.cuda.is_available():
+            device = torch.device('cuda:0')
+        elif torch.backends.mps.is_available():
+            device = torch.device('mps')
+        else:
+            device = torch.device('cpu')
         self.set_device(device)
 
     def save(self, path):
@@ -118,10 +124,32 @@ class BaseSynthesizer:
     @classmethod
     def load(cls, path):
         """Load the model stored in the passed `path`."""
-        device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+        # Prioritize CUDA if available, then MPS, finally CPU
+        if torch.cuda.is_available():
+            device = torch.device('cuda:0')
+        elif torch.backends.mps.is_available():
+            device = torch.device('mps')
+        else:
+            device = torch.device('cpu')
         model = torch.load(path)
         model.set_device(device)
         return model
+
+    def set_device(self, device):
+        """Set the `device` to be used ('GPU' or 'CPU')."""
+        self._device = device
+        if device.type == 'cuda':
+            # For CUDA, move the generator to the appropriate device
+            if self._generator is not None:
+                self._generator.to(self._device)
+        elif device.type == 'mps':
+            # For MPS, move module parameters and buffers to the MPS device
+            if self._generator is not None:
+                self._generator.to(self._device)
+                for parameter in self._generator.parameters():
+                    parameter.data = parameter.data.to(self._device)
+                for buffer in self._generator.buffers():
+                    buffer.data = buffer.data.to(self._device)
 
     def set_random_state(self, random_state):
         """Set the random state.
