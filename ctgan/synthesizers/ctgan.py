@@ -11,6 +11,7 @@ from tqdm import tqdm
 
 from ctgan.data_sampler import DataSampler
 from ctgan.data_transformer import DataTransformer
+from ctgan.errors import InvalidDataError
 from ctgan.synthesizers.base import BaseSynthesizer, random_state
 
 
@@ -289,6 +290,31 @@ class CTGAN(BaseSynthesizer):
         if invalid_columns:
             raise ValueError(f'Invalid columns found: {invalid_columns}')
 
+    def _validate_null_data(self, train_data, discrete_columns):
+        """Check whether null values exist in continuous ``train_data``.
+
+        Args:
+            train_data (numpy.ndarray or pandas.DataFrame):
+                Training Data. It must be a 2-dimensional numpy array or a pandas.DataFrame.
+            discrete_columns (list-like):
+                List of discrete columns to be used to generate the Conditional
+                Vector. If ``train_data`` is a Numpy array, this list should
+                contain the integer indices of the columns. Otherwise, if it is
+                a ``pandas.DataFrame``, this list should contain the column names.
+        """
+        if isinstance(train_data, pd.DataFrame):
+            continuous_cols = list(set(train_data.columns) - set(discrete_columns))
+            any_nulls = train_data[continuous_cols].isna().any().any()
+        else:
+            continuous_cols = [i for i in range(train_data.shape[1]) if i not in discrete_columns]
+            any_nulls = pd.DataFrame(train_data)[continuous_cols].isna().any().any()
+
+        if any_nulls:
+            raise InvalidDataError(
+                'CTGAN does not support null values in the continuous training data. '
+                'Please remove all null values from your continuous training data.'
+            )
+
     @random_state
     def fit(self, train_data, discrete_columns=(), epochs=None):
         """Fit the CTGAN Synthesizer models to the training data.
@@ -303,6 +329,7 @@ class CTGAN(BaseSynthesizer):
                 a ``pandas.DataFrame``, this list should contain the column names.
         """
         self._validate_discrete_columns(train_data, discrete_columns)
+        self._validate_null_data(train_data, discrete_columns)
 
         if epochs is None:
             epochs = self._epochs

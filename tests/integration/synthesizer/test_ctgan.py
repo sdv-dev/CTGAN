@@ -15,6 +15,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from ctgan.errors import InvalidDataError
 from ctgan.synthesizers.ctgan import CTGAN
 
 
@@ -130,6 +131,19 @@ def test_categorical_nan():
     assert len(values) == 3
     assert any(pd.isna(x) for x in values)
     assert {'b', 'c'}.issubset(values)
+
+
+def test_continuous_nan():
+    """Test the CTGAN with missing numerical values."""
+    data = pd.DataFrame({
+        'continuous': [np.nan, 1.0, 2.0] * 10,
+        'discrete': ['a', 'b', 'c'] * 10,
+    })
+    discrete_columns = ['discrete']
+
+    ctgan = CTGAN(epochs=1)
+    with pytest.raises(InvalidDataError):
+        ctgan.fit(data, discrete_columns)
 
 
 def test_synthesizer_sample():
