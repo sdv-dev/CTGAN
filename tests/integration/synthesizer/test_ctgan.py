@@ -135,14 +135,20 @@ def test_categorical_nan():
 
 def test_continuous_nan():
     """Test the CTGAN with missing numerical values."""
+    # Setup
     data = pd.DataFrame({
         'continuous': [np.nan, 1.0, 2.0] * 10,
         'discrete': ['a', 'b', 'c'] * 10,
     })
     discrete_columns = ['discrete']
+    error_message = (
+        'CTGAN does not support null values in the continuous training data. '
+        'Please remove all null values from your continuous training data.'
+    )
 
+    # Run and Assert
     ctgan = CTGAN(epochs=1)
-    with pytest.raises(InvalidDataError):
+    with pytest.raises(InvalidDataError, match=error_message):
         ctgan.fit(data, discrete_columns)
 
 
