@@ -297,25 +297,6 @@ class TestCTGAN(TestCase):
 
         Check the appropriate error is raised if null values are present in
         continuous columns, both for numpy arrays and dataframes.
-
-        Setup:
-            - Create dataframe with a continuous column
-            - Create numpy array with same data
-            - Create dataframe with a discrete column
-            - Create numpy array with a discrete column
-
-        Input:
-            - train_data = 2-dimensional numpy array or a pandas.DataFrame
-            - discrete_columns = list of strings or integers
-
-        Output:
-            None
-
-        Side Effects:
-            - Raises error if a continuous column contains a null value.
-
-        Note:
-            - could create another function for numpy array
         """
         # Setup
         discrete_df = pd.DataFrame({'discrete': ['a', 'b']})
