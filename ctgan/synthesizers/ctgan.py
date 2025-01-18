@@ -142,6 +142,10 @@ class CTGAN(BaseSynthesizer):
             Whether to attempt to use cuda for GPU computation.
             If this is False or CUDA is not available, CPU will be used.
             Defaults to ``True``.
+        mps (bool):
+            Whether to attempt to use mps for GPU computation.
+            If this is False or MPS is not available, CPU will be used.
+            Defaults to ``False``.
     """
 
     def __init__(
@@ -160,6 +164,7 @@ class CTGAN(BaseSynthesizer):
         epochs=300,
         pac=10,
         cuda=True,
+        mps=False,
     ):
         assert batch_size % 2 == 0
 
@@ -179,12 +184,16 @@ class CTGAN(BaseSynthesizer):
         self._epochs = epochs
         self.pac = pac
 
-        if not cuda or not torch.cuda.is_available():
+        if not cuda and not mps:
             device = 'cpu'
+        elif mps and torch.backends.mps.is_available():
+            device = 'mps'
+        elif cuda and torch.cuda.is_available():
+            device = 'cuda'
         elif isinstance(cuda, str):
             device = cuda
         else:
-            device = 'cuda'
+            device = 'cpu'
 
         self._device = torch.device(device)
 
