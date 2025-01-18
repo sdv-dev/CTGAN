@@ -1,5 +1,5 @@
 numpy==2.0.2
 pandas==2.2.3
-rdt==1.13.1
+rdt==1.13.2
 torch==2.5.1
 tqdm==4.67.1
