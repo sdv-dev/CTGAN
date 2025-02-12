@@ -35,7 +35,7 @@ dependencies = [
     "torch>=2.2.0;python_version>='3.12' and python_version<'3.13'",
     "torch>=2.6.0;python_version>='3.13'",
     'tqdm>=4.29,<5',
-    'rdt @ git+https://github.com/sdv-dev/RDT@main',
+    'rdt>=1.14.0',
 ]
 
 [project.urls]
