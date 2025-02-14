@@ -119,7 +119,7 @@ class BaseSynthesizer:
     def load(cls, path):
         """Load the model stored in the passed `path`."""
         device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
-        model = torch.load(path)
+        model = torch.load(path, weights_only=False)
         model.set_device(device)
         return model
 
