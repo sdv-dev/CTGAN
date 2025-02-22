@@ -2,8 +2,8 @@ import pandas as pd
 from sdv.metadata import SingleTableMetadata
 
 # === File Paths ===
-dataset_path = r"C:\Users\ortho\OneDrive\Desktop\PendarLink AI\Registry\Dataset\Python_Analysis\data\dataset_26219_16.csv"
-metadata_path = r"C:\Users\ortho\OneDrive\Desktop\PendarLink AI\Registry\Dataset\Python_Analysis\data\metadata\metadata.json"
+dataset_path = r"C:\Users\ortho\OneDrive\Desktop\SDV\CTGAN\my_project\data\dataset_26219_16.csv"
+metadata_path = r"C:\Users\ortho\OneDrive\Desktop\SDV\CTGAN\my_project\output\metadata.json"
 
 # === Step 1: Load Dataset ===
 real_data = pd.read_csv(dataset_path)
