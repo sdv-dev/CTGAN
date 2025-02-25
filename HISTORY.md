@@ -1,6 +1,18 @@
 # History
 
-### v0.10.2 - 2024-10-22
+### v0.11.0 - 2025-02-25
+
+### New Features
+
+* Surface error to user during fit if training data contains null values - Issue [#414](https://github.com/sdv-dev/CTGAN/issues/414) by @rwedge
+
+### Maintenance
+
+* Combine  `static_code_analysis.yml` with `release_notes.yml` - Issue [#421](https://github.com/sdv-dev/CTGAN/issues/421) by @R-Palazzo
+* Support Python 3.13 - Issue [#411](https://github.com/sdv-dev/CTGAN/issues/411) by @rwedge
+* Update codecov and add flag for integration tests - Issue [#410](https://github.com/sdv-dev/CTGAN/issues/410) by @pvk-developer
+
+## v0.10.2 - 2024-10-22
 
 ### Bugs Fixed
 
