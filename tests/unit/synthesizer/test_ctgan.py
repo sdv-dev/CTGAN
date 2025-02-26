@@ -3,11 +3,13 @@
 from unittest import TestCase
 from unittest.mock import Mock
 
+import numpy as np
 import pandas as pd
 import pytest
 import torch
 
 from ctgan.data_transformer import SpanInfo
+from ctgan.errors import InvalidDataError
 from ctgan.synthesizers.ctgan import CTGAN, Discriminator, Generator, Residual
 
 
@@ -289,3 +291,42 @@ class TestCTGAN(TestCase):
         ctgan = CTGAN(epochs=1)
         with pytest.raises(ValueError, match=r'Invalid columns found: {\'doesnt exist\'}'):
             ctgan.fit(data, discrete_columns)
+
+    def test__validate_null_data(self):
+        """Test `_validate_null_data` with pandas and numpy data.
+
+        Check the appropriate error is raised if null values are present in
+        continuous columns, both for numpy arrays and dataframes.
+        """
+        # Setup
+        discrete_df = pd.DataFrame({'discrete': ['a', 'b']})
+        discrete_array = np.array([['a'], ['b']])
+        continuous_no_nulls_df = pd.DataFrame({'continuous': [0, 1]})
+        continuous_no_nulls_array = np.array([[0], [1]])
+        continuous_with_null_df = pd.DataFrame({'continuous': [1, np.nan]})
+        continuous_with_null_array = np.array([[1], [np.nan]])
+        ctgan = CTGAN(epochs=1)
+        error_message = (
+            'CTGAN does not support null values in the continuous training data. '
+            'Please remove all null values from your continuous training data.'
+        )
+
+        # Test discrete DataFrame fits without error
+        ctgan.fit(discrete_df, ['discrete'])
+
+        # Test discrete array fits without error
+        ctgan.fit(discrete_array, [0])
+
+        # Test continuous DataFrame without nulls fits without error
+        ctgan.fit(continuous_no_nulls_df)
+
+        # Test continuous array without nulls fits without error
+        ctgan.fit(continuous_no_nulls_array)
+
+        # Test nulls in continuous columns DataFrame errors on fit
+        with pytest.raises(InvalidDataError, match=error_message):
+            ctgan.fit(continuous_with_null_df)
+
+        # Test nulls in continuous columns array errors on fit
+        with pytest.raises(InvalidDataError, match=error_message):
+            ctgan.fit(continuous_with_null_array)

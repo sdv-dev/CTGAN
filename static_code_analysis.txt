@@ -1,74 +1,74 @@
-Run started:2024-05-13 15:58:39.077701
+Run started:2025-02-25 21:10:33.223731
 
 Test results:
 >> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
    Severity: Low   Confidence: High
    CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
    More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b101_assert_used.html
-   Location: ./ctgan/__main__.py:88:8
-87	    if args.sample_condition_column is not None:
-88	        assert args.sample_condition_column_value is not None
-89	
+   Location: ./ctgan/__main__.py:121:8
+120	    if args.sample_condition_column is not None:
+121	        assert args.sample_condition_column_value is not None
+122	
 
 --------------------------------------------------
 >> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
    Severity: Low   Confidence: High
    CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
    More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b101_assert_used.html
-   Location: ./ctgan/data.py:53:12
-52	        else:
-53	            assert item[0] == 'D'
-54	            discrete.append(idx)
+   Location: ./ctgan/data.py:48:12
+47	        else:
+48	            assert item[0] == 'D'
+49	            discrete.append(idx)
 
 --------------------------------------------------
 >> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
    Severity: Low   Confidence: High
    CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
    More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b101_assert_used.html
-   Location: ./ctgan/data.py:74:16
-73	            else:
-74	                assert idx in discrete
-75	                row.append(column_info[idx].index(col))
+   Location: ./ctgan/data.py:69:16
+68	            else:
+69	                assert idx in discrete
+70	                row.append(column_info[idx].index(col))
 
 --------------------------------------------------
 >> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
    Severity: Low   Confidence: High
    CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
    More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b101_assert_used.html
-   Location: ./ctgan/data.py:91:20
-90	                else:
-91	                    assert idx in meta['discrete_columns']
-92	                    print(meta['column_info'][idx][int(col)], end=' ', file=f)
+   Location: ./ctgan/data.py:85:20
+84	                else:
+85	                    assert idx in meta['discrete_columns']
+86	                    print(meta['column_info'][idx][int(col)], end=' ', file=f)
 
 --------------------------------------------------
 >> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
    Severity: Low   Confidence: High
    CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
    More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b101_assert_used.html
-   Location: ./ctgan/data_sampler.py:41:8
-40	                st += sum([span_info.dim for span_info in column_info])
-41	        assert st == data.shape[1]
-42	
+   Location: ./ctgan/data_sampler.py:40:8
+39	                st += sum([span_info.dim for span_info in column_info])
+40	        assert st == data.shape[1]
+41	
 
 --------------------------------------------------
 >> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
    Severity: Low   Confidence: High
    CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
    More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b101_assert_used.html
-   Location: ./ctgan/synthesizers/ctgan.py:56:8
-55	        """Apply the Discriminator to the `input_`."""
-56	        assert input_.size()[0] % self.pac == 0
-57	        return self.seq(input_.view(-1, self.pacdim))
+   Location: ./ctgan/synthesizers/ctgan.py:60:8
+59	        """Apply the Discriminator to the `input_`."""
+60	        assert input_.size()[0] % self.pac == 0
+61	        return self.seq(input_.view(-1, self.pacdim))
 
 --------------------------------------------------
 >> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
    Severity: Low   Confidence: High
    CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
    More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b101_assert_used.html
-   Location: ./ctgan/synthesizers/ctgan.py:148:8
-147	
-148	        assert batch_size % 2 == 0
-149	
+   Location: ./ctgan/synthesizers/ctgan.py:164:8
+163	    ):
+164	        assert batch_size % 2 == 0
+165	
 
 --------------------------------------------------
 >> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
@@ -83,7 +83,7 @@ Test results:
 --------------------------------------------------
 
 Code scanned:
-	Total lines of code: 1342
+	Total lines of code: 1414
 	Total lines skipped (#nosec): 0
 	Total potential issues skipped due to specifically being disabled (e.g., #nosec BXXX): 0
 
