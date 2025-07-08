@@ -222,7 +222,7 @@ endif
 .PHONY: check-deps
 check-deps: # Dependency targets
 	$(eval allow_list='numpy=|pandas=|tqdm=|torch=|rdt=')
-	pip freeze | grep -v "RDT.git" | grep -E $(allow_list) | sort > $(OUTPUT_FILEPATH)
+	pip freeze | grep -v "CTGAN.git" | grep -E $(allow_list) > $(OUTPUT_FILEPATH)
 
 .PHONY: check-release
 check-release: check-clean check-candidate check-main check-history ## Check if the release can be made
