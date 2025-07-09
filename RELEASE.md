@@ -102,7 +102,7 @@ It's important to check that the GitHub and milestone issues are up to date with
 You neet to check that:
 
 - The milestone for the current release exists.
-- All the issues closed since the latest release are associated to the milestone. If they are not, associate them
+- All the issues closed since the latest release are associated to the milestone. If they are not, associate them.
 - All the issues associated to the milestone are closed. If there are open issues but the milestone needs to
   be released anyway, move them to the next milestone.
 - All the issues in the milestone are assigned to at least one person.
