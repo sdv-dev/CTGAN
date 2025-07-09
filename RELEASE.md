@@ -154,7 +154,7 @@ Depending on the type of release, run one of the following:
 * `make release-major`: This will release the next major version. Use this to if the changes modify the user API in a backwards incompatible way after the major version 1 has been released.
 
 Running one of these will **push commits directly** to `main`.
-At the end, you should see the 3 commits on `main` on (from oldest to newest):
+At the end, you should see the 3 commits on `main` (from oldest to newest):
 - `make release-tag: Merge branch 'main' into stable`
 - `Bump version: X.Y.Z.devN → X.Y.Z`
 - `Bump version: X.Y.Z -> X.Y.A.dev0`
