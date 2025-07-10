@@ -239,3 +239,9 @@ release-candidate: check-main publish bumpversion-candidate git-push
 
 .PHONY: release-candidate-test
 release-candidate-test: check-clean check-main publish-test
+
+.PHONY: release-minor
+release-minor: check-release bumpversion-minor release
+
+.PHONY: release-major
+release-major: check-release bumpversion-major release
