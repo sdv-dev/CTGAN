@@ -145,6 +145,7 @@ Once HISTORY.md has been updated on `main`, check if the release can be made:
 make check-release
 ```
 
+## Update stable branch and bump version
 The `stable` branch needs to be updated with the changes from `main` and the version needs to be bumped.
 Depending on the type of release, run one of the following:
 
