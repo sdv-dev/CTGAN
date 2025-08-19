@@ -146,18 +146,18 @@ class CTGAN(BaseSynthesizer):
 
     def __init__(
         self,
-        embedding_dim=128,
-        generator_dim=(256, 256),
-        discriminator_dim=(256, 256),
-        generator_lr=2e-4,
+        embedding_dim=256,
+        generator_dim=(512, 512, 256),
+        discriminator_dim=(512, 512, 256),
+        generator_lr=1e-4,
         generator_decay=1e-6,
-        discriminator_lr=2e-4,
+        discriminator_lr=1e-4,
         discriminator_decay=1e-6,
-        batch_size=500,
+        batch_size=256,
         discriminator_steps=1,
         log_frequency=True,
         verbose=False,
-        epochs=300,
+        epochs=800,
         pac=10,
         cuda=True,
     ):
@@ -426,7 +426,7 @@ class CTGAN(BaseSynthesizer):
                     y_real = discriminator(real_cat)
 
                     pen = discriminator.calc_gradient_penalty(
-                        real_cat, fake_cat, self._device, self.pac
+                        real_cat, fake_cat, self._device, self.pac, lambda_=20
                     )
                     loss_d = -(torch.mean(y_real) - torch.mean(y_fake))
 
