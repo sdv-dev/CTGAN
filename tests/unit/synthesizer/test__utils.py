@@ -1,5 +1,5 @@
+import platform
 import re
-import sys
 from unittest.mock import patch
 
 import pytest
@@ -45,7 +45,7 @@ def test__set_device():
 
     # Assert
     if (
-        sys.platform == 'darwin'
+        platform.machine() == 'arm64'
         and getattr(torch.backends, 'mps', None)
         and torch.backends.mps.is_available()
     ):
