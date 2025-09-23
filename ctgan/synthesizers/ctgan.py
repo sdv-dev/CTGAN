@@ -12,6 +12,7 @@ from tqdm import tqdm
 from ctgan.data_sampler import DataSampler
 from ctgan.data_transformer import DataTransformer
 from ctgan.errors import InvalidDataError
+from ctgan.synthesizers._utils import _set_device, validate_and_set_device
 from ctgan.synthesizers.base import BaseSynthesizer, random_state
 
 
@@ -138,8 +139,11 @@ class CTGAN(BaseSynthesizer):
         pac (int):
             Number of samples to group together when applying the discriminator.
             Defaults to 10.
+        enable_gpu (bool):
+            Whether to attempt to use GPU for computation.
+            Defaults to ``True``.
         cuda (bool):
-            Whether to attempt to use cuda for GPU computation.
+            ** Deprecated ** Whether to attempt to use cuda for GPU computation.
             If this is False or CUDA is not available, CPU will be used.
             Defaults to ``True``.
     """
@@ -159,7 +163,8 @@ class CTGAN(BaseSynthesizer):
         verbose=False,
         epochs=300,
         pac=10,
-        cuda=True,
+        enable_gpu=True,
+        cuda=None,
     ):
         assert batch_size % 2 == 0
 
@@ -178,16 +183,8 @@ class CTGAN(BaseSynthesizer):
         self._verbose = verbose
         self._epochs = epochs
         self.pac = pac
-
-        if not cuda or not torch.cuda.is_available():
-            device = 'cpu'
-        elif isinstance(cuda, str):
-            device = cuda
-        else:
-            device = 'cuda'
-
-        self._device = torch.device(device)
-
+        self._device = validate_and_set_device(enable_gpu, cuda)
+        self._enable_gpu = cuda if cuda is not None else enable_gpu
         self._transformer = None
         self._data_sampler = None
         self._generator = None
@@ -544,6 +541,6 @@ class CTGAN(BaseSynthesizer):
 
     def set_device(self, device):
         """Set the `device` to be used ('GPU' or 'CPU)."""
-        self._device = device
+        self._device = _set_device(self._enable_gpu, device)
         if self._generator is not None:
             self._generator.to(self._device)

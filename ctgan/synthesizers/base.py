@@ -5,6 +5,8 @@ import contextlib
 import numpy as np
 import torch
 
+from ctgan.synthesizers._utils import _set_device
+
 
 @contextlib.contextmanager
 def set_random_states(random_state, set_model_random_state):
@@ -118,7 +120,7 @@ class BaseSynthesizer:
     @classmethod
     def load(cls, path):
         """Load the model stored in the passed `path`."""
-        device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+        device = _set_device(enable_gpu=True)
         model = torch.load(path, weights_only=False)
         model.set_device(device)
         return model
