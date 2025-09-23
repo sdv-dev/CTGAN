@@ -1,4 +1,4 @@
-import sys
+import platform
 import warnings
 
 import torch
@@ -35,8 +35,12 @@ def _set_device(enable_gpu, device=None):
         return torch.device(device)
 
     if enable_gpu:
-        if sys.platform == 'darwin':  # macOS
-            if getattr(torch.backends, 'mps', None) and torch.backends.mps.is_available():
+        if platform.system() == 'Darwin':  # macOS
+            if (
+                platform.machine() == 'arm64'
+                and getattr(torch.backends, 'mps', None)
+                and torch.backends.mps.is_available()
+            ):
                 device = 'mps'
             else:
                 device = 'cpu'
