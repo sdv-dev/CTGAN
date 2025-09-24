@@ -107,7 +107,7 @@ class BaseSynthesizer:
             state['random_states'] = (current_numpy_state, current_torch_state)
 
         self.__dict__ = state
-        device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+        device = _set_device(enable_gpu=True)
         self.set_device(device)
 
     def save(self, path):
