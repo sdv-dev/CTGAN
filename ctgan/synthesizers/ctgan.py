@@ -541,6 +541,7 @@ class CTGAN(BaseSynthesizer):
 
     def set_device(self, device):
         """Set the `device` to be used ('GPU' or 'CPU)."""
-        self._device = _set_device(self._enable_gpu, device)
+        enable_gpu = getattr(self, '_enable_gpu', True)
+        self._device = _set_device(enable_gpu, device)
         if self._generator is not None:
             self._generator.to(self._device)
