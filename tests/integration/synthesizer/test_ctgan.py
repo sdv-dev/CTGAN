@@ -236,7 +236,7 @@ def test_fixed_random_seed():
     })
     discrete_columns = ['discrete']
 
-    ctgan = CTGAN(epochs=1, cuda=False)
+    ctgan = CTGAN(epochs=1, enable_gpu=False)
 
     # Run
     ctgan.fit(data, discrete_columns)

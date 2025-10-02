@@ -8,6 +8,27 @@ from ctgan.synthesizers import TVAE
 
 
 class TestTVAE:
+    @patch('ctgan.synthesizers.tvae.validate_and_set_device')
+    def test___init__(self, mock_validate_and_set_device):
+        """Test the `__init__` method."""
+        # Setup
+        mock_validate_and_set_device.return_value = 'cpu'
+
+        # Run
+        synth = TVAE()
+
+        # Assert
+        assert synth.embedding_dim == 128
+        assert synth.compress_dims == (128, 128)
+        assert synth.decompress_dims == (128, 128)
+        assert synth.batch_size == 500
+        assert synth.epochs == 300
+        assert synth.loss_values.equals(pd.DataFrame(columns=['Epoch', 'Batch', 'Loss']))
+        assert synth.verbose is False
+        assert synth._enable_gpu is True
+        assert synth._device == 'cpu'
+        mock_validate_and_set_device.assert_called_once_with(True, None)
+
     @patch('ctgan.synthesizers.tvae._loss_function')
     @patch('ctgan.synthesizers.tvae.tqdm')
     def test_fit_verbose(self, tqdm_mock, loss_func_mock):
