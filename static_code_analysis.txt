@@ -1,4 +1,4 @@
-Run started:2025-02-25 21:10:33.223731
+Run started:2025-10-30 20:43:43.045588
 
 Test results:
 >> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
@@ -55,35 +55,35 @@ Test results:
    Severity: Low   Confidence: High
    CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
    More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b101_assert_used.html
-   Location: ./ctgan/synthesizers/ctgan.py:60:8
-59	        """Apply the Discriminator to the `input_`."""
-60	        assert input_.size()[0] % self.pac == 0
-61	        return self.seq(input_.view(-1, self.pacdim))
+   Location: ./ctgan/synthesizers/ctgan.py:61:8
+60	        """Apply the Discriminator to the `input_`."""
+61	        assert input_.size()[0] % self.pac == 0
+62	        return self.seq(input_.view(-1, self.pacdim))
 
 --------------------------------------------------
 >> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
    Severity: Low   Confidence: High
    CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
    More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b101_assert_used.html
-   Location: ./ctgan/synthesizers/ctgan.py:164:8
-163	    ):
-164	        assert batch_size % 2 == 0
-165	
+   Location: ./ctgan/synthesizers/ctgan.py:169:8
+168	    ):
+169	        assert batch_size % 2 == 0
+170	
 
 --------------------------------------------------
 >> Issue: [B101:assert_used] Use of assert detected. The enclosed code will be removed when compiling to optimised byte code.
    Severity: Low   Confidence: High
    CWE: CWE-703 (https://cwe.mitre.org/data/definitions/703.html)
    More Info: https://bandit.readthedocs.io/en/1.7.7/plugins/b101_assert_used.html
-   Location: ./ctgan/synthesizers/tvae.py:100:4
-99	
-100	    assert st == recon_x.size()[1]
-101	    KLD = -0.5 * torch.sum(1 + logvar - mu**2 - logvar.exp())
+   Location: ./ctgan/synthesizers/tvae.py:101:4
+100	
+101	    assert st == recon_x.size()[1]
+102	    KLD = -0.5 * torch.sum(1 + logvar - mu**2 - logvar.exp())
 
 --------------------------------------------------
 
 Code scanned:
-	Total lines of code: 1414
+	Total lines of code: 1459
 	Total lines skipped (#nosec): 0
 	Total potential issues skipped due to specifically being disabled (e.g., #nosec BXXX): 0
 
