@@ -1,6 +1,31 @@
 # History
 
-### v0.11.0 - 2025-02-26
+### v0.11.1 - 2025-10-30
+
+### New Features
+
+* Make the _get_enable_gpu_value public - Issue [#466](https://github.com/sdv-dev/CTGAN/issues/466) by @R-Palazzo
+* Enable GPU usage for MacOS (using MPS) - Issue [#462](https://github.com/sdv-dev/CTGAN/issues/462) by @R-Palazzo
+
+### Bugs Fixed
+
+* All bump-version commands are failing - Issue [#439](https://github.com/sdv-dev/CTGAN/issues/439) by @amontanez24
+
+### Documentation
+
+* Update release documentation - Issue [#473](https://github.com/sdv-dev/CTGAN/issues/473) by @gsheni
+
+### Internal
+
+* Check pyproject for release candidate dependencies - Issue [#445](https://github.com/sdv-dev/CTGAN/issues/445) by @rwedge
+
+### Maintenance
+
+* Remove support for Python 3.8 - Issue [#469](https://github.com/sdv-dev/CTGAN/issues/469) by @fealho
+* Add workflow to release CTGAN on PyPI - Issue [#451](https://github.com/sdv-dev/CTGAN/issues/451) by @gsheni
+* Update python set up step in workflows to use latest python version - Issue [#416](https://github.com/sdv-dev/CTGAN/issues/416) by @frances-h
+
+## v0.11.0 - 2025-02-26
 
 ### New Features
 

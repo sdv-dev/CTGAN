@@ -1,7 +1,7 @@
 """CTGAN unit testing module."""
 
 from unittest import TestCase
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 import numpy as np
 import pandas as pd
@@ -175,6 +175,30 @@ def _assert_is_between(data, lower, upper):
 
 
 class TestCTGAN(TestCase):
+    @patch('ctgan.synthesizers.ctgan.validate_and_set_device')
+    def test___init__(self, mock_validate_and_set_device):
+        """Test the `__init__` method."""
+        # Setup
+        mock_validate_and_set_device.return_value = 'cpu'
+
+        # Run
+        synth = CTGAN()
+
+        # Assert
+        assert synth._embedding_dim == 128
+        assert synth._generator_dim == (256, 256)
+        assert synth._discriminator_dim == (256, 256)
+        assert synth._batch_size == 500
+        assert synth._epochs == 300
+        assert synth.pac == 10
+        assert synth.loss_values is None
+        assert synth._generator is None
+        assert synth._data_sampler is None
+        assert synth._verbose is False
+        assert synth._enable_gpu is True
+        assert synth._device == 'cpu'
+        mock_validate_and_set_device.assert_called_once_with(True, None)
+
     def test__apply_activate_(self):
         """Test `_apply_activate` for tables with both continuous and categoricals.
 
