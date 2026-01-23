@@ -1,8 +1,8 @@
 """Script that checks project requirements for pre-release versions."""
 
+import tomllib
 from pathlib import Path
 
-import tomllib
 from packaging.requirements import Requirement
 
 
