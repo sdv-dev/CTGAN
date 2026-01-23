@@ -162,6 +162,7 @@ preview = true
 line-length = 100
 indent-width = 4
 src = ["ctgan"]
+target-version = "py314"
 exclude = [
     "docs",
     ".tox",
@@ -193,7 +194,6 @@ ignore = [
     # pydocstyle
     "D107",  # Missing docstring in __init__
     "D417",   # Missing argument descriptions in the docstring, this is a bug from pydocstyle: https://github.com/PyCQA/pydocstyle/issues/449
-    "PD901",
     "PD101",
 ]
 
