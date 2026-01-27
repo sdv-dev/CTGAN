@@ -1,6 +1,21 @@
 # History
 
-### v0.11.1 - 2025-10-30
+### v0.12.0 - 2026-01-27
+
+### Internal
+
+* Update linting rules - Issue [#471](https://github.com/sdv-dev/CTGAN/issues/471) by @gsheni
+
+### Maintenance
+
+* Support Python 3.14 - Issue [#481](https://github.com/sdv-dev/CTGAN/issues/481) by @gsheni
+* Update macOS workflow runner following runner deprecation - Issue [#477](https://github.com/sdv-dev/CTGAN/issues/477) by @gsheni
+
+### Miscellaneous
+
+* Minimum workflows are running out of disk space - Issue [#478](https://github.com/sdv-dev/CTGAN/issues/478) by @gsheni
+
+## v0.11.1 - 2025-10-30
 
 ### New Features
 
