@@ -26,14 +26,14 @@
 
 CTGAN is a collection of Deep Learning based synthetic data generators for single table data, which are able to learn from real data and generate synthetic data with high fidelity.
 
-| Important Links                               |                                                                      |
-| --------------------------------------------- | -------------------------------------------------------------------- |
+| Important Links                               |                                                                                           |
+| --------------------------------------------- | ------------------------------------------------------------------------------------------|
 | :computer: **[Website]**                      | Check out the SDV Website for more information about our overall synthetic data ecosystem.|
-| :orange_book: **[Blog]**                      | A deeper look at open source, synthetic data creation and evaluation.|
-| :book: **[Documentation]**                    | Quickstarts, User and Development Guides, and API Reference.         |
-| :octocat: **[Repository]**                    | The link to the Github Repository of this library.                   |
-| :keyboard: **[Development Status]**           | This software is in its Pre-Alpha stage.                             |
-| :busts_in_silhouette: **[Community]**         | Discuss SDV features, ask questions, and receive help     .                                         |
+| :orange_book: **[Blog]**                      | A deeper look at open source, synthetic data creation and evaluation.                     |
+| :book: **[Documentation]**                    | Quickstarts, User and Development Guides, and API Reference.                              |
+| :octocat: **[Repository]**                    | The link to the Github Repository of this library.                                        |
+| :keyboard: **[Development Status]**           | This software is in its Pre-Alpha stage.                                                  |
+| :busts_in_silhouette: **[DataCebo Forum]**    | Discuss CTGAN features, ask questions, and receive help.                                  |
 
 [Website]: https://sdv.dev
 [Blog]: https://datacebo.com/blog
@@ -41,7 +41,7 @@ CTGAN is a collection of Deep Learning based synthetic data generators for s
 [Repository]: https://github.com/sdv-dev/CTGAN
 [License]: https://github.com/sdv-dev/CTGAN/blob/main/LICENSE
 [Development Status]: https://pypi.org/search/?c=Development+Status+%3A%3A+2+-+Pre-Alpha
-[Community]: https://forum.datacebo.com
+[DataCebo Forum]: https://forum.datacebo.com
 
 Currently, this library implements the **CTGAN** and **TVAE** models described in the [Modeling Tabular data using Conditional GAN](https://arxiv.org/abs/1907.00503) paper, presented at the 2019 NeurIPS conference.
 
@@ -111,7 +111,7 @@ Irvine, CA: University of California, School of Information and Computer Science
 
 # Join our community
 
-Join our [forum](https://forum.datacebo.com/) to discuss more about CTGAN and synthetic data. If you find a bug or have a feature request, you can also [open an issue](https://github.com/sdv-dev/CTGAN/issues) on our GitHub.
+Join our [forum](https://forum.datacebo.com/) to discuss more about CTGAN, ask questions, and receive help.
 
 **Interested in contributing to CTGAN?** Read our [Contribution Guide](CONTRIBUTING.rst) to get started.
 
