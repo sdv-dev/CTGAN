@@ -21,4 +21,4 @@ We appreciate your understanding.
 
 
 .. _Business Source License: https://github.com/sdv-dev/CTGAN/blob/main/LICENSE
-.. _file an issue: https://github.com/sdv-dev/CTGAN/issues
+.. _file an issue: https://forum.datacebo.com/
