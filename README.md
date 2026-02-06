@@ -9,6 +9,7 @@
 [![Unit Tests](https://github.com/sdv-dev/CTGAN/actions/workflows/unit.yml/badge.svg)](https://github.com/sdv-dev/CTGAN/actions/workflows/unit.yml)
 [![Downloads](https://pepy.tech/badge/ctgan)](https://pepy.tech/project/ctgan)
 [![Coverage Status](https://codecov.io/gh/sdv-dev/CTGAN/branch/main/graph/badge.svg)](https://codecov.io/gh/sdv-dev/CTGAN)
+[![Forum](https://img.shields.io/badge/Forum-Join%20now!-36C5F0)](https://forum.datacebo.com)
 
 <div align="left">
 <br/>
@@ -32,7 +33,7 @@ CTGAN is a collection of Deep Learning based synthetic data generators for s
 | :book: **[Documentation]**                    | Quickstarts, User and Development Guides, and API Reference.         |
 | :octocat: **[Repository]**                    | The link to the Github Repository of this library.                   |
 | :keyboard: **[Development Status]**           | This software is in its Pre-Alpha stage.                             |
-| [![][Slack Logo] **Community**][Community]    | Join our Slack Workspace for announcements and discussions.          |
+| :busts_in_silhouette: **[Community]**         | Discuss SDV features, ask questions, and receive help     .                                         |
 
 [Website]: https://sdv.dev
 [Blog]: https://datacebo.com/blog
@@ -40,8 +41,7 @@ CTGAN is a collection of Deep Learning based synthetic data generators for s
 [Repository]: https://github.com/sdv-dev/CTGAN
 [License]: https://github.com/sdv-dev/CTGAN/blob/main/LICENSE
 [Development Status]: https://pypi.org/search/?c=Development+Status+%3A%3A+2+-+Pre-Alpha
-[Slack Logo]: https://github.com/sdv-dev/SDV/blob/stable/docs/images/slack.png
-[Community]: https://bit.ly/sdv-slack-invite
+[Community]: https://forum.datacebo.com
 
 Currently, this library implements the **CTGAN** and **TVAE** models described in the [Modeling Tabular data using Conditional GAN](https://arxiv.org/abs/1907.00503) paper, presented at the 2019 NeurIPS conference.
 
@@ -111,7 +111,7 @@ Irvine, CA: University of California, School of Information and Computer Science
 
 # Join our community
 
-Join our [Slack channel](https://bit.ly/sdv-slack-invite) to discuss more about CTGAN and synthetic data. If you find a bug or have a feature request, you can also [open an issue](https://github.com/sdv-dev/CTGAN/issues) on our GitHub.
+Join our [forum](https://forum.datacebo.com/) to discuss more about CTGAN and synthetic data. If you find a bug or have a feature request, you can also [open an issue](https://github.com/sdv-dev/CTGAN/issues) on our GitHub.
 
 **Interested in contributing to CTGAN?** Read our [Contribution Guide](CONTRIBUTING.rst) to get started.
 
