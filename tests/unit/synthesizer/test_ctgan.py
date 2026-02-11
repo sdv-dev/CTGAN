@@ -286,6 +286,21 @@ class TestCTGAN(TestCase):
 
         assert (result - expected).abs() < 1e-3
 
+    @patch('ctgan.synthesizers.ctgan._format_score')
+    def test_fit_verbose_calls_format_score(self, format_score_mock):
+        """Test that ``_format_score`` is called during verbose fitting."""
+        # Setup
+        format_score_mock.side_effect = lambda x: f'+{abs(x):05.2f}'
+        data = pd.DataFrame({'col1': [0, 1, 2, 3, 4], 'col2': ['a', 'b', 'c', 'a', 'b']})
+
+        # Run
+        ctgan = CTGAN(epochs=1, verbose=True)
+        ctgan.fit(data, discrete_columns=['col2'])
+
+        # Assert
+        assert format_score_mock.call_count == 4
+        format_score_mock.assert_any_call(0)
+
     def test__validate_discrete_columns(self):
         """Test `_validate_discrete_columns` if the discrete column doesn't exist.
 
