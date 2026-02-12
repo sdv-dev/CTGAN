@@ -10,7 +10,7 @@ from torch.utils.data import DataLoader, TensorDataset
 from tqdm import tqdm
 
 from ctgan.data_transformer import DataTransformer
-from ctgan.synthesizers._utils import _set_device, validate_and_set_device
+from ctgan.synthesizers._utils import _format_score, _set_device, validate_and_set_device
 from ctgan.synthesizers.base import BaseSynthesizer, random_state
 
 
@@ -161,8 +161,8 @@ class TVAE(BaseSynthesizer):
         self.loss_values = pd.DataFrame(columns=['Epoch', 'Batch', 'Loss'])
         iterator = tqdm(range(self.epochs), disable=(not self.verbose))
         if self.verbose:
-            iterator_description = 'Loss: {loss:.3f}'
-            iterator.set_description(iterator_description.format(loss=0))
+            iterator_description = 'Loss: {loss}'
+            iterator.set_description(iterator_description.format(loss=_format_score(0)))
 
         for i in iterator:
             loss_values = []
@@ -205,7 +205,7 @@ class TVAE(BaseSynthesizer):
 
             if self.verbose:
                 iterator.set_description(
-                    iterator_description.format(loss=loss.detach().cpu().item())
+                    iterator_description.format(loss=_format_score(loss.detach().cpu().item()))
                 )
 
     @random_state

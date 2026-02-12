@@ -5,7 +5,12 @@ from unittest.mock import patch
 import pytest
 import torch
 
-from ctgan.synthesizers._utils import _set_device, get_enable_gpu_value, validate_and_set_device
+from ctgan.synthesizers._utils import (
+    _format_score,
+    _set_device,
+    get_enable_gpu_value,
+    validate_and_set_device,
+)
 
 
 def test__validate_gpu_parameter():
@@ -59,6 +64,27 @@ def test__set_device():
     assert device_2 == expected_device_2
     assert device_3 == torch.device('cpu')
     assert device_4 == torch.device('cpu')
+
+
+@pytest.mark.parametrize(
+    'score, expected',
+    [
+        (0, '+00.00'),
+        (1.233434, '+01.23'),
+        (-0.93, '-00.93'),
+        (0.01, '+00.01'),
+        (-1.21, '-01.21'),
+        (99.99, '+99.99'),
+        (-99.99, '-99.99'),
+        (150, '+99.99'),
+        (-200, '-99.99'),
+    ],
+)
+def test__format_score(score, expected):
+    """Test the ``_format_score`` method."""
+    result = _format_score(score)
+    assert result == expected
+    assert len(result) == 6
 
 
 @patch('ctgan.synthesizers._utils._set_device')

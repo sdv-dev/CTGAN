@@ -12,7 +12,7 @@ from tqdm import tqdm
 from ctgan.data_sampler import DataSampler
 from ctgan.data_transformer import DataTransformer
 from ctgan.errors import InvalidDataError
-from ctgan.synthesizers._utils import _set_device, validate_and_set_device
+from ctgan.synthesizers._utils import _format_score, _set_device, validate_and_set_device
 from ctgan.synthesizers.base import BaseSynthesizer, random_state
 
 
@@ -379,8 +379,10 @@ class CTGAN(BaseSynthesizer):
 
         epoch_iterator = tqdm(range(epochs), disable=(not self._verbose))
         if self._verbose:
-            description = 'Gen. ({gen:.2f}) | Discrim. ({dis:.2f})'
-            epoch_iterator.set_description(description.format(gen=0, dis=0))
+            description = 'Gen. ({gen}) | Discrim. ({dis})'
+            epoch_iterator.set_description(
+                description.format(gen=_format_score(0), dis=_format_score(0))
+            )
 
         steps_per_epoch = max(len(train_data) // self._batch_size, 1)
         for i in epoch_iterator:
@@ -479,7 +481,10 @@ class CTGAN(BaseSynthesizer):
 
             if self._verbose:
                 epoch_iterator.set_description(
-                    description.format(gen=generator_loss, dis=discriminator_loss)
+                    description.format(
+                        gen=_format_score(generator_loss),
+                        dis=_format_score(discriminator_loss),
+                    )
                 )
 
     @random_state
