@@ -55,3 +55,14 @@ def _set_device(enable_gpu, device=None):
 def validate_and_set_device(enable_gpu, cuda):
     enable_gpu = get_enable_gpu_value(enable_gpu, cuda)
     return _set_device(enable_gpu)
+
+
+def _format_score(score):
+    """Format a score as a fixed-length string ``±XX.XX``.
+
+    Values are clipped to the range ``[-99.99, +99.99]`` so the result
+    is always exactly 6 characters.
+    """
+    score = max(-99.99, min(99.99, score))
+    sign = '+' if score >= 0 else '-'
+    return f'{sign}{abs(score):05.2f}'

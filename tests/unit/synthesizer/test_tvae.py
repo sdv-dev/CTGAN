@@ -60,6 +60,6 @@ class TestTVAE:
 
         # Assert
         tqdm_mock.assert_called_once_with(range(epochs), disable=False)
-        assert iterator_mock.set_description.call_args_list[0] == call('Loss: 0.000')
-        assert iterator_mock.set_description.call_args_list[1] == call('Loss: 1.235')
+        assert iterator_mock.set_description.call_args_list[0] == call('Loss: +00.00')
+        assert iterator_mock.set_description.call_args_list[1] == call('Loss: +01.23')
         assert iterator_mock.set_description.call_count == 2

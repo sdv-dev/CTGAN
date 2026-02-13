@@ -120,5 +120,5 @@ def test_tvae_save(tmpdir, capsys):
     assert len(loss_values) == 10
     assert set(loss_values.columns) == {'Epoch', 'Batch', 'Loss'}
     assert all(loss_values['Batch'] == 0)
-    last_loss_val = loss_values['Loss'].iloc[-1]
-    assert f'Loss: {round(last_loss_val, 3):.3f}: 100%' in captured_out
+    last_loss_val = max(-99.99, min(99.99, loss_values['Loss'].iloc[-1]))
+    assert f'Loss: {last_loss_val:+06.2f}: 100%' in captured_out
