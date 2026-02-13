@@ -1,6 +1,17 @@
 # History
 
-### v0.12.0 - 2026-01-27
+### v0.12.1 - 2026-02-12
+
+### New Features
+
+* In `verbose` mode, make the prefix of the progress bar a fixed-length - Issue [#487](https://github.com/sdv-dev/CTGAN/issues/487) by @fealho
+
+### Maintenance
+
+* Update README and other meta information to point to the DataCebo forum - Issue [#489](https://github.com/sdv-dev/CTGAN/issues/489) by @pvk-developer
+* Update license information in pyproject.toml to use new format - Issue [#480](https://github.com/sdv-dev/CTGAN/issues/480) by @pvk-developer
+
+## v0.12.0 - 2026-01-27
 
 ### Internal
 
