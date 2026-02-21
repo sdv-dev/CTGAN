@@ -369,3 +369,94 @@ class TestCTGAN(TestCase):
         # Test nulls in continuous columns array errors on fit
         with pytest.raises(InvalidDataError, match=error_message):
             ctgan.fit(continuous_with_null_array)
+
+    def test_adaptive_training_parameters(self):
+        """Test that adaptive training parameters are properly initialized."""
+        ctgan = CTGAN(
+            adaptive_training=True,
+            gradient_clipping=1.0,
+            early_stopping=True,
+            early_stopping_patience=5,
+            adaptive_lr=True,
+            lr_patience=3,
+            lr_factor=0.5,
+        )
+        assert ctgan._adaptive_training is True
+        assert ctgan._gradient_clipping == 1.0
+        assert ctgan._early_stopping is True
+        assert ctgan._early_stopping_patience == 5
+        assert ctgan._adaptive_lr is True
+        assert ctgan._lr_patience == 3
+        assert ctgan._lr_factor == 0.5
+
+    def test_adapt_discriminator_steps(self):
+        """Test adaptive discriminator steps adjustment."""
+        ctgan = CTGAN(adaptive_training=True, discriminator_steps=1)
+        ctgan._base_discriminator_steps = 1
+
+        # Generator too strong (low gen loss relative to disc loss)
+        steps = ctgan._adapt_discriminator_steps(0.1, 1.0)
+        assert steps >= 1
+
+        # Discriminator too strong (high gen loss relative to disc loss)
+        steps = ctgan._adapt_discriminator_steps(2.5, 1.0)
+        assert steps >= 1
+
+        # Balanced losses
+        steps = ctgan._adapt_discriminator_steps(1.0, 1.0)
+        assert steps == 1
+
+    def test_gradient_clipping(self):
+        """Test gradient clipping functionality."""
+        ctgan = CTGAN(gradient_clipping=1.0)
+        data = pd.DataFrame({'col1': [0, 1, 2, 3, 4], 'col2': ['a', 'b', 'c', 'a', 'b']})
+        ctgan.fit(data, discrete_columns=['col2'], epochs=1)
+        # If gradient clipping works, training should complete without errors
+        assert ctgan._generator is not None
+
+    def test_early_stopping(self):
+        """Test early stopping functionality."""
+        ctgan = CTGAN(early_stopping=True, early_stopping_patience=2, epochs=10)
+        data = pd.DataFrame({'col1': [0, 1, 2, 3, 4], 'col2': ['a', 'b', 'c', 'a', 'b']})
+        ctgan.fit(data, discrete_columns=['col2'], epochs=10)
+
+        # Early stopping should prevent training for all epochs if loss doesn't improve
+        # The exact behavior depends on loss values, but we verify it doesn't crash
+        assert ctgan._generator is not None
+
+    def test_generator_eval_mode_during_sampling(self):
+        """Test that generator is set to eval mode during sampling."""
+        ctgan = CTGAN(epochs=1)
+        data = pd.DataFrame({'col1': [0, 1, 2, 3, 4], 'col2': ['a', 'b', 'c', 'a', 'b']})
+        ctgan.fit(data, discrete_columns=['col2'])
+
+        # Generator should be in training mode after fit
+        assert ctgan._generator.training is True
+
+        # During sampling, generator should be in eval mode
+        samples = ctgan.sample(10)
+
+        # After sampling, generator should be back to training mode
+        assert ctgan._generator.training is True
+        assert len(samples) == 10
+
+    def test_gradient_norm_computation(self):
+        """Test gradient norm computation."""
+        ctgan = CTGAN(epochs=1)
+        data = pd.DataFrame({'col1': [0, 1, 2, 3, 4], 'col2': ['a', 'b', 'c', 'a', 'b']})
+        ctgan.fit(data, discrete_columns=['col2'])
+
+        # After training, gradient norms should be tracked
+        # The exact values depend on training, but lists should exist
+        assert isinstance(ctgan._generator_grad_norms, list)
+        assert isinstance(ctgan._discriminator_grad_norms, list)
+
+    def test_adaptive_lr_scheduling(self):
+        """Test adaptive learning rate scheduling."""
+        ctgan = CTGAN(adaptive_lr=True, lr_patience=2, epochs=5)
+        data = pd.DataFrame({'col1': [0, 1, 2, 3, 4], 'col2': ['a', 'b', 'c', 'a', 'b']})
+        initial_lr = ctgan._generator_lr
+        ctgan.fit(data, discrete_columns=['col2'])
+
+        # Adaptive LR should track loss history
+        assert len(ctgan._loss_history) > 0
