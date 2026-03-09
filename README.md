@@ -95,7 +95,7 @@ discrete_columns = [
     'race',
     'sex',
     'native-country',
-    'income'
+    'income',
 ]
 
 ctgan = CTGAN(epochs=10)
