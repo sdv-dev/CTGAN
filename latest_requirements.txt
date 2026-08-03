@@ -2,4 +2,4 @@ numpy==2.5.1
 pandas==2.3.3
 rdt==1.21.1
 torch==2.13.0
-tqdm==4.69.1
+tqdm==4.70.0
