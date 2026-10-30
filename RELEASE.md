@@ -22,6 +22,8 @@ The process of releasing a new version involves several steps:
 
 10. [Close milestone and create new milestone](#close-milestone-and-create-new-milestone)
 
+11. [Release on Conda-Forge](#release-on-conda-forge)
+
 ## Install CTGAN from source
 
 Clone the project and install the development requirements before starting the release process. Alternatively, with your virtualenv activated:
@@ -172,3 +174,7 @@ Click `Publish release`, which will kickoff the release workflow and automatical
 ## Close milestone and create new milestone
 
 Finaly, **close the milestone** and, if it does not exist, **create the next milestone**.
+
+## Release on conda-forge
+
+After the release is published on [public PyPI](https://pypi.org/project/ctgan/), Anacanoda will automatically open a [PR on conda-forge](https://github.com/conda-forge/ctgan-feedstock/pulls). Make sure the dependencies match and then merge the PR for the anaconda release to be published.
