@@ -1,6 +1,13 @@
 # History
 
-### v0.12.1 - 2026-02-12
+### v0.13.0 - 2026-10-30
+
+### Maintenance
+
+* Remove Python 3.9 support - Issue [#518](https://github.com/sdv-dev/CTGAN/issues/518) by @rwedge
+* Use Node.js 24 compatible github actions - Issue [#505](https://github.com/sdv-dev/CTGAN/issues/505) by @gsheni
+
+## v0.12.1 - 2026-02-12
 
 ### New Features
 
